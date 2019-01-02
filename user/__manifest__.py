@@ -26,10 +26,15 @@
         # 'security/ir.model.access.csv',
         'views/views.xml',
         'views/templates.xml',
+        'views/user_management/employees_management.xml',
+        'views/insert.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
         'demo/demo.xml',
+    ],
+    'qweb': [
+        'static/xml/*.xml',
     ],
     'application': True
 }

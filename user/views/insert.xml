@@ -1,0 +1,9 @@
+<odoo>
+    <data>
+        <template id="user_js_insert" name="user_station_res" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <script type="text/javascript" src="/user/static/js/employees_management.js"/>
+            </xpath>
+        </template>
+    </data>
+</odoo>
