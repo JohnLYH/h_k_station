@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_vue_template_manager_template_manage,vue_template_manager.template_manage,model_vue_template_manager_template_manage,,1,1,1,1

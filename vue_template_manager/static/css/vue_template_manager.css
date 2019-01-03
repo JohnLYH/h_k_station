@@ -1,0 +1,10 @@
+
+.vue_manager_button{
+    border: 1px solid black;
+    margin-top: 10px;
+    margin-bottom: 30px;
+}
+
+.fa-menu-vue资源管理::before {
+    content: "\f1c0";
+}

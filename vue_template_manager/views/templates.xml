@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <template id="vue_template_manager_tem" name="vue_template_manager_tem" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+            <link rel="stylesheet" type="text/css" href="/vue_template_manager/static/css/vue_template_manager.css"/>
+            <link rel="stylesheet" href="/vue_template_manager/static/css/element.css"/>
+            <link rel="stylesheet" href="/vue_template_manager/static/css/theme/index.css"/>
+            <script src="/vue_template_manager/static/js/vue.js"></script>
+            <script src="/vue_template_manager/static/js/element.js"></script>
+            <script src="/vue_template_manager/static/js/echarts.js"></script>
+        </xpath>
+    </template>
+    </data>
+</odoo>

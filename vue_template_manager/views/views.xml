@@ -1,0 +1,52 @@
+<odoo>
+  <data>
+
+    <!-- explicit list view definition -->
+    <record model="ir.ui.view" id="vue_template_manager.template_list">
+      <field name="name">模板管理</field>
+      <field name="model">vue_template_manager.template_manage</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="module_name"/>
+          <field name="template_name"/>
+        </tree>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="vue_template_manager.list">
+      <field name="name">模板管理</field>
+      <field name="model">vue_template_manager.template_manage</field>
+      <field name="arch" type="xml">
+        <form>
+          <sheet>
+            <group>
+                <field name="module_name"/>
+                <field name="template_name"/>
+                <field name="remark" />
+                <field name="template_content" widget="ace"/>
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <!-- actions opening views on models -->
+    <record model="ir.actions.act_window" id="action_template_manage_window">
+      <field name="name">模板管理</field>
+      <field name="res_model">vue_template_manager.template_manage</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Top menu item -->
+    <menuitem name="vue资源管理"
+              icon="&#xe663;"
+              id="vue_template_manager.menu_root"
+              groups="group_funenc_vue_template_manager"/>
+
+    <!-- menu categories -->
+    <menuitem name="模板管理"
+              id="vue_template_manager.menu_template_manage"
+              parent="vue_template_manager.menu_root"
+              action="action_template_manage_window"/>
+  </data>
+</odoo>

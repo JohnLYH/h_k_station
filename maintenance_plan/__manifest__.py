@@ -24,12 +24,16 @@
     # always loaded
     'data': [
         # 'security/ir.model.access.csv',
-        'views/views.xml',
+        'views/assets.xml',
         'views/templates.xml',
+        'views/maintenance_plan/maintenance_plan_view.xml',
+        'views/wok_order/work_order_view.xml',
+        'views/menu.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
         'demo/demo.xml',
     ],
+    'qweb': ['static/xml/*.xml'],
     'application': True
 }
