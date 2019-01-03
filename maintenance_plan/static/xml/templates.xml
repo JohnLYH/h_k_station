@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<template>
+    <!-- plan搜索 -->
+    <t t-name="plan_search_template">
+        <div class="form-inline custom_search_box" search_pannel_js_class="plan_search_pannel">
+            <div class="container-fluid">
+                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;">工單編號:</span>
+                    <div class="col-md-8 col-sm-12 col-xs-12">
+                        <div for="num" class="form-widget-item"/>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;">設備編號:</span>
+                    <div class="col-md-8 col-sm-12 col-xs-12">
+                        <div for="equipment_num" class="form-widget-item"/>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;">計劃時間:</span>
+                    <div class="col-md-8 col-sm-12 col-xs-12">
+                        <div for="plan_start_time" class="form-widget-item"/>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
+                    <div class="form-widget-item col-md-12 col-sm-12 col-xs-12">
+                        <button type="button" class="btn btn-primary search_extend_apply">
+                            搜索
+                        </button>
+                        <button type="button" class="btn btn-default search_extend_reset">
+                            重置
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <!-- 工單搜索 -->
+    <t t-name="work_order_search_template">
+        <div class="form-inline custom_search_box" search_pannel_js_class="plan_search_pannel">
+            <div class="container-fluid">
+                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;">工單編號:</span>
+                    <div class="col-md-8 col-sm-12 col-xs-12">
+                        <div for="num" class="form-widget-item"/>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;">設備編號:</span>
+                    <div class="col-md-8 col-sm-12 col-xs-12">
+                        <div for="equipment_num" class="form-widget-item"/>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;">狀態:</span>
+                    <div class="col-md-8 col-sm-12 col-xs-12">
+                        <div for="status" class="form-widget-item"/>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;">計劃時間:</span>
+                    <div class="col-md-8 col-sm-12 col-xs-12">
+                        <div for="plan_start_time" class="form-widget-item"/>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;">實際開始時間:</span>
+                    <div class="col-md-8 col-sm-12 col-xs-12">
+                        <div for="actual_start_time" class="form-widget-item"/>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;">實際結束時間:</span>
+                    <div class="col-md-8 col-sm-12 col-xs-12">
+                        <div for="actual_end_time" class="form-widget-item"/>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
+                    <div class="form-widget-item col-md-12 col-sm-12 col-xs-12">
+                        <button type="button" class="btn btn-primary search_extend_apply">
+                            搜索
+                        </button>
+                        <button type="button" class="btn btn-default search_extend_reset">
+                            重置
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="tem_maintenance_plan_tree_button">
+        <div style="text-align: center">
+            <t t-if="widget.record.data.status == false">
+                <a t-attf-record-id="#{widget.id}" class="maintenance_plan_edit" href="javascript: void 0">編輯</a>
+            </t>
+            <t t-else="">
+                <a t-attf-record-id="#{widget.id}" class="maintenance_plan_look" href="javascript: void 0">查看</a>
+            </t>
+        </div>
+    </t>
+
+    <t t-name="tem_work_order_tree_button">
+        <div style="text-align: center">
+            <a t-attf-record-id="#{widget.id}" class="work_order_a" href="javascript: void 0">詳情</a>
+        </div>
+    </t>
+
+    <t t-name="tem_maintenance_plan_tree_edit">
+        <div class="layer_open_div">
+            <div class="layui-row">
+                <div class="layui-col-xs6 layui-col-sm6 layui-col-md4">
+                    工單編號：
+                    <t t-esc="widget.record.data.num"/>
+                </div>
+                <div class="layui-col-xs6 layui-col-sm6 layui-col-md4">
+                    工單類型：
+                    <t t-esc="widget.record.data.work_order_type"/>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-xs6 layui-col-sm6 layui-col-md4">
+                    設備編號：
+                    <t t-esc="widget.record.data.num"/>
+                </div>
+                <div class="layui-col-xs6 layui-col-sm6 layui-col-md4">
+                    設備類別：
+                    <t t-esc="widget.record.data.work_order_type"/>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-xs6 layui-col-sm6 layui-col-md4">
+                    設備描述：
+                    <t t-esc="widget.record.data.num"/>
+                </div>
+                <div class="layui-col-xs6 layui-col-sm6 layui-col-md4">
+                    設備類別描述：
+                    <t t-esc="widget.record.data.work_order_type"/>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+                    標準工作：
+                    <t t-esc="widget.record.data.num"/>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+                    工單描述：
+                    <t t-esc="widget.record.data.num"/>
+                </div>
+            </div>
+            <div class="layui-row">
+                <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+                    計劃執行時間：
+                    <t t-esc="widget.record.data.display_plan_time"/>
+                </div>
+            </div>
+
+            <form class="layui-form" action="" lay-filter="plan_tree_form">
+                <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+                    <div class="layui-form-item">
+                        具體執行時間：
+                        <div class="layui-inline">
+                            <input type="text" required="required" name="action_time" class="layui-input"
+                                   id="action_time"/>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+                    <div class="layui-form-item">
+                        執行班組：
+                        <div class="layui-inline">
+                            <select name="city" lay-verify="required">
+                                <option value=""></option>
+                                <option value="0">北京</option>
+                                <option value="1">上海</option>
+                                <option value="2">广州</option>
+                                <option value="3">深圳</option>
+                                <option value="4">杭州</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </t>
+</template>

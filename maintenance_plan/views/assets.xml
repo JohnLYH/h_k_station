@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+        <template id="duty_manage_js" name="duty_manage_js" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <script type="text/javascript" src="/maintenance_plan/static/js/plan_search_pannel.js"/>
+                <script type="text/javascript" src="/maintenance_plan/static/js/tree_buttons.js"/>
+                <script type="text/javascript" src="/maintenance_plan/static/js/import_and_download_demo.js"/>
+                <script type="text/javascript"
+                        src="/maintenance_plan/static/js/maintenance_plan/maintenance_plan_tree_button.js"/>
+                <script type="text/javascript"
+                        src="/maintenance_plan/static/js/work_order/maintenance_plan_tree_button.js"/>
+                <link rel="stylesheet" type="text/css" href="/maintenance_plan/static/css/admin.css"/>
+            </xpath>
+        </template>
+    </data>
+</odoo>
