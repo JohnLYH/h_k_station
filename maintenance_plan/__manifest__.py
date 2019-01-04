@@ -27,6 +27,7 @@
         'views/assets.xml',
         'views/templates.xml',
         'views/maintenance_plan/maintenance_plan_view.xml',
+        'views/device_management/device_management_view.xml',
         'views/wok_order/work_order_view.xml',
         'views/menu.xml',
     ],
