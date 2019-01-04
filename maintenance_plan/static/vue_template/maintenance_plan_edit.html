@@ -1,0 +1,68 @@
+<div id="app" class="open_div">
+    <el-row>
+        <el-col :span="12">
+            工單編號：{{num}}
+        </el-col>
+        <el-col :span="12">
+            工單類型：{{work_order_type}}
+        </el-col>
+    </el-row>
+
+    <el-row>
+        <el-col :span="12">
+            設備編號：{{equipment_num}}
+        </el-col>
+        <el-col :span="12">
+            設備類別：
+        </el-col>
+    </el-row>
+
+    <el-row>
+        <el-col :span="12">
+            設備描述：
+        </el-col>
+        <el-col :span="12">
+            設備類別描述：
+        </el-col>
+    </el-row>
+
+    <el-row>
+        <el-col :span="24">
+            標準工作：
+        </el-col>
+    </el-row>
+
+    <el-row>
+        <el-col :span="24">
+            工單描述:
+        </el-col>
+    </el-row>
+
+    <el-row>
+        <el-col :span="24">
+            計劃執行時間：{{display_plan_time}}
+        </el-col>
+    </el-row>
+
+    <el-row>
+        <el-col :span="24">
+            具體執行時間：
+            <el-date-picker value-format="yyyy-MM-dd" :picker-options="pickerDate" v-model="display_action_time" type="date"
+                placeholder="选择日期">
+            </el-date-picker>
+        </el-col>
+    </el-row>
+
+    <el-row>
+        <el-col :span="24">
+            執行班組：
+            <el-cascader :options="deps" v-model="selected_dep">
+            </el-cascader>
+        </el-col>
+    </el-row>
+
+    <el-row type="flex" justify="center" style="padding: 0px;margin-top: 20px">
+        <el-button size="small" @click="cancel">取消</el-button>
+        <el-button size="small" type="primary" @click="confirm">確認</el-button>
+    </el-row>
+</div>

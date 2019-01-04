@@ -1,11 +1,7 @@
-.layer_open_div{
-    padding: 20px
-}
-
-.layer_open_div .layui-row{
+.open_div .el-row {
     padding: 10px 0px;
 }
 
-.el-upload__input{
+.el-upload__input {
     display: none !important;
 }
