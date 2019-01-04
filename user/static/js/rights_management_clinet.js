@@ -1,15 +1,15 @@
-odoo.define('employees_management_action', function (require) {
+odoo.define('rights_management', function (require) {
     "use strict";
     var core = require('web.core');
     var Widget = require('web.Widget');
 
-    var construct_id = 12345124;
+    var construct_id = 1234;
 
-    var employees_management_action = Widget.extend({
+    var rights_management = Widget.extend({
         app: undefined,
         group_id: 0,
         is_update: false,
-        dom_id: 'employees_management_action' + construct_id++,
+        dom_id: 'rights_management' + construct_id++,
         init: function (parent, action) {
             var self = this;
             this._super.apply(this, arguments);
@@ -44,7 +44,7 @@ odoo.define('employees_management_action', function (require) {
                         model: 'cdtct_dingtalk.cdtct_dingtalk_users',
                         method: 'get_department_users',
                     }).then(function(data){
-                        self.vue_data.departmentList = data
+                        self.vue_data.tableData = data
                     })
             },
 
@@ -55,11 +55,11 @@ odoo.define('employees_management_action', function (require) {
             this._rpc({
                 model: 'html_model.template_manage',
                 method: 'get_template_content',
-                kwargs: {module_name: 'user', template_name: 'employees_management'}
+                kwargs: {module_name: 'user', template_name: 'rights_management_clinet'}
             })).then(function (res) {
                 self.replaceElement($(res));
                 var vue = new Vue({
-                    el: '#employees_html',
+                    el: '#rights_management',
                     data() {
                         return self.vue_data
                     },
@@ -178,17 +178,6 @@ odoo.define('employees_management_action', function (require) {
 
 
                                  },
-                                 loaddown: function(data){
-                                      self.do_action({
-                                                name: '\u5c0e\u5165\u4eba\u54e1\u4fe1\u606f',
-                                                type: 'ir.actions.act_window',
-                                                res_model: 'user.import_date',
-                                                views: [[self.vue_data.views, 'form']],
-                                                target: 'new',
-                                            });
-
-
-                                 },
                     },
 
                 });
@@ -196,8 +185,8 @@ odoo.define('employees_management_action', function (require) {
         },
     });
 
-    core.action_registry.add('employees_management_action', employees_management_action);
-    return {'employees_management_action': employees_management_action};
+    core.action_registry.add('rights_management', rights_management);
+    return {'rights_management': rights_management};
 
 
 });

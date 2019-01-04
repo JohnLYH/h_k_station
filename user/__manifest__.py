@@ -28,6 +28,8 @@
         'views/templates.xml',
         'views/user_management/employees_management.xml',
         'views/insert.xml',
+        'views/user_management/import_date.xml',
+        'views/rights_management/rights_management_clinet.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
