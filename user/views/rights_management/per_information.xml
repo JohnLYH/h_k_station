@@ -1,0 +1,8 @@
+<odoo>
+    <data>
+        <record model="ir.actions.client" id="edit_role_clinet_id">
+          <field name="name">编辑角色</field>
+          <field name="tag">edit_role</field>
+        </record>
+    </data>
+</odoo>

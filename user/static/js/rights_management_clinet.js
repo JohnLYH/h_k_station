@@ -114,14 +114,12 @@ odoo.define('rights_management', function (require) {
                                  },
 
                                  handleEdit: function(data){
-                                     alert(self.vue_data.list_size)
-//                                   self._rpc({
-//                                              model: 'cdtct_dingtalk.cdtct_dingtalk_users',
-//                                              method:'get_users',
-//                                              kwargs: {'department_id':data.id}
-//                                            }).then(function(get_data){
-//                                              self.vue_data.tableData=get_data;
-//                                            });
+                               self.do_action({
+                                                name: '\u7de8\u8f2f\u4eba\u54e1\u4fe1\u606f',
+                                                type: 'ir.actions.client',
+                                                tag: 'edit_role',
+                                                target: 'new',
+                                            });
 
 
                                  },
