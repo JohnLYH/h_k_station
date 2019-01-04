@@ -6,10 +6,9 @@
                 <script type="text/javascript" src="/maintenance_plan/static/js/plan_search_pannel.js"/>
                 <script type="text/javascript" src="/maintenance_plan/static/js/tree_buttons.js"/>
                 <script type="text/javascript" src="/maintenance_plan/static/js/import_and_download_demo.js"/>
-                <script type="text/javascript"
-                        src="/maintenance_plan/static/js/maintenance_plan/maintenance_plan_tree_button.js"/>
-                <script type="text/javascript"
-                        src="/maintenance_plan/static/js/work_order/maintenance_plan_tree_button.js"/>
+                <script type="text/javascript" src="/maintenance_plan/static/js/maintenance_plan/maintenance_plan_tree_button.js"/>
+                <script type="text/javascript" src="/maintenance_plan/static/js/maintenance_plan/maintenance_plan_edit.js"/>
+                <script type="text/javascript" src="/maintenance_plan/static/js/work_order/work_order_tree_button.js"/>
                 <link rel="stylesheet" type="text/css" href="/maintenance_plan/static/css/admin.css"/>
             </xpath>
         </template>

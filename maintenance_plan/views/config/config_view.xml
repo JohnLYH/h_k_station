@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+        <record id="maintenance_plan_config_form" model="ir.ui.view">
+            <field name="name">參數设置</field>
+            <field name="model">maintenance_plan.config</field>
+            <field name="arch" type="xml">
+                <form import="false" edit="false" create="false" delete="false">
+                    <header style="height:35px; padding-top:3px;">
+                        <button string="确认" type="object" name="execute" class="oe_highlight"/>
+                    </header>
+                    <div>
+                        <h3>工單執行時間閾值設置</h3>
+                    </div>
+                    <group col="3">
+                        <group>
+                            <field name="max_advance_days"/>
+                        </group>
+                        <group>
+                            <field name="max_delay_days"/>
+                        </group>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record id="act_maintenance_plan_config" model="ir.actions.act_window">
+            <field name="name">主题设置</field>
+            <field name="res_model">maintenance_plan.config</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+            <field name="view_id" ref="maintenance_plan_config_form"/>
+        </record>
+    </data>
+</odoo>

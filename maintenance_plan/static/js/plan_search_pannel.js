@@ -8,6 +8,13 @@ odoo.define("plan_search_pannel", function (require) {
     var search_pannel_default = require('layui_theme.search_pannel_default');
 
     var plan_search_pannel = search_pannel_default.extend({
+        events: _.extend({}, search_pannel_default.prototype.events, {
+            'click .export_excel': 'export_excel',
+        }),
+        export_excel: function(event){
+            // TODO: 導出excel
+            console.log(event)
+        },
         commit_search: function () {
             var domains = []
             _.each(this.propositions, function (proposition) {
