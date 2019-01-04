@@ -33,6 +33,9 @@
                         <button type="button" class="btn btn-default search_extend_reset">
                             重置
                         </button>
+                        <button type="button" class="btn layui-btn-sm btn-primary export_excel">
+                            導入
+                        </button>
                     </div>
                 </div>
             </div>
@@ -93,6 +96,9 @@
                         <button type="button" class="btn btn-default search_extend_reset">
                             重置
                         </button>
+                        <button type="button" class="btn layui-btn-sm btn-primary export_excel">
+                            導出
+                        </button>
                     </div>
                 </div>
             </div>
@@ -116,84 +122,4 @@
         </div>
     </t>
 
-    <t t-name="tem_maintenance_plan_tree_edit">
-        <div class="layer_open_div">
-            <div class="layui-row">
-                <div class="layui-col-xs6 layui-col-sm6 layui-col-md4">
-                    工單編號：
-                    <t t-esc="widget.record.data.num"/>
-                </div>
-                <div class="layui-col-xs6 layui-col-sm6 layui-col-md4">
-                    工單類型：
-                    <t t-esc="widget.record.data.work_order_type"/>
-                </div>
-            </div>
-            <div class="layui-row">
-                <div class="layui-col-xs6 layui-col-sm6 layui-col-md4">
-                    設備編號：
-                    <t t-esc="widget.record.data.num"/>
-                </div>
-                <div class="layui-col-xs6 layui-col-sm6 layui-col-md4">
-                    設備類別：
-                    <t t-esc="widget.record.data.work_order_type"/>
-                </div>
-            </div>
-            <div class="layui-row">
-                <div class="layui-col-xs6 layui-col-sm6 layui-col-md4">
-                    設備描述：
-                    <t t-esc="widget.record.data.num"/>
-                </div>
-                <div class="layui-col-xs6 layui-col-sm6 layui-col-md4">
-                    設備類別描述：
-                    <t t-esc="widget.record.data.work_order_type"/>
-                </div>
-            </div>
-            <div class="layui-row">
-                <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
-                    標準工作：
-                    <t t-esc="widget.record.data.num"/>
-                </div>
-            </div>
-            <div class="layui-row">
-                <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
-                    工單描述：
-                    <t t-esc="widget.record.data.num"/>
-                </div>
-            </div>
-            <div class="layui-row">
-                <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
-                    計劃執行時間：
-                    <t t-esc="widget.record.data.display_plan_time"/>
-                </div>
-            </div>
-
-            <form class="layui-form" action="" lay-filter="plan_tree_form">
-                <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
-                    <div class="layui-form-item">
-                        具體執行時間：
-                        <div class="layui-inline">
-                            <input type="text" required="required" name="action_time" class="layui-input"
-                                   id="action_time"/>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
-                    <div class="layui-form-item">
-                        執行班組：
-                        <div class="layui-inline">
-                            <select name="city" lay-verify="required">
-                                <option value=""></option>
-                                <option value="0">北京</option>
-                                <option value="1">上海</option>
-                                <option value="2">广州</option>
-                                <option value="3">深圳</option>
-                                <option value="4">杭州</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </t>
 </template>
