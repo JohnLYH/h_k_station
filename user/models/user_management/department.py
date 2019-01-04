@@ -31,11 +31,15 @@ class Department(models.Model):
 
     @api.model
     def department_information(self):
+        '''
+
+        导入人员信息
+        '''
         data = xlrd.open_workbook(file_contents=base64.decodebytes(self.env['user.import_date'].search([])[-1].file))
         sheet_data = data.sheet_by_name(data.sheet_names()[0])
-        rows = sheet_data.nrows
+        rows = sheet_data.nrows  # 获取有多好行
         cols = sheet_data.ncols
-        keys = ('parent','child')
+        keys = ('parent','child') # 用来作为父部门 和 子部门装载器
         one_sheet_content =[]
         for i in range(1, rows):
             row_content = []
@@ -52,15 +56,15 @@ class Department(models.Model):
             record = self.search([('name','=',item['parent'])])
             if not record and item['parent']:
                 dic['name']=item['parent']
-                self.create(dic)
+                record = self.create(dic)
+                record.department_order = record.id
+
             record_child = self.search([('name', '=', item['child'])])
             if not record_child and item['child']:
                 dic['name']= item['child']
-                self.create(dic)
-
-    @api.model
-    def create(self, vals):
-        record = super(Department, self).create(vals)
-        vals['parent_order']=record.id
-        print(record.id)
-        return record
+                record_child = self.create(dic)
+            if item['child']:
+                if record_child.parent_id != record.id:
+                    record_child.parent_id = record.id
+                    record_child.department_order = record_child.id
+                    record_child.parent_order = record.id
