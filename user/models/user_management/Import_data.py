@@ -18,7 +18,7 @@ class ImportDate(models.Model):
         用來導入人員的個人信息
 
         '''
-        return self.env['user.department'].department_information()
+
         data = xlrd.open_workbook(file_contents=base64.decodebytes(self.file))
         sheet_data = data.sheet_by_name(data.sheet_names()[0])
         rows = sheet_data.nrows
@@ -34,7 +34,7 @@ class ImportDate(models.Model):
             one_sheet_content.append(one_dict)
         for i, item in enumerate(one_sheet_content):
             self.env['user.employees_get'].create(item)
-        # self.search([]).unlink()
+        return self.env['user.department'].department_information()
 
 
 
