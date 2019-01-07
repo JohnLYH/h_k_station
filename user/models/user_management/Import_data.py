@@ -22,7 +22,7 @@ class ImportDate(models.Model):
         sheet_data = data.sheet_by_name(data.sheet_names()[0])
         rows = sheet_data.nrows
         cols = sheet_data.ncols
-        keys = ('login', 'account', 'post', 'role', 'email', 'state')
+        keys = ('login', 'name', 'email', 'role', 'post')
         one_sheet_content =[]
         for i in range(1, rows):
             row_content = []
@@ -32,7 +32,9 @@ class ImportDate(models.Model):
                 one_dict = dict(zip(keys, row_content))
             one_sheet_content.append(one_dict)
         for i, item in enumerate(one_sheet_content):
-            self.env['res.users'].create(item)
+            record = self.env['res.users'].search([('name','=',item.get('login'))])
+            if record:
+                self.env['res.users'].create(item)
         return self.env['user.department'].department_information()
 
 
