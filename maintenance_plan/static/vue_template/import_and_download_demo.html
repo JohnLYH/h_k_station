@@ -1,6 +1,6 @@
 <div id="app">
     <el-row>
-        <el-upload class="upload-demo" :on-success="upload_success" limit="1" accept=".xlsx" ref="upload" action="/on_duty_manage/upload_duty_crop"
+        <el-upload class="upload-demo" :on-success="upload_success" limit="1" accept=".xlsx" ref="upload" :action="url"
             :auto-upload="false">
             <a style="float: left;margin-right: 15px;" href="/on_duty_manage/download_duty_crop_template">
                 <el-button type="primary" size="small">下載模板</el-button>

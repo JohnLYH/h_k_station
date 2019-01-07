@@ -8,11 +8,10 @@ odoo.define('import_and_download_demo', function (require) {
     var core = require('web.core');
 
     var import_and_download_demo = Widget.extend({
-        template: '',
         init: function (parent, record, node) {
             this._super(parent, record, node);
             this.vue_data = {
-
+                url: record.params.url
             }
         },
         start: function () {

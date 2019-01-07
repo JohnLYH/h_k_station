@@ -11,6 +11,7 @@ STATUS = [
 class MaintenancePlan(models.Model):
     _name = 'maintenance_plan.maintenance.plan'
     _description = '維修計劃'
+    _rec_name = 'num'
 
     num = fields.Char('工單編號')
     work_order_type = fields.Char('工單類型')
@@ -26,7 +27,6 @@ class MaintenancePlan(models.Model):
     actual_start_time = fields.Datetime('實際開始時間')
     actual_end_time = fields.Datetime('實際結束時間')
     status = fields.Selection(STATUS, string='狀態')
-
 
     @api.depends('equipment_id')
     def _com_equipment(self):
@@ -56,5 +56,9 @@ class MaintenancePlan(models.Model):
 
     @api.model
     def get_departs(self):
+        '''
+        獲取編輯工單頁的執行班組下拉
+        :return:
+        '''
         config = self.env['maintenance_plan.config'].sudo().get_values()
         return config

@@ -17,17 +17,27 @@ odoo.define('maintenance_plan_edit', function (require) {
 
             this.vue_data = {
                 num: this.record.data.num,
-                selected_dep: '', // 選擇班組
                 deps: [], // 選擇班組下拉
                 work_order_type: this.record.data.work_order_type,
                 equipment_num: this.record.data.equipment_num,
                 display_plan_time: this.record.data.display_plan_time,
-                display_action_time: this.record.data.display_action_time || '',
                 pickerDate: {
                     disabledDate(time) {
                         var this_time = moment(time);
                         return !(this_time >= self.max_advance_days && this_time <= self.max_delay_days);
                     }
+                },
+                form: {
+                    display_action_time: this.record.data.display_action_time || '',
+                    selected_dep: '', // 選擇班組
+                },
+                rules: {
+                    display_action_time: [
+                        {type: 'date', required: true, message: '請選擇具體執行時間', trigger: 'blur'},
+                    ],
+                    selected_dep: [
+                        {required: true, message: '請選擇執行班組', trigger: 'blur'},
+                    ]
                 }
             }
         },
@@ -40,14 +50,14 @@ odoo.define('maintenance_plan_edit', function (require) {
             }).then(function (config) {
                 self.max_advance_days = self.record.data.plan_start_time.subtract(config.max_advance_days, 'days');
                 self.max_delay_days = self.record.data.plan_end_time.add(config.max_delay_days, 'days');
-            })
+            });
             // 獲取班組tree圖
             var get_deps = self._rpc({
                 model: 'maintenance_plan.maintenance.plan',
                 method: 'get_departs'
             }).then(function (deps) {
                 console.log(deps)
-            })
+            });
             return $.when(get_config, get_deps)
         },
         start: function () {
@@ -70,20 +80,26 @@ odoo.define('maintenance_plan_edit', function (require) {
                         cancel: function () {
                             self.do_action(false)
                         },
-                        confirm: function () {
-                            this.$confirm('工單指派后不可修改，是否確認指派？', '提示', {
-                                confirmButtonText: '确定',
-                                cancelButtonText: '取消',
-                                type: 'warning'
-                            }).then(() => {
-                                this.$message({
-                                    type: 'success',
-                                    message: '删除成功!'
-                                });
-                                self.do_action(false)
+                        confirm: function (formName) {
+                            var this_vue = this;
+                            this.$refs[formName].validate((valid) => {
+                                if (valid) {
+                                    this_vue.$confirm('工單指派后不可修改，是否確認指派？', '提示', {
+                                        confirmButtonText: '确定',
+                                        cancelButtonText: '取消',
+                                        type: 'warning'
+                                    }).then(() => {
+                                        this_vue.$message({
+                                            type: 'success',
+                                            message: '删除成功!'
+                                        });
+                                        self.do_action(false)
+                                    });
+                                } else {
+                                    return false;
+                                }
                             });
                         },
-
                     }
                 })
             })
