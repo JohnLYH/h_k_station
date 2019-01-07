@@ -29,7 +29,8 @@ odoo.define('employees_management_action', function (require) {
                                 currentPage4:1,
                                 message:0,
                                 value:[],
-                                options:'',
+                                options:[{value: 'normal',label: '正常'},
+                                    {value: 'disable',label: '禁用'},{value: 'all',label: '全部'}],
                                 size_:10,
                                 list_size:[10, 20, 30, 40],
 
@@ -66,10 +67,9 @@ odoo.define('employees_management_action', function (require) {
 
                     methods: {
                                 click_node: function(data){
-
                                    self._rpc({
                                               model: 'res.users',
-                                              method:'get_users',
+                                              method:'get_users_info',
                                               kwargs: {'department_id':data.id}
                                             }).then(function(get_data){
                                               self.vue_data.tableData=get_data.slice(0,10);
@@ -140,41 +140,38 @@ odoo.define('employees_management_action', function (require) {
 
                                  },
 
-                                 handleDisable: function(data){
-                                    alert('handleDisable')
-//                                   self._rpc({
-//                                              model: 'cdtct_dingtalk.cdtct_dingtalk_users',
-//                                              method:'get_users',
-//                                              kwargs: {'department_id':data.id}
-//                                            }).then(function(get_data){
-//                                              self.vue_data.tableData=get_data;
-//                                            });
+                                 handleDisable: function(index,row){
+                                      self._rpc({
+                                                 model: 'res.users',
+                                                 method:'disable_info',
+                                                 kwargs: {'disable_id': row.login}
+                                               }).then(function(get_data){
+                                                 alert('成功')
+                                               });
 
 
                                  },
 
                                  search: function(data){
-                                    alert('handleDisable')
-//                                   self._rpc({
-//                                              model: 'cdtct_dingtalk.cdtct_dingtalk_users',
-//                                              method:'get_users',
-//                                              kwargs: {'department_id':data.id}
-//                                            }).then(function(get_data){
-//                                              self.vue_data.tableData=get_data;
-//                                            });
+                                  self._rpc({
+                                             model: 'res.users',
+                                             method:'get_chose_user_info',
+                                             kwargs: {'name':self.vue_data.input,'chose':self.vue_data.value}
+                                           }).then(function(get_data){
+                                             self.vue_data.tableData = get_data
+                                           });
 
 
                                  },
 
                                  reset: function(data){
-                                    alert('handleDisable')
-//                                   self._rpc({
-//                                              model: 'cdtct_dingtalk.cdtct_dingtalk_users',
-//                                              method:'get_users',
-//                                              kwargs: {'department_id':data.id}
-//                                            }).then(function(get_data){
-//                                              self.vue_data.tableData=get_data;
-//                                            });
+                                  // self._rpc({
+                                  //            model: 'res.users',
+                                  //            method:'disable_info',
+                                  //            kwargs: {'disable_id':data.id}
+                                  //          }).then(function(get_data){
+                                  //            alert('成功')
+                                  //          });
 
 
                                  },
