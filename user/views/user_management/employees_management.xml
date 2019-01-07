@@ -1,0 +1,10 @@
+<odoo>
+    <data>
+        <record model="ir.actions.client" id="employees_management_clinet_id">
+          <field name="name">員工管理</field>
+          <field name="tag">employees_management_action</field>
+        </record>
+    </data>
+
+    <menuitem name="員工管理" id="employees_management_id" action="employees_management_clinet_id"></menuitem>
+</odoo>

@@ -1,0 +1,98 @@
+<div id="device_management">
+    <el-row type="flex" align="middle">
+        <el-col :xs="24" :sm="12" :md="4" :lg="3" :xl="2">
+            <el-input  size="small" placeholder="搜索設備名稱" v-model="name"></el-input>
+        </el-col>
+
+        <el-col :xs="24" :sm="12" :md="12" :lg="15" :xl="14">
+            <span>註冊時間：</span>
+            <el-date-picker
+              v-model="value1"
+              type="date"
+              placeholder="選擇日期">
+            </el-date-picker>
+            <el-date-picker
+              v-model="value2"
+              type="date"
+              placeholder="選擇日期">
+            </el-date-picker>
+        </el-col>
+
+        <el-col :xs="24" :sm="12" :md="4" :lg="3" :xl="4">
+            <el-button size="small" @click="search" type="danger">搜索</el-button>
+            <el-button size="small" @click="reset">重置</el-button>
+        </el-col>
+
+         <el-col :xs="24" :sm="12" :md="4" :lg="3" :xl="4">
+            <el-button size="small" @click="open_chioce" >導入設備</el-button>
+            <el-button size="small" @click="reset">導出二維碼</el-button>
+        </el-col>
+    </el-row>
+    <hr class="vue_hr">
+     <!-- 选择模板弹窗 -->
+    <el-dialog title="導入設備" :visible.sync="chioce_able" append-to-body="true" width="30%" @open="open_chioce">
+        <el-row type="flex" align="middle">
+            <el-col :span="5">
+                <span>模板：</span>
+            </el-col>
+
+            <el-col :span="7">
+                <el-button type="warning" plain>下載</el-button>
+            </el-col>
+        </el-row>
+
+        <el-row style="margin-top: 20px">
+            <el-col :span="5">
+                <span>選擇文件：</span>
+            </el-col>
+            <el-col :span="18" >
+                <el-button size="small" type="primary">点击上传</el-button>
+            </el-col>
+        </el-row>
+
+        <hr class="vue_hr">
+
+        <el-row type="flex" justify="end" align="center">
+            <el-button  @click="chioce_able = false" round>取消</el-button>
+            <a style="margin-left: 10px"  :href="'/on_duty_manage/download_on_duty_manage_list_template?month=' + choice_month + '&ids=' + checked_duty_crop">
+                <el-button type="danger"  round>確認</el-button>
+            </a>
+        </el-row>
+    </el-dialog>
+    <div id="device_management_left">
+        <el-row class="tac">
+            <el-col :span="4">
+                <el-menu
+                        default-active="2"
+                        class="el-menu-vertical-demo"
+                        @open="handleOpen"
+                        @close="handleClose">
+                        <el-submenu index="1">
+                            <template slot="title">
+                                <span>轉轍機<el-button icon="el-icon-delete" circle size="small"></el-button></span>
+                            </template>
+                            <el-menu-item-group>
+                                <el-menu-item index="1-1">部件1</el-menu-item>
+                                <el-menu-item index="1-2">部件2</el-menu-item>
+                            </el-menu-item-group>
+                        </el-submenu>
+                    <el-submenu index="2">
+                            <template slot="title">
+                                <span>空調</span>
+                            </template>
+                            <el-menu-item-group>
+                                <el-menu-item index="1-1">部件1</el-menu-item>
+                                <el-menu-item index="1-2">部件2</el-menu-item>
+                            </el-menu-item-group>
+                        </el-submenu>
+                </el-menu>
+             </el-col>
+            <el-col :span="20">
+                <div>
+                    <span>轉轍機</span>
+                    <el-button  size="small">編輯</el-button>
+                </div>
+             </el-col>
+        </el-row>
+    </div>
+</div>

@@ -1,0 +1,10 @@
+<odoo>
+    <data>
+        <record model="ir.actions.client" id="rights_management_clinet_id">
+          <field name="name">權限管理</field>
+          <field name="tag">rights_management</field>
+        </record>
+    </data>
+
+    <menuitem name="權限管理" id="rights_management_id" action="rights_management_clinet_id"></menuitem>
+</odoo>
