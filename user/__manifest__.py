@@ -19,7 +19,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'web', 'layui_theme'],
+    'depends': ['base', 'web', 'layui_theme', 'odoo_groups_manage'],
 
     # always loaded
     'data': [

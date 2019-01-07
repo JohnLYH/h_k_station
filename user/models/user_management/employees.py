@@ -7,7 +7,6 @@ from odoo import api, models, fields
 class EmployeesGet(models.Model):
     _inherit = 'res.users'
 
-    name = fields.Char(string='姓名')
     post = fields.Char(string='崗位')
     role = fields.Char(string='角色')
     state = fields.Char(string='狀態')
@@ -51,6 +50,40 @@ class EmployeesGet(models.Model):
 
     @api.model
     def get_department_users(self):
-        pass
+        department_tree = []
+
+        # # 客运部
+        # parent_department_ids = self.env['cdtct_dingtalk.cdtct_dingtalk_department'].sudo(1).search(
+        #     [('department_hierarchy', '=', 1)])
+        # for parent_department_id in parent_department_ids:
+        #     parent_department = {'label': parent_department_id.name}
+        #     parent_department['id'] = parent_department_id.id
+        #
+        #     # 中心部门
+        #     gentral_department_ids = self.env['cdtct_dingtalk.cdtct_dingtalk_department'].sudo(1).search_read(
+        #         [('parentid', '=', parent_department_id.departmentId)], ['parentid', 'name', 'id', 'departmentId'])
+        #     child_departments = []
+        #     for gentral_department_id in gentral_department_ids:
+        #         department_map = {}
+        #         department_map['label'] = gentral_department_id.get('name')
+        #         department_map['id'] = gentral_department_id.get('id')
+        #
+        #         gentral_department_department_id = gentral_department_id.get('departmentId')
+        #
+        #         site_department_ids = self.env['cdtct_dingtalk.cdtct_dingtalk_department'].sudo(1).search_read(
+        #             [('parentid', '=', gentral_department_department_id)], ['parentid', 'name', 'id', 'departmentId'])
+        #         # 站点部门
+        #         site_department_list = []
+        #         for site_department_id in site_department_ids:
+        #             site_department_map = {}
+        #             site_department_map['label'] = site_department_id.get('name')
+        #             site_department_map['id'] = site_department_id.get('id')
+        #             site_department_list.append(site_department_map)
+        #         department_map['children'] = site_department_list
+        #         child_departments.append(department_map)
+        #     parent_department['children'] = child_departments
+        #     department_tree.append(parent_department)
+        #
+        # return department_tree
 
 
