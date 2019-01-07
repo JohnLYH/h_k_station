@@ -24,7 +24,7 @@ class Department(models.Model):
     parent_right = fields.Integer(index=True)
 
     users = fields.Many2many(
-        'user.employees_get',
+        'res.users',
         'user_department_rel',
         'user_id',
         'udepartment_id', readonly=True)
