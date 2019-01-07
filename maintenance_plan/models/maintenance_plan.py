@@ -60,5 +60,7 @@ class MaintenancePlan(models.Model):
         獲取編輯工單頁的執行班組下拉
         :return:
         '''
-        config = self.env['maintenance_plan.config'].sudo().get_values()
-        return config
+        deps = self.env['user.department'].search_read([
+            ('parent_id', '=', None)
+        ], fields=['name'])
+        return deps
