@@ -41,7 +41,7 @@ odoo.define('rights_management', function (require) {
                     var self= this;
 
                     return self._rpc({
-                        model: 'cdtct_dingtalk.cdtct_dingtalk_users',
+                        model: 'res.users',
                         method: 'get_department_users',
                     }).then(function(data){
                         self.vue_data.tableData = data
@@ -68,7 +68,7 @@ odoo.define('rights_management', function (require) {
                                 click_node: function(data){
 
                                    self._rpc({
-                                              model: 'user.employees_get',
+                                              model: 'res.users',
                                               method:'get_users',
                                               kwargs: {'department_id':data.id}
                                             }).then(function(get_data){
@@ -93,7 +93,7 @@ odoo.define('rights_management', function (require) {
 
                                  handleSizeChange: function(data){
                                    self._rpc({
-                                              model: 'user.employees_get',
+                                              model: 'res.users',
                                               method:'page_size',
                                               kwargs: {'size':data}
                                             }).then(function(get_data){
@@ -105,7 +105,7 @@ odoo.define('rights_management', function (require) {
 
                                  handleCurrentChange: function(page){
                                    self._rpc({
-                                              model: 'user.employees_get',
+                                              model: 'res.users',
                                               method:'current_change',
                                               kwargs: {'record':page,'page':self.vue_data.tableData.length}
                                             }).then(function(get_data){

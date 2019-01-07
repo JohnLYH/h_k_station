@@ -30,7 +30,10 @@
         'views/insert.xml',
         'views/user_management/import_date.xml',
         'views/rights_management/rights_management_clinet.xml',
-        'views/rights_management/per_information.xml'
+        'views/rights_management/per_information.xml',
+        'security/add_category.xml',
+        'views/category_group.xml',
+        'views/catagory_menu.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
