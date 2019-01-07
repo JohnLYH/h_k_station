@@ -4,3 +4,4 @@ from . import maintenance_plan
 from . import equipment
 from . import config
 from . import trans_excel
+from . import standard_Job

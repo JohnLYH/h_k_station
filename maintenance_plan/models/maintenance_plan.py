@@ -16,6 +16,7 @@ class MaintenancePlan(models.Model):
     num = fields.Char('工單編號')
     work_order_type = fields.Char('工單類型')
     work_order_description = fields.Text('工單描述')
+    standard_job_id = fields.Many2one('maintenance_plan.standard.job', string='標準工作')
     equipment_id = fields.Many2one('maintenance_plan.equipment', string='設備')
     equipment_num = fields.Char('設備編號', compute='_com_equipment', store=True)
     plan_start_time = fields.Date('計劃執行時間(開始)')
