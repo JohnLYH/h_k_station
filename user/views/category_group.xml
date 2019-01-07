@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record model="ir.module.category" id="category_fuenc1">
+            <field name="name">生产管理系统</field>
+        </record>
+
+        <record model="res.groups" id="system_fuenc_tester1">
+            <field name="name">交接班</field>
+            <field name="category_id" ref="category_fuenc1"/>
+        </record>
+        <!--添加该category下其他group-->
+
+        <record model="ir.module.category" id="category_fuenc2">
+            <field name="name">运作管理系统</field>
+        </record>
+
+        <record model="res.groups" id="system_fuenc_tester2">
+            <field name="name">属地管理</field>
+            <field name="category_id" ref="category_fuenc2"/>
+        </record>
+        <!--添加该category下其他group-->
+    </data>
+</odoo>

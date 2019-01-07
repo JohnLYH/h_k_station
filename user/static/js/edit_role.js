@@ -31,7 +31,7 @@ odoo.define('edit_role', function (require) {
                     var self= this;
 
                     return self._rpc({
-                        model: 'cdtct_dingtalk.cdtct_dingtalk_users',
+                        model: 'res.users',
                         method: 'get_department_users',
                     }).then(function(data){
                         self.vue_data.departmentList = data
