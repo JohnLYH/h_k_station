@@ -27,6 +27,7 @@
         'views/assets.xml',
         'views/templates.xml',
         'views/config/config_view.xml',
+        'views/approval_management/approval_management_tree.xml',
         'views/maintenance_plan/maintenance_plan_view.xml',
         'views/maintenance_plan/work_order_view.xml',
         'views/device_management/device_management_view.xml',

@@ -1,44 +1,34 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <template>
-    <t t-name="tem_maintenance_plan_tree_button">
-        <div style="text-align: center">
-            <t t-if="widget.record.data.status == false">
-                <a t-attf-record-id="#{widget.id}" class="maintenance_plan_edit" href="javascript: void 0">編輯</a>
-            </t>
-            <t t-else="">
-                <a t-attf-record-id="#{widget.id}" class="maintenance_plan_look" href="javascript: void 0">查看</a>
-            </t>
-        </div>
-    </t>
-
-    <t t-name="tem_work_order_tree_button">
-        <div style="text-align: center">
-            <a t-attf-record-id="#{widget.id}" class="work_order_a" href="javascript: void 0">詳情</a>
-        </div>
-    </t>
-
     <!-- 工單審批搜索 -->
-    <t t-name="maintenance_plan_approval_search_template">
+    <t t-name="tool_maintenance_search_template">
         <div class="form-inline custom_search_box" search_pannel_js_class="plan_search_pannel">
             <div class="container-fluid">
                 <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
-                    <span class="search_label" style="float:left;">工單編號:</span>
+                    <span class="search_label" style="float:left;">設備名稱:</span>
                     <div class="col-md-8 col-sm-12 col-xs-12">
-                        <div for="num" class="form-widget-item"/>
+                        <div for="equipment_id" class="form-widget-item"/>
                     </div>
                 </div>
 
                 <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
-                    <span class="search_label" style="float:left;">提交人:</span>
+                    <span class="search_label" style="float:left;">設備編號:</span>
                     <div class="col-md-8 col-sm-12 col-xs-12">
-                        <div for="submitter" class="form-widget-item"/>
+                        <div for="equipment_num" class="form-widget-item"/>
                     </div>
                 </div>
 
                 <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
-                    <span class="search_label" style="float:left;">審批人:</span>
+                    <span class="search_label" style="float:left;">所屬班組:</span>
                     <div class="col-md-8 col-sm-12 col-xs-12">
-                        <div for="approver" class="form-widget-item"/>
+                        <div for="departments" class="form-widget-item"/>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;">型號:</span>
+                    <div class="col-md-8 col-sm-12 col-xs-12">
+                        <div for="model" class="form-widget-item"/>
                     </div>
                 </div>
 
@@ -63,25 +53,11 @@
         </div>
     </t>
 
-    <!-- 工單審批詳情按鈕 -->
-    <t t-name="tem_maintenance_plan_approval_tree_button">
-        <div style="text-align: center">
-            <!--<a t-attf-record-id="#{widget.id}" class="work_order_a" href="javascript: void 0">詳情</a>-->
-            <button type="object" name="_go_to_details" class="btn-primary btn">詳情</button>
-        </div>
-    </t>
-
     <!-- 參考資料審批詳情按鈕 -->
     <t t-name="tem_maintenance_plan_data_approval_tree_button">
         <div style="text-align: center">
             <!--<a t-attf-record-id="#{widget.id}" class="work_order_a" href="javascript: void 0">詳情</a>-->
             <button type="object" name="_go_to_details" class="btn-primary btn">詳情</button>
-    <t t-name="tem_equipment_type_tree_button">
-        <div style="text-align: center">
-            <a t-attf-record-id="#{widget.id}" class="maintenance_plan_detail" href="javascript: void 0">詳情</a>
-            <t t-if="widget.record.data.equipment_ids.count === 0">
-                <a t-attf-record-id="#{widget.id}" class="maintenance_plan_delete" href="javascript: void 0">刪除</a>
-            </t>
         </div>
     </t>
 </template>
