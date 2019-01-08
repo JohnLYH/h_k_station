@@ -3,6 +3,8 @@
 # Author: Artorias
 from odoo import models, fields, api
 
+from .approval_management.order_approval import STATUS as APPROVER_STATUS
+
 STATUS = [
     ('be_executed', '待執行'), ('pending_approval', '待審批'), ('closed', '已關閉')
 ]
@@ -24,10 +26,17 @@ class MaintenancePlan(models.Model):
     display_plan_time = fields.Char('計劃執行時間', compute='_com_plan_time', store=True)
     action_time = fields.Date('具體執行時間')
     display_action_time = fields.Char('具體執行時間', compute='_com_action_time', store=True)
-    action_dep = fields.Many2one('user.department', string='執行班組')
+    action_dep_id = fields.Many2one('user.department', string='執行班組')
     actual_start_time = fields.Datetime('實際開始時間')
     actual_end_time = fields.Datetime('實際結束時間')
     status = fields.Selection(STATUS, string='狀態')
+    # TODO: compute
+    order_approval_ids = fields.One2many('maintenance_plan.order.approval', 'work_order_id', string='審批')
+    approver_status = fields.Selection(APPROVER_STATUS, string='審批狀態')
+    submit_user_id = fields.Many2one('res.users', string='提交人')
+    approver_user_id = fields.Many2one('res.users', string='審批人')
+    last_submit_date = fields.Datetime('最後提交時間')
+    last_approver_date = fields.Datetime('最後審批時間')
 
     @api.depends('equipment_id')
     def _com_equipment(self):
@@ -49,6 +58,11 @@ class MaintenancePlan(models.Model):
         for record in self:
             if record.action_time is not False:
                 record.display_action_time = record.action_time.replace('-', '/')
+
+    @api.model
+    def get_ref_id(self, act_name):
+        act_id = self.env.ref(act_name).id
+        return act_id
 
     @api.model
     def get_config(self):
@@ -91,7 +105,7 @@ class MaintenancePlan(models.Model):
         '''
         self.browse(order_id).write({
             'action_time': action_time,
-            'action_dep': dep[-1],
+            'action_dep_id': dep[-1],
             'status': 'be_executed'
         })
         return

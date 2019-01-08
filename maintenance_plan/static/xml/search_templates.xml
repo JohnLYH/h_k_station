@@ -134,7 +134,7 @@
     </t>
 
     <!-- 工單審批搜索 -->
-    <t t-name="maintenance_plan_approval_search_template">
+    <t t-name="order_approval_search_template">
         <div class="form-inline custom_search_box" search_pannel_js_class="plan_search_pannel">
             <div class="container-fluid">
                 <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
@@ -145,23 +145,30 @@
                 </div>
 
                 <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;">執行班組:</span>
+                    <div class="col-md-8 col-sm-12 col-xs-12">
+                        <div for="action_dep_id" class="form-widget-item"/>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
                     <span class="search_label" style="float:left;">提交人:</span>
                     <div class="col-md-8 col-sm-12 col-xs-12">
-                        <div for="submitter" class="form-widget-item"/>
+                        <div for="submit_user_id" class="form-widget-item"/>
                     </div>
                 </div>
 
                 <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
                     <span class="search_label" style="float:left;">審批人:</span>
                     <div class="col-md-8 col-sm-12 col-xs-12">
-                        <div for="approver" class="form-widget-item"/>
+                        <div for="approver_user_id" class="form-widget-item"/>
                     </div>
                 </div>
 
                 <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
                     <span class="search_label" style="float:left;">狀態:</span>
                     <div class="col-md-8 col-sm-12 col-xs-12">
-                        <div for="status" class="form-widget-item"/>
+                        <div for="approver_status" class="form-widget-item"/>
                     </div>
                 </div>
 
