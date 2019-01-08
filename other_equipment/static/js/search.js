@@ -15,7 +15,7 @@ odoo.define("tool_search", function (require) {
 
         start: function() {
             this._super.apply(this, arguments);
-            this.collapse_search()
+            // this.collapse_search()
         },
 
         search_export: function() {

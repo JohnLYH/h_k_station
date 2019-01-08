@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <template>
-    <!-- 工單審批搜索 -->
+    <!-- 工器具搜索 -->
     <t t-name="tool_maintenance_search_template">
-        <div class="form-inline custom_search_box" search_pannel_js_class="plan_search_pannel">
+        <div class="form-inline custom_search_box" search_pannel_js_class="tool_search">
             <div class="container-fluid">
                 <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
                     <span class="search_label" style="float:left;">設備名稱:</span>
@@ -49,8 +49,23 @@
                         </button>
                     </div>
                 </div>
+
+                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
+                    <div class="form-widget-item col-md-12 col-sm-12 col-xs-12">
+                        <button type="button" class="btn search_import">
+                            導入
+                        </button>
+                        <button type="button" class="btn search_export">
+                            導出
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </t>
 
+    <!--工器具檢驗-->
+    <t t-name="tool_inspection">
+
+    </t>
 </template>

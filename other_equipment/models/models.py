@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import json
+
 from dateutil.relativedelta import relativedelta
 from odoo import models, fields, api
 from datetime import datetime as dt
@@ -10,9 +12,6 @@ STATUS = [
 class other_equipment(models.Model):
     _name = 'other_equipment.other_equipment'
 
-    equipment_id = fields.Many2one('maintenance_plan.equipment', string='設備')
-    equipment_name = fields.Char('設備名稱', compute='_com_equipment', store=True)
-    equipment_num = fields.Char('設備編號', compute='_com_equipment', store=True)
     # TODO: 組號
     departments = fields.Many2one('res.users', string='組號')
     # team_num
@@ -31,6 +30,9 @@ class other_equipment(models.Model):
     model = fields.Char(string='型號')
     brand = fields.Char(string='品牌')
     result_reference = fields.Char(string='結果參考')
+    equipment_id = fields.Many2one('maintenance_plan.equipment', string='設備')
+    equipment_name = fields.Char('設備名稱', compute='_com_equipment', store=True)
+    equipment_num = fields.Char('設備編號', compute='_com_equipment', store=True)
 
     @api.depends('equipment_id')
     def _com_equipment(self):
@@ -41,5 +43,27 @@ class other_equipment(models.Model):
 
     @api.onchange('last_maintenance_date')
     def _maintenance_due_data(self):
-        self.maintenance_due_data = dt.strptime(self.last_maintenance_date, '%Y-%m-%d')\
-                                    + relativedelta(months=int(self.freq_of_cal))
+        if self.last_maintenance_date:
+            self.maintenance_due_data = dt.strptime(self.last_maintenance_date, '%Y-%m-%d')\
+                                        + relativedelta(months=int(self.freq_of_cal))
+
+    @api.model
+    def get_tool_information(self, id):
+        tool_info = self.env.search_read([('id', '=', id)])
+        if tool_info:
+            equipment_name = tool_info.equipment_name
+            equipment_num = tool_info.equipment_name
+            model = tool_info.model
+            freq_of_cal = tool_info.freq_of_cal
+            last_maintenance_date = tool_info.last_maintenance_date
+            maintenance_due_data = tool_info.maintenance_due_data
+            data = {
+                'equipment_name':equipment_name,
+                'equipment_num': equipment_num,
+                'model': model,
+                'freq_of_cal': freq_of_cal,
+                'last_maintenance_date': last_maintenance_date,
+                'maintenance_due_data': maintenance_due_data,
+            }
+            return json.dumps(data)
+        return False

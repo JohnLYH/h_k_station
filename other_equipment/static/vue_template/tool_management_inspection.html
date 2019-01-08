@@ -1,0 +1,34 @@
+<div id="tool_management_inspection">
+    <el-row>
+        <el-col :span="6" :offset="6">
+             名稱：{{ equipment_name }}
+        </el-col>
+        <el-col :span="6" :offset="6">
+            編號：{{ equipment_num }}
+        </el-col>
+    </el-row>
+    <el-row>
+        <el-col :span="6" :offset="6">
+             型號：{{ model }}
+        </el-col>
+        <el-col :span="6" :offset="6">
+            檢驗週期：{{ freq_of_cal }}
+        </el-col>
+    </el-row>
+    <el-row>
+        <el-col :span="6" :offset="6">
+              <el-date-picker
+              v-model="last_maintenance_date"
+              type="date"
+              placeholder="檢驗日期">
+            </el-date-picker>
+        </el-col>
+        <el-col :span="6" :offset="6">
+           <el-date-picker
+              v-model="maintenance_due_data"
+              type="date"
+              placeholder="有效期">
+            </el-date-picker>
+        </el-col>
+    </el-row>
+</div>

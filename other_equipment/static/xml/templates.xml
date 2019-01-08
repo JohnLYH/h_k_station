@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <template>
-    <!-- 參考資料審批詳情按鈕 -->
+    <!-- 工器具管理按鈕 -->
     <t t-name="tem_tool_management_tree_button">
         <div style="text-align: center">
-            <!--<a t-attf-record-id="#{widget.id}" class="work_order_a" href="javascript: void 0">詳情</a>-->
-            <button type="object" name="_go_to_details" class="btn-primary btn">詳情</button>
+            <a t-attf-record-id="#{widget.id}" class="tool_detail" href="javascript: void 0">詳情</a>
+            <a t-attf-record-id="#{widget.id}" class="tool_inspection" href="javascript: void 0">檢驗</a>
+            <a t-attf-record-id="#{widget.id}" class="tool_scrap" href="javascript: void 0">報廢</a>
         </div>
     </t>
+
+    <!--工器具彈出框-->
 
 </template>
