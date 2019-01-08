@@ -10,10 +10,12 @@
                 <script type="text/javascript" src="/maintenance_plan/static/js/import_and_download_demo.js"/>
                 <script type="text/javascript" src="/maintenance_plan/static/js/maintenance_plan/maintenance_plan_tree_button.js"/>
                 <script type="text/javascript" src="/maintenance_plan/static/js/maintenance_plan/maintenance_plan_edit.js"/>
-                <script type="text/javascript" src="/maintenance_plan/static/js/approval_management/approval_management_tree_button.js"/>
+                <script type="text/javascript" src="/maintenance_plan/static/js/approval_management/order_approval_form_widget.js"/>
                 <script type="text/javascript" src="/maintenance_plan/static/js/work_order/work_order_tree_button.js"/>
                 <script type="text/javascript" src="/maintenance_plan/static/js/device_management/device_management_tree.js"/>
                 <script type="text/javascript" src="/maintenance_plan/static/js/equipment/equipment_type_tree_button.js"/>
+                <script type="text/javascript" src="/maintenance_plan/static/js/layui/layui_pager.js"/>
+                <script type="text/javascript" src="/maintenance_plan/static/js/layui/layui_theme_list_renderer.js"/>
             </xpath>
         </template>
     </data>

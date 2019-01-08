@@ -5,7 +5,7 @@
             <field name="model">maintenance_plan.maintenance.plan</field>
             <field name="arch" type="xml">
                 <tree import="false" edit="0" create="0" delete="0" search_ex_template="order_approval_search_template"
-                      search_pannel_js_class="plan_search_pannel">
+                      search_pannel_js_class="plan_search_pannel" class="noOpen">
                     <field name="num"/>
                     <field name="action_dep_id"/>
                     <field name="submit_user_id"/>
@@ -23,26 +23,26 @@
             <field name="name">工單審批</field>
             <field name="model">maintenance_plan.maintenance.plan</field>
             <field name="arch" type="xml">
-                <form edit="0" delete="0" >
-                    <div class="col-md-12 col-lg-12">
-                        <span>工單編號：</span>
-                        <field name="num"/>
-                    </div>
-                    <div class="col-md-3 col-lg-3">
-                        <span>工單描述：</span>
-                        <field name="work_order_description"/>
-                    </div>
-                    <div class="col-md-3 col-lg-3">
-                        <span>規定完成時間：</span>
-                        <field name="plan_end_time"/>
-                    </div>
-                    <div class="col-md-3 col-lg-3">
-                        <span>實際開始時間：</span>
-                        <field name="actual_start_time"/>
-                    </div>
-                    <div class="col-md-3 col-lg-3">
-                        <span>實際結束時間：</span>
-                        <field name="actual_end_time"/>
+                <form import="false" edit="0" delete="0" create="0">
+                    <group col="3">
+                        <group>
+                            <field name="num"/>
+                        </group>
+                        <group>
+                            <field name="work_order_description"/>
+                        </group>
+                        <group>
+                            <field name="plan_end_time" string="規定完成時間"/>
+                        </group>
+                        <group>
+                            <field name="actual_start_time"/>
+                        </group>
+                        <group>
+                            <field name="actual_end_time"/>
+                        </group>
+                    </group>
+                    <div>
+                        <widget name="order_approval_form_widget"/>
                     </div>
                 </form>
             </field>
@@ -51,7 +51,7 @@
         <record id="act_order_approval" model="ir.actions.act_window">
             <field name="name">工單審批</field>
             <field name="res_model">maintenance_plan.maintenance.plan</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">tree</field>
             <field name="domain">[]</field>
             <!--<field name="domain">[('status', '!=', False), ('status', '!=', 'be_executed')]</field>-->
             <field name="view_ids" eval="[(5, 0, 0),
