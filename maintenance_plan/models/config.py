@@ -18,13 +18,13 @@ class Config(models.TransientModel):
 
     def set_values(self):
         self.env['ir.config_parameter'] \
-            .set_param('maintenance_plan_max_advance_days', self.max_advance_days)
+            .sudo().set_param('maintenance_plan_max_advance_days', self.max_advance_days)
         self.env['ir.config_parameter'] \
-            .set_param('maintenance_plan_max_delay_days', self.max_delay_days)
+            .sudo().set_param('maintenance_plan_max_delay_days', self.max_delay_days)
 
     def get_values(self):
         max_advance_days = self.env['ir.config_parameter'] \
-            .get_param('maintenance_plan_max_advance_days', default=0)
+            .sudo().get_param('maintenance_plan_max_advance_days', default=0)
         max_delay_days = self.env['ir.config_parameter'] \
-            .get_param('maintenance_plan_max_delay_days', default=0)
+            .sudo().get_param('maintenance_plan_max_delay_days', default=0)
         return dict(max_advance_days=int(max_advance_days), max_delay_days=int(max_delay_days))

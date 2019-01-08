@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+        <record id="maintenance_plan_equipment_type_tree" model="ir.ui.view">
+            <field name="name">設備類別列表</field>
+            <field name="model">maintenance_plan.equipment.type</field>
+            <field name="arch" type="xml">
+                <tree import="false" edit="1" create="1" delete="1" search_ex_template="equipment_type_search_template">
+                    <field name="name"/>
+                    <field name="parent_id"/>
+                    <field name="child_ids"/>
+                    <field name="equipment_ids"/>
+                    <widget name="equipment_type_tree_button" string="操作"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="act_maintenance_plan_equipment_type" model="ir.actions.act_window">
+            <field name="name">設備類別列表</field>
+            <field name="res_model">maintenance_plan.equipment.type</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+    </data>
+</odoo>
