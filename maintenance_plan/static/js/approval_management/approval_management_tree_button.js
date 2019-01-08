@@ -92,3 +92,36 @@ odoo.define('maintenance_plan_approval_management', function (require) {
         maintenance_plan_approval_management: maintenance_plan_approval_management
     };
 });
+
+odoo.define('data_approval_management_tree_button', function (require) {
+    "use strict";
+
+    var Widget = require('web.Widget');
+    var widget_registry = require('web.widget_registry');
+    var core = require('web.core');
+    var QWeb = core.qweb;
+
+    var data_approval_management_tree_button = Widget.extend({
+        events: {
+            'click': '_click_tree_buttons'
+        },
+        init: function (parent, record, node) {
+            this._super(parent, record, node);
+            this.id = record.res_id;
+            this.record = record;
+        },
+        start: function () {
+            var $el = $(QWeb.render('tem_maintenance_plan_data_approval_tree_button', {widget: this}).trim());
+            this.replaceElement($el)
+        },
+        _click_tree_buttons: function (event) {
+            console.log('我愛你');
+            var self = this;
+            console.log(self);
+            event.stopPropagation();
+        }
+    });
+    widget_registry.add('data_approval_management_tree_button', data_approval_management_tree_button);
+    return {data_approval_management_tree_button: data_approval_management_tree_button}
+
+});

@@ -71,5 +71,31 @@
             <field name="res_model">maintenance_plan.approval</field>
             <field name="view_mode">tree,form</field>
         </record>
+
+        <!--  參考資料審批tree -->
+        <record model="ir.ui.view" id="maintenance_plan_app_approval_tree">
+            <field name="name">工單審批</field>
+            <field name="model">maintenance_plan.data.approval</field>
+            <field name="arch" type="xml">
+                <!--<tree import="false" edit="0" create="0" delete="0" search_ex_template="maintenance_plan_approval_search_template"-->
+                      <!--search_pannel_js_class="plan_search_pannel">-->
+                <tree import="false"  search_ex_template="maintenance_plan_approval_search_template"
+                  search_pannel_js_class="plan_search_pannel">
+                    <field name="equipment_id"/>
+                    <field name="submitter"/>
+                    <field name="submit_time"/>
+                    <field name="status"/>
+                    <field name="approver"/>
+                    <field name="approval_time"/>
+                    <widget name="data_approval_management_tree_button" string="操作"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_data_approval_management">
+            <field name="name">參考資料審批</field>
+            <field name="res_model">maintenance_plan.data.approval</field>
+            <field name="view_mode">tree,form</field>
+        </record>
   </data>
 </odoo>

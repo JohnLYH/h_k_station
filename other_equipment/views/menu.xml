@@ -1,0 +1,3 @@
+<odoo>
+    <menuitem name="工器具管理" id="tool_management_id" action="employees_management_clinet_id"></menuitem>
+</odoo>

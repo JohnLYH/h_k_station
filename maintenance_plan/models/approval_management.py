@@ -34,6 +34,15 @@ class ApprovalManagement(models.Model):
             record.plan_end_time = record.num.plan_end_time
             record.work_order_description = record.num.work_order_description
 
-    @api.multi
-    def _go_to_details(self):
-        print("李容成")
+
+class ReferenceExaminationApproval(models.Model):
+    '''參考資料審批'''
+    _name = 'maintenance_plan.data.approval'
+    _description = '參考資料審批'
+
+    equipment_id = fields.Many2one('maintenance_plan.equipment', string='設備')
+    submitter = fields.Many2one('user.employees_get', '提交人')
+    submit_time = fields.Datetime('提交時間')
+    approver = fields.Many2one('user.employees_get', '審批人')
+    status = fields.Selection(STATUS, string='審批狀態')
+    approval_time = fields.Datetime('審批時間')

@@ -9,3 +9,4 @@ class Equipment(models.Model):
     _description = '設備'
 
     num = fields.Char('Equipment No')
+    name = fields.Char('Equipment Name')
