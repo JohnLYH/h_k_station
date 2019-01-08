@@ -132,4 +132,50 @@
             </div>
         </div>
     </t>
+
+    <!-- 工單審批搜索 -->
+    <t t-name="maintenance_plan_approval_search_template">
+        <div class="form-inline custom_search_box" search_pannel_js_class="plan_search_pannel">
+            <div class="container-fluid">
+                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;">工單編號:</span>
+                    <div class="col-md-8 col-sm-12 col-xs-12">
+                        <div for="num" class="form-widget-item"/>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;">提交人:</span>
+                    <div class="col-md-8 col-sm-12 col-xs-12">
+                        <div for="submitter" class="form-widget-item"/>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;">審批人:</span>
+                    <div class="col-md-8 col-sm-12 col-xs-12">
+                        <div for="approver" class="form-widget-item"/>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;">狀態:</span>
+                    <div class="col-md-8 col-sm-12 col-xs-12">
+                        <div for="status" class="form-widget-item"/>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
+                    <div class="form-widget-item col-md-12 col-sm-12 col-xs-12">
+                        <button type="button" class="btn btn-primary search_extend_apply">
+                            搜索
+                        </button>
+                        <button type="button" class="btn btn-default search_extend_reset">
+                            重置
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
 </template>

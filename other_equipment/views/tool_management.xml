@@ -1,5 +1,6 @@
 <odoo>
   <data>
+
     <!--  工器具管理tree -->
         <record model="ir.ui.view" id="tool_maintenance_tree">
             <field name="name">工器具管理</field>
@@ -18,9 +19,15 @@
                     <field name="last_maintenance_date"/>
                     <field name="maintenance_due_data"/>
                     <field name="status"/>
-                    <widget name="data_approval_management_tree_button" string="操作"/>
+                    <widget name="tool_management" string="操作"/>
                 </tree>
             </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_tool_management">
+              <field name="name">工器具管理</field>
+              <field name="res_model">other_equipment.other_equipment</field>
+              <field name="view_mode">tree,form</field>
         </record>
   </data>
 </odoo>
