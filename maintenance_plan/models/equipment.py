@@ -10,7 +10,6 @@ class Equipment(models.Model):
 
     num = fields.Char('Equipment No')  # 設備編號
     description = fields.Char('Equipment Description')  # 設備描述
-    # TODO: 設備類別
-    standard_job = fields.Char('Standard Job Description')  # 標準工作
+    equipment_type_id = fields.Many2one('maintenance_plan.equipment.type', string='設備類別')
 
 

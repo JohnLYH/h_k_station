@@ -19,7 +19,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'web', 'layui_theme', 'vue_template_manager'],
+    'depends': ['base', 'web', 'layui_theme', 'vue_template_manager', 'user'],
 
     # always loaded
     'data': [
@@ -28,8 +28,9 @@
         'views/templates.xml',
         'views/config/config_view.xml',
         'views/maintenance_plan/maintenance_plan_view.xml',
+        'views/maintenance_plan/work_order_view.xml',
         'views/device_management/device_management_view.xml',
-        'views/wok_order/work_order_view.xml',
+        'views/equipment/equipment_type_view.xml',
         'views/menu.xml',
     ],
     # only loaded in demonstration mode

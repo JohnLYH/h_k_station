@@ -58,7 +58,7 @@
         <el-form-item prop="selected_dep">
             <el-col :span="24">
                 執行班組：
-                <el-cascader :options="deps" v-model="form.selected_dep">
+                <el-cascader change-on-select :show-all-levels="false" expand-trigger="hover" :props="deps_props" :options="deps" v-model="form.selected_dep">
                 </el-cascader>
             </el-col>
         </el-form-item>

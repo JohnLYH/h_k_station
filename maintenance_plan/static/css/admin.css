@@ -5,3 +5,7 @@
 .el-upload__input {
     display: none !important;
 }
+
+.o_list_view th, .o_list_view td{
+    text-align: center;
+}

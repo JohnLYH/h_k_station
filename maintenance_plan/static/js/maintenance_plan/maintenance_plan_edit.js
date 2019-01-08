@@ -18,6 +18,11 @@ odoo.define('maintenance_plan_edit', function (require) {
             this.vue_data = {
                 num: this.record.data.num,
                 deps: [], // 選擇班組下拉
+                deps_props: {
+                    label: 'name',
+                    value: 'id',
+                    children: 'children'
+                },
                 work_order_type: this.record.data.work_order_type,
                 equipment_num: this.record.data.equipment_num,
                 display_plan_time: this.record.data.display_plan_time,
@@ -33,10 +38,10 @@ odoo.define('maintenance_plan_edit', function (require) {
                 },
                 rules: {
                     display_action_time: [
-                        {type: 'date', required: true, message: '請選擇具體執行時間', trigger: 'blur'},
+                        {required: true, message: '請選擇具體執行時間', trigger: 'change'},
                     ],
                     selected_dep: [
-                        {required: true, message: '請選擇執行班組', trigger: 'blur'},
+                        {required: true, message: '請選擇執行班組', trigger: 'change'},
                     ]
                 }
             }
@@ -56,7 +61,7 @@ odoo.define('maintenance_plan_edit', function (require) {
                 model: 'maintenance_plan.maintenance.plan',
                 method: 'get_departs'
             }).then(function (deps) {
-                console.log(deps)
+                self.vue_data.deps = deps
             });
             return $.when(get_config, get_deps)
         },
@@ -89,11 +94,21 @@ odoo.define('maintenance_plan_edit', function (require) {
                                         cancelButtonText: '取消',
                                         type: 'warning'
                                     }).then(() => {
-                                        this_vue.$message({
-                                            type: 'success',
-                                            message: '删除成功!'
-                                        });
-                                        self.do_action(false)
+                                        self._rpc({
+                                            model: 'maintenance_plan.maintenance.plan',
+                                            method: 'assign_work_order',
+                                            kwargs: {
+                                                order_id: self.record.res_id,
+                                                action_time: this_vue.form.display_action_time,
+                                                dep: this_vue.form.selected_dep
+                                            }
+                                        }).then(function () {
+                                            this_vue.$message({
+                                                type: 'success',
+                                                message: '更改成功!'
+                                            });
+                                            self.do_action(false);
+                                        })
                                     });
                                 } else {
                                     return false;

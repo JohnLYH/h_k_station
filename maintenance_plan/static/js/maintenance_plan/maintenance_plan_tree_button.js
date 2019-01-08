@@ -29,7 +29,13 @@ odoo.define('maintenance_plan_tree_button', function (require) {
                     "tag": "maintenance_plan_edit",
                     "target": "new",
                     "params": {record: self.record}
+                }, {
+                    on_close: function () {
+                        self.trigger_up('reload')
+                    }
                 })
+            }else {
+                // TODO: 跳轉工單詳情
             }
         }
     });
