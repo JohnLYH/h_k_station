@@ -34,8 +34,17 @@ odoo.define('maintenance_plan_tree_button', function (require) {
                         self.trigger_up('reload')
                     }
                 })
-            }else {
-                // TODO: 跳轉工單詳情
+            } else {
+                self._rpc({
+                    model: self.record.model,
+                    method: 'get_ref_id',
+                    args: ['maintenance_plan.act_order_approval']
+                }).then(function (act_id) {
+                    self.do_action(act_id, {
+                        res_id: self.id,
+                        view_type: 'form',
+                    })
+                })
             }
         }
     });
