@@ -23,7 +23,16 @@ odoo.define('equipment_tree_domain', function (require) {
         },
 
         _add_quipment_type: function(){
-
+            var self = this;
+            self.do_action({
+                type: "ir.actions.act_window",
+                res_model: "maintenance_plan.equipment",
+                views: [[false, "form"]],
+                target: "new",
+                context: {
+                    "default_equipment_type_id": self.app.current_id
+                }
+            })
         },
 
         _renderNoContentHelper: function () {
