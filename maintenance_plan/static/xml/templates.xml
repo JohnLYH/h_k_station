@@ -40,4 +40,10 @@
             </t>
         </div>
     </t>
+
+    <t t-name="tem_equipment_tree_button">
+        <div style="text-align: center">
+            <a t-attf-record-id="#{widget.id}" class="maintenance_plan_detail" href="javascript: void 0">查看詳情</a>
+        </div>
+    </t>
 </template>

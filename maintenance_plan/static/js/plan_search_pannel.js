@@ -71,10 +71,10 @@ odoo.define("plan_search_pannel", function (require) {
             target.change(function () {
                 if ($(this).val()) {
                     var fileName = $(this).val().substring($(this).val().lastIndexOf(".") + 1).toLowerCase();
-                    if (fileName != "xls") {
+                    if (fileName != "xlsx") {
                         self.vue.$notify({
                             title: '錯誤',
-                            message: '请选择xls格式文件上传！',
+                            message: '请选择xlsx格式文件上传！',
                             type: 'error'
                         });
                         $(this).val("");

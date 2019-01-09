@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<odoo>
-    <data>
-        <record id="act_device_management" model="ir.actions.client">
-          <field name="name">設備管理</field>
-          <field name="tag">device_management</field>
-      </record>
-    </data>
-</odoo>
