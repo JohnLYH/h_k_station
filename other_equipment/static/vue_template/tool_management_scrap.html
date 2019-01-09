@@ -1,0 +1,36 @@
+<div id="tool_management_scrap" >
+        <el-row>
+            <el-col :span="12">
+                 名稱：{{ equipment_name }}
+            </el-col>
+            <el-col :span="12">
+                編號：{{ equipment_num }}
+            </el-col>
+        </el-row>
+        <el-row>
+            <el-col :span="12" >
+                 型號：{{ model }}
+            </el-col>
+            <el-col :span="12">
+                品牌：{{ brand }}
+            </el-col>
+        </el-row>
+        <el-row>
+            <el-col :span="24" >
+               備註：<el-input
+                      type="textarea"
+                      :rows="2"
+                      placeholder="请输入内容"
+                      v-model="remark">
+                    </el-input>
+            </el-col>
+        </el-row>
+        <hr class="vue_hr">
+        <el-col :span="6" :offset="6">
+            <el-button round @click="cancel">取消</el-button>
+        </el-col>
+        <el-col :span="6" >
+            <el-button type="danger" round @click="save">確認</el-button>
+        </el-col>
+
+</div>

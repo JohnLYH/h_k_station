@@ -19,14 +19,12 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'web', 'layui_theme'],
+    'depends': ['base', 'web', 'layui_theme', 'maintenance_plan'],
 
     # always loaded
     'data': [
         'security/ir.model.access.csv',
         'views/assets.xml',
-        'views/views.xml',
-        'views/templates.xml',
         'views/tool_management.xml',
         'views/menu.xml',
     ],
