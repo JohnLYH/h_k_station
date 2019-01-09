@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<template>
+    <t t-name="layui_pager">
+        <div t-attf-id="#{widget.id}.layui_pager" class="layui_pager"/>
+    </t>
+</template>

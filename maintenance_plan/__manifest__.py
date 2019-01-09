@@ -23,11 +23,11 @@
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
+        'security/ir.model.access.csv',
         'views/assets.xml',
         'views/templates.xml',
         'views/config/config_view.xml',
-        'views/approval_management/order_approval_tree.xml',
+        'views/approval_management/order_approval_view.xml',
         'views/maintenance_plan/maintenance_plan_view.xml',
         'views/maintenance_plan/work_order_view.xml',
         'views/device_management/device_management_view.xml',
