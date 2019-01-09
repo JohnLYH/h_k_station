@@ -1,0 +1,51 @@
+<div id="tool_management_inspection" >
+        <el-row>
+            <el-col :span="12">
+                 名稱：{{ equipment_name }}
+            </el-col>
+            <el-col :span="12">
+                編號：{{ equipment_num }}
+            </el-col>
+        </el-row>
+        <el-row>
+            <el-col :span="12" >
+                 型號：{{ model }}
+            </el-col>
+            <el-col :span="12">
+                檢驗週期：{{ freq_of_cal }}
+            </el-col>
+        </el-row>
+        <el-row>
+            <el-col :span="12">
+                  檢驗日期：<el-date-picker
+                  v-model="last_maintenance_date"
+                  type="date"
+                  placeholder="檢驗日期">
+                </el-date-picker>
+            </el-col>
+            <el-col :span="12" >
+               有效期：<el-date-picker
+                  v-model="maintenance_due_data"
+                  type="date"
+                  placeholder="有效期">
+                </el-date-picker>
+            </el-col>
+        </el-row>
+        <el-row>
+            <el-col :span="24" >
+               備註：<el-input
+                      type="textarea"
+                      :rows="2"
+                      placeholder="请输入内容"
+                      v-model="remark">
+                    </el-input>
+            </el-col>
+        </el-row>
+        <hr class="vue_hr">
+        <el-col :span="6" :offset="6">
+            <el-button round @click="cancel">取消</el-button>
+        </el-col>
+        <el-col :span="6" >
+            <el-button type="danger" round @click="save">確認</el-button>
+        </el-col>
+</div>
