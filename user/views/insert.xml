@@ -5,6 +5,9 @@
                 <script type="text/javascript" src="/user/static/js/employees_management.js"/>
                 <script type="text/javascript" src="/user/static/js/rights_management_clinet.js"/>
                 <script type="text/javascript" src="/user/static/js/edit_role.js"/>
+                <script type="text/javascript" src="/user/static/js/tree_buttons.js"/>
+                <script type="text/javascript" src="/user/static/js/person_edit.js"/>
+                <script type="text/javascript" src="/user/static/js/change_password.js"/>
             </xpath>
         </template>
     </data>

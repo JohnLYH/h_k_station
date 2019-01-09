@@ -34,13 +34,14 @@
         'security/add_category.xml',
         'views/category_group.xml',
         'views/catagory_menu.xml',
+        'views/send_email/email-list.xml'
     ],
     # only loaded in demonstration mode
     'demo': [
         'demo/demo.xml',
     ],
     'qweb': [
-        'static/xml/*.xml',
+        'static/xml/*.xml'
     ],
     'application': True
 }
