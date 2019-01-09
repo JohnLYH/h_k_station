@@ -30,7 +30,7 @@
         'views/approval_management/order_approval_view.xml',
         'views/maintenance_plan/maintenance_plan_view.xml',
         'views/maintenance_plan/work_order_view.xml',
-        'views/device_management/device_management_view.xml',
+        'views/equipment/equipment_view.xml',
         'views/equipment/equipment_type_view.xml',
         'views/menu.xml',
     ],

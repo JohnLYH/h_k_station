@@ -1,24 +1,11 @@
 odoo.define('maintenance_plan_tree_button', function (require) {
     "use strict";
 
-    var Widget = require('web.Widget');
     var widget_registry = require('web.widget_registry');
-    var core = require('web.core');
-    var QWeb = core.qweb;
+    var tree_button = require('treebtns');
 
-    var maintenance_plan_tree_button = Widget.extend({
-        events: {
-            'click': '_click_tree_buttons'
-        },
-        init: function (parent, record, node) {
-            this._super(parent, record, node);
-            this.id = record.res_id;
-            this.record = record;
-        },
-        start: function () {
-            var $el = $(QWeb.render('tem_maintenance_plan_tree_button', {widget: this}).trim());
-            this.replaceElement($el)
-        },
+    var maintenance_plan_tree_button = tree_button.extend({
+        template: 'tem_maintenance_plan_tree_button',
         _click_tree_buttons: function (event) {
             var self = this;
             event.stopPropagation();
@@ -28,8 +15,9 @@ odoo.define('maintenance_plan_tree_button', function (require) {
                     "type": "ir.actions.client",
                     "tag": "maintenance_plan_edit",
                     "target": "new",
-                    "params": {record: self.record}
+                    "params": {record: self.record},
                 }, {
+                    "size": 'medium',
                     on_close: function () {
                         self.trigger_up('reload')
                     }

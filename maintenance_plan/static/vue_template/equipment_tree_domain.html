@@ -1,0 +1,16 @@
+<div id="user_tree">
+    <el-tree :load="loadNode" lazy :props="defaultProps" @node-click="handleNodeClick" :expand-on-click-node="false">
+        <span class="custom-tree-node" slot-scope="{ node, data }">
+        <span>{{ node.label }}</span>
+        <span>
+          <el-button type="text" size="mini" @click="add_equipment($event, node)">
+                       <i class="el-icon-plus" style="border: 1px solid"/>
+          </el-button>
+
+          <el-button type="text" size="mini" @click="del_equipment($event, node)">
+                       <i class="el-icon-minus" style="border: 1px solid"/>
+          </el-button>
+        </span>
+      </span>
+    </el-tree>
+</div>

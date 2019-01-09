@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+        <record id="maintenance_plan_equipment_tree" model="ir.ui.view">
+            <field name="name">設備管理列表</field>
+            <field name="model">maintenance_plan.equipment</field>
+            <field name="arch" type="xml">
+                <tree import="false" edit="1" create="1" delete="1" js_class="equipment_tree_domain">
+                    <field name="parent_equipment_num"/>
+                    <field name="num"/>
+                    <field name="description"/>
+                    <field name="serial_number" string="序列號"/>
+                    <field name="equipment_model" string="型號"/>
+                    <field name="create_date" string="註冊時間"/>
+                    <field name="status"/>
+                    <widget name="equipment_tree_button" string="操作"/>
+                </tree>
+            </field>
+        </record>
+
+        <!--<record id="maintenance_plan_equipment_form" model="ir.ui.view">-->
+            <!--<field name="name">設備管理詳情</field>-->
+            <!--<field name="model">maintenance_plan.equipment</field>-->
+            <!--<field name="arch" type="xml">-->
+                <!--<form import="false" edit="1" create="1" delete="1">-->
+
+                <!--</form>-->
+            <!--</field>-->
+        <!--</record>-->
+
+        <record id="act_equipment_management" model="ir.actions.act_window">
+            <field name="name">設備管理</field>
+            <field name="res_model">maintenance_plan.equipment</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!--<record id="act_equipment_management" model="ir.actions.client">-->
+            <!--<field name="name">設備管理</field>-->
+            <!--<field name="tag">equipment_management</field>-->
+        <!--</record>-->
+    </data>
+</odoo>
