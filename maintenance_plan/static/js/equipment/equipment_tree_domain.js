@@ -22,7 +22,7 @@ odoo.define('equipment_tree_domain', function (require) {
             this.record = state
         },
 
-        _add_quipment_type: function(){
+        _add_quipment_type: function () {
             var self = this;
             self.do_action({
                 type: "ir.actions.act_window",
@@ -87,10 +87,10 @@ odoo.define('equipment_tree_domain', function (require) {
                     .removeClass('table-responsive')
                     .empty();
                 $('<div class="container-fluid" style="padding: 0px">' +
-                    '<div class="col-lg-2 col-md-4 col-md-sm-12 col-md-xs-12" style="padding: 0px 5px 5px 0px; min-height: 100%; overflow-x: hidden" id="tree_box"></div>' +
-                    '<div class="col-lg-10 col-md-8 col-md-sm-12 col-md-xs-12" style="padding: 0px; min-height: 100%"><div>' +
+                    '<div class="col-lg-3 col-md-4 col-md-sm-12 col-md-xs-12" style="padding: 0px 5px 5px 0px; min-height: 100%; overflow-x: hidden" id="tree_box"></div>' +
+                    '<div class="col-lg-9 col-md-8 col-md-sm-12 col-md-xs-12" style="padding: 0px; min-height: 100%"><div>' +
                     '<div style="margin-bottom: 20px">' +
-                    '<span id="type_route">&nbsp;</span><button id="add_quipment_type_bt" style="float: right" class="btn btn-primary btn-sm">添加</button>' +
+                    '<span id="type_route">信號系統</span><button id="add_quipment_type_bt" style="float: right" class="btn btn-primary btn-sm">添加</button>' +
                     '</div></div><div id="list_box"></div></div>' +
                     '</div>').appendTo(self.$el);
                 self.$tree_list_box = self.$("#list_box");
@@ -120,9 +120,16 @@ odoo.define('equipment_tree_domain', function (require) {
                         },
                         methods: {
                             handleNodeClick(data) {
+                                var domains;
+                                if (data.id == null) {
+                                    domains = []
+                                }
+                                else {
+                                    domains = [[["equipment_type_id.id", "=", data.id]]]
+                                }
                                 var this_vue = this;
                                 self.trigger_up("search", {
-                                    domains: [[["equipment_type_id.id", "=", data.id]]],
+                                    domains: domains,
                                     contexts: [],
                                     groupbys: []
                                 });
@@ -137,7 +144,12 @@ odoo.define('equipment_tree_domain', function (require) {
                             },
 
                             loadNode(node, resolve) {
-                                var id = (node.data && node.data.id) || null;
+                                var id;
+                                if (node.level === 0) {
+                                    id = false
+                                } else {
+                                    id = (node.data && node.data.id) || null
+                                }
                                 self._rpc({
                                     model: 'maintenance_plan.equipment.type',
                                     method: 'get_type_tree',
@@ -148,10 +160,41 @@ odoo.define('equipment_tree_domain', function (require) {
                             },
 
                             add_equipment(event, node) {
-
+                                event.stopPropagation();
+                                self.do_action({
+                                    type: "ir.actions.act_window",
+                                    res_model: "maintenance_plan.equipment.type",
+                                    views: [[false, "form"]],
+                                    target: "new",
+                                    context: {
+                                        "default_parent_id": node.data.id
+                                    }
+                                }, {
+                                    on_close: function () {
+                                        self.trigger_up('reload')
+                                    }
+                                })
                             },
                             del_equipment(event, node) {
-
+                                var this_vue = this;
+                                event.stopPropagation();
+                                this_vue.$confirm('設備類型刪除后不可修改，是否確認刪除？', '提示', {
+                                        confirmButtonText: '确定',
+                                        cancelButtonText: '取消',
+                                        type: 'warning'
+                                    }).then(() => {
+                                        self._rpc({
+                                            model: 'maintenance_plan.equipment.type',
+                                            method: 'unlink',
+                                            args: [node.data.id]
+                                        }).then(function () {
+                                            this_vue.$message({
+                                                type: 'success',
+                                                message: '刪除成功!'
+                                            });
+                                            self.trigger_up('reload')
+                                        })
+                                    });
                             }
                         }
                     });

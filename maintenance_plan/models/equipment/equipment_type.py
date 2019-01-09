@@ -20,24 +20,34 @@ class EquipmentType(models.Model):
     parent_right = fields.Integer(index=True)
 
     @api.model
-    def get_type_tree(self, type_id=None):
+    def get_type_tree(self, type_id=False):
         '''
         tree页获取類型树结构
         :param type_id: 類型的id
         :return:
         '''
-        records = self.search([('parent_id', '=', type_id)])
-        result = [{
-            'id': i.id, 'name': i.name, 'leaf': True if len(i.child_ids) == 0 else False,
-            'parent_left': i.parent_left, 'parent_right': i.parent_right
-        } for i in records]
+        if type_id is False:
+            result = [{
+                'id': None, 'name': '信號系統', 'leaf': True if self.search_count([]) == 0 else False
+            }]
+        else:
+            records = self.search([('parent_id', '=', type_id)])
+            result = [{
+                'id': i.id, 'name': i.name, 'leaf': True if len(i.child_ids) == 0 else False,
+                'parent_left': i.parent_left, 'parent_right': i.parent_right
+            } for i in records]
         return result
 
     @api.model
     def get_type_route(self, type_id=None):
         current_type = self.browse(type_id)
-        route = current_type.name or ' '
+        if type_id is not None:
+            root = '信號系統>>'
+            route = current_type.name
+        else:
+            root = '信號系統'
+            route = ''
         while len(current_type.parent_id) > 0:
             current_type = current_type.parent_id
             route = current_type.name + '>>' + route
-        return route
+        return root + route
