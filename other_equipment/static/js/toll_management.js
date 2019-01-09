@@ -31,34 +31,23 @@ odoo.define('tool_management', function (require) {
             if ($(event.target).hasClass('tool_detail')) {
                 // TODO: 詳情
                 console.log('詳情')
-            }
-            else if ($(event.target).hasClass('tool_inspection')) {
+            } else if ($(event.target).hasClass('tool_inspection')) {
                 // TODO: 检验
                 self.do_action({
                     "name": "檢驗",
                     "type": "ir.actions.client",
                     "tag": "tool_management_inspection",
                     "target": "new",
-                    "params": {record: self.record,id: self.id}
+                    "params": {record: self.record, id: self.id}
                 })
                 // console.log('检验')
-            }else {
-                self.vue.$confirm('設備類別刪除后不可恢復，是否確認刪除？', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    type: 'warning'
-                }).then(() => {
-                    self._rpc({
-                        model: self.record.model,
-                        method: 'unlink',
-                        args: [self.id],
-                    }).then(function () {
-                        self.vue.$message({
-                            type: 'success',
-                            message: '刪除成功!'
-                        });
-                        self.trigger_up('reload')
-                    })
+            } else {
+                self.do_action({
+                    "name": "報廢",
+                    "type": "ir.actions.client",
+                    "tag": "tool_management_scrap",
+                    "target": "new",
+                    "params": {record: self.record, id: self.id}
                 });
             }
         }
@@ -76,68 +65,204 @@ odoo.define('tool_management_inspection', function (require) {
 
     var tool_management_inspection = Widget.extend({
         init: function (parent, model) {
+            this._super(parent, model);
             this.vue_data = {
                 id: model.params.id,
-                equipment_name:'xxx',
-                equipment_num: 'xxx',
-                model: 'xxx',
-                freq_of_cal: 'xxxx',
+                equipment_name:'',
+                equipment_num: '',
+                model: '',
+                freq_of_cal: '',
                 last_maintenance_date: '',
                 maintenance_due_data: '',
+                remark :''
             };
-            self._super(parent);
         },
         start: function () {
             var self = this;
-            setTimeout(function () {
-                // 获取vue模板
-                self._rpc({
-                    model: 'vue_template_manager.template_manage',
-                    method: 'get_template_content',
-                    kwargs: {
-                        module_name: 'other_equipment',
-                        template_name: 'tool_management_inspection'
-                    }
-                }).then(function (el) {
-                    // 加载vue模板
-                    self.replaceElement($(el));
-                    new Vue({
-                        el: '#approval_management',
-                        mounted() {
-                            this.get_tool_information()
+            // 获取vue模板
+            self._rpc({
+                model: 'vue_template_manager.template_manage',
+                method: 'get_template_content',
+                kwargs: {
+                    module_name: 'other_equipment',
+                    template_name: 'tool_management_inspection'
+                }
+            }).then(function (el) {
+                // 加载vue模板
+                self.replaceElement($(el));
+                self.vue = new Vue({
+                    el: '#tool_management_inspection',
+                    mounted() {
+                        this.get_tool_information()
+                    },
+                    data() {
+                        return self.vue_data
+                    },
+                    methods: {
+                        get_tool_information: function () {
+                            var this_vue = this;
+                            var get_info = self._rpc({
+                                model: 'other_equipment.other_equipment',
+                                method: 'search_read',
+                                domain: [['id', '=', this_vue.id]] || None,
+                            });
+                            $.when(get_info).then(function (tool_info) {
+                                this_vue.equipment_name = tool_info[0].equipment_name;
+                                this_vue.equipment_num = tool_info[0].equipment_num;
+                                this_vue.model = tool_info[0].model;
+                                this_vue.freq_of_cal = tool_info[0].freq_of_cal;
+                                this_vue.last_maintenance_date = tool_info[0].last_maintenance_date;
+                                this_vue.maintenance_due_data = tool_info[0].maintenance_due_data;
+
+                            });
                         },
-                        data() {
-                            return self.vue_data
-                        },
-                        methods: {
-                            get_tool_information:function () {
-                                console.log('测',this.vue_data)
+                        save: function () {
                                 var this_vue = this;
-                                var get_info = self._rpc({
+                                this_vue.$confirm('是否確認保存校驗信息？', '提示', {
+                                        confirmButtonText: '确定',
+                                        cancelButtonText: '取消',
+                                        type: 'warning'
+                                    }).then(() => {
+                                        self._rpc({
                                     model: 'other_equipment.other_equipment',
-                                    method: 'search_read',
-                                    domain: [['id', '=', this_vue.id]] || None,
+                                    method: 'save_tool_management_inspection',
+                                    kwargs: {'id':this_vue.id,
+                                        'equipment_name': this_vue.equipment_name,
+                                        'equipment_num': this_vue.equipment_num,
+                                        'model': this_vue.model,
+                                        'freq_of_cal': this_vue.freq_of_cal,
+                                        'last_maintenance_date': this_vue.last_maintenance_date,
+                                        'maintenance_due_data': this_vue.maintenance_due_data,
+                                        'remark': this_vue.remark
+                                    }
+                                }).then(function (e) {
+                                    if(e){
+                                        self.do_action(false);
+                                       // self.getParent().destroy();
+                                       // window.location.reload();
+                                       // return this.parent.load(['invitations']);
+                                    }else{
+                                        self.vue.$message({
+                                          message: '未找到這條記錄',
+                                          type: 'warning'
+                                        });
+                                    }
                                 });
-                                $.when(get_info).then(function (tool_info) {
-                                    console.log(tool_info);
-                                    this_vue.equipment_name = tool_info.equipment_name;
-                                    this_vue.equipment_num = tool_info.equipment_num;
-                                    this_vue.model = tool_info.model;
-                                    this_vue.freq_of_cal = tool_info.freq_of_cal;
-                                    this_vue.last_maintenance_date = tool_info.last_maintenance_date;
-                                    this_vue.maintenance_due_data = tool_info.maintenance_due_data;
-                                    console.log('测',this_vue)
-                                })
+                                    });
                             },
-                        }
-                    })
+                            cancel: function () {
+                                self.getParent().destroy()
+                            }
+                    }
                 })
-            }, 100)
+            })
         }
 
     });
     core.action_registry.add('tool_management_inspection', tool_management_inspection);
     return {
         tool_management_inspection: tool_management_inspection
+    };
+});
+
+odoo.define('tool_management_scrap', function (require) {
+    "use strict";
+
+    var core = require('web.core');
+    var Widget = require('web.Widget');
+
+    var tool_management_scrap = Widget.extend({
+        init: function (parent, model) {
+            this._super(parent, model);
+            this.vue_data = {
+                id: model.params.id,
+                equipment_name:'',
+                equipment_num: '',
+                model: '',
+                brand: '',
+                remark :''
+            };
+        },
+        start: function () {
+            var self = this;
+            // 获取vue模板
+            self._rpc({
+                model: 'vue_template_manager.template_manage',
+                method: 'get_template_content',
+                kwargs: {
+                    module_name: 'other_equipment',
+                    template_name: 'tool_management_scrap'
+                }
+            }).then(function (el) {
+                // 加载vue模板
+                self.replaceElement($(el));
+                self.vue = new Vue({
+                    el: '#tool_management_scrap',
+                    mounted() {
+                        this.get_tool_information()
+                    },
+                    data() {
+                        return self.vue_data
+                    },
+                    methods: {
+                        get_tool_information: function () {
+                            var this_vue = this;
+                            var get_info = self._rpc({
+                                model: 'other_equipment.other_equipment',
+                                method: 'search_read',
+                                domain: [['id', '=', this_vue.id]] || None,
+                            });
+                            $.when(get_info).then(function (tool_info) {
+                                this_vue.equipment_name = tool_info[0].equipment_name;
+                                this_vue.equipment_num = tool_info[0].equipment_num;
+                                this_vue.model = tool_info[0].model;
+                                this_vue.brand = tool_info[0].brand;
+                            });
+                        },
+                        save: function () {
+                                var this_vue = this;
+                                this_vue.$confirm('是否確認該設備已報廢？', '提示', {
+                                        confirmButtonText: '确定',
+                                        cancelButtonText: '取消',
+                                        type: 'warning'
+                                    }).then(() => {
+                                        self._rpc({
+                                    model: 'other_equipment.other_equipment',
+                                    method: 'save_tool_management_scrap',
+                                    kwargs: {'id':this_vue.id,
+                                        'equipment_name': this_vue.equipment_name,
+                                        'equipment_num': this_vue.equipment_num,
+                                        'model': this_vue.model,
+                                        'brand': this_vue.brand,
+                                        'remark': this_vue.remark
+                                    }
+                                }).then(function (e) {
+                                    if(e){
+                                        self.do_action(false);
+                                       // self.getParent().destroy();
+                                       // window.location.reload();
+                                       // return this.parent.load(['invitations']);
+                                    }else{
+                                        self.vue.$message({
+                                          message: '未找到這條記錄',
+                                          type: 'warning'
+                                        });
+                                    }
+                                });
+                                    });
+
+                            },
+                            cancel: function () {
+                                self.getParent().destroy()
+                            }
+                    }
+                })
+            })
+        }
+
+    });
+    core.action_registry.add('tool_management_scrap', tool_management_scrap);
+    return {
+        tool_management_scrap: tool_management_scrap
     };
 });

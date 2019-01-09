@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
+import datetime
 import json
+from datetime import datetime, timedelta
 
 from dateutil.relativedelta import relativedelta
 from odoo import models, fields, api
@@ -13,19 +15,18 @@ class other_equipment(models.Model):
     _name = 'other_equipment.other_equipment'
 
     # TODO: 組號
-    departments = fields.Many2one('res.users', string='組號')
+    departments = fields.Many2one('res.users', string='所屬班組')
     # team_num
-    remark = fields.Char(string='備註')
     status = fields.Selection(STATUS, string='狀態')
     maintenance_due_data = fields.Date(string='應用到期時間')
     last_maintenance_date = fields.Date(string='最後維護日期')
-    calibration_requipemnets = fields.Char(string='標準要求')
-    calibration_body = fields.Char(string='標準體')
+    calibration_requipemnets = fields.Char(string='檢驗要求')
+    calibration_body = fields.Char(string='檢驗主體')
     # 单位为月
     freq_of_cal = fields.Char(string='檢驗週期')
     location_of_equipment = fields.Char(string='設備位置')
     equipment_owner = fields.Char(string='設備擁有者')
-    manual_ref_no = fields.Char(string='手动参考号')
+    manual_ref_no = fields.Char(string='參考手冊編號')
     serial_no = fields.Char(string='序列號')
     model = fields.Char(string='型號')
     brand = fields.Char(string='品牌')
@@ -67,3 +68,90 @@ class other_equipment(models.Model):
             }
             return json.dumps(data)
         return False
+
+    @api.model
+    def save_tool_management_inspection(self, **kw):
+        id = kw['id']
+        equipment_name = kw['equipment_name']
+        equipment_num = kw['equipment_num']
+        remark = kw['remark']
+        model = kw['model']
+        freq_of_cal = kw['freq_of_cal']
+        last_maintenance_date = kw['last_maintenance_date']
+        maintenance_due_data = kw['maintenance_due_data']
+        this_env = self.env['other_equipment.other_equipment'].search([
+            ('id', '=', id), ('equipment_name', '=', equipment_name), ('equipment_num', '=', equipment_num),
+            ('model', '=', model), ('freq_of_cal', '=', freq_of_cal)
+        ])
+        if this_env:
+            try:
+                last_maintenance_date = datetime.strptime(last_maintenance_date, "%Y-%m-%dT%H:%M:%S.%fZ")
+                last_maintenance_date = last_maintenance_date + timedelta(hours=8)
+                last_maintenance_date = last_maintenance_date.strftime('%Y-%m-%d')
+            except ValueError:
+                last_maintenance_date = last_maintenance_date
+            try:
+                maintenance_due_data = datetime.strptime(maintenance_due_data, "%Y-%m-%dT%H:%M:%S.%fZ")
+                maintenance_due_data = maintenance_due_data + timedelta(hours=8)
+                maintenance_due_data = maintenance_due_data.strftime('%Y-%m-%d')
+            except ValueError:
+                maintenance_due_data = maintenance_due_data
+            content = '更新有效期{}为{}'.format(this_env.maintenance_due_data, maintenance_due_data)
+            this_env.write({
+                'last_maintenance_date': last_maintenance_date,
+                'maintenance_due_data': maintenance_due_data,
+                # 'remark': remark
+            })
+            self.env['other_equipment.other_equipment_records'].create({
+                'other_equipment_id': id,
+                'remark': remark,
+                'operation_time': datetime.now(),
+                'operation_type': '檢修',
+                'content': content,
+                'user_id': self._uid,
+            })
+            return True
+        else:
+            return False
+
+    @api.model
+    def save_tool_management_scrap(self, **kw):
+        id = kw['id']
+        equipment_name = kw['equipment_name']
+        equipment_num = kw['equipment_num']
+        remark = kw['remark']
+        model = kw['model']
+        brand = kw['brand']
+        this_env = self.env['other_equipment.other_equipment'].search([
+            ('id', '=', id), ('equipment_name', '=', equipment_name), ('equipment_num', '=', equipment_num),
+            ('model', '=', model), ('brand', '=', brand)
+        ])
+        if this_env:
+            this_env.write({
+                'status': 'scrap',
+                # 'remark': remark
+            })
+            self.env['other_equipment.other_equipment_records'].create({
+                'other_equipment_id': id,
+                'remark': remark,
+                'operation_time': datetime.now(),
+                'operation_type': '報廢',
+                'content': '工器具報廢',
+                'user_id': self._uid,
+            })
+            return True
+        else:
+            return False
+
+
+class other_equipment_records(models.Model):
+    _name = 'other_equipment.other_equipment_records'
+    _description = '工器具操作記錄'
+
+    other_equipment_id = fields.Many2one('other_equipment.other_equipment', '工器具')
+    user_id = fields.Many2one('res.users', '操作人')
+    content = fields.Char('內容')
+    remark = fields.Char(string='備註')
+    operation_time = fields.Datetime('操作時間')
+    operation_type = fields.Char('操作類型')
+

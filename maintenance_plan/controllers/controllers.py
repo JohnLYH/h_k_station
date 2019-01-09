@@ -6,7 +6,6 @@ from datetime import datetime as dt
 import time
 import os
 import random
-import struct
 from xlutils3.copy import copy as xl_copy
 
 
@@ -27,22 +26,51 @@ APP_DIR = os.path.dirname(os.path.dirname(__file__))
 class MaintenancePlan(http.Controller):
 
     @staticmethod
-    def excel_validate(sheet, new_sheet, num, cols_list, red_style):
+    def excel_validate(sheet, new_sheet, num, cols_list, style, has_date_col=True):
+        '''
+        驗證excel的一行的錯誤性
+        :param sheet: sheet活動表
+        :param new_sheet: 用來變更顏色的複製sheet活動表
+        :param num: 行數，0開始
+        :param cols_list: 需要驗證的列數列表
+        :param style: sheet顏色style
+        :param has_date_col: 是否驗證第17、18列的時間格式
+        :return:
+        '''
         row_error = False
         for col in cols_list:
             if sheet.cell(num, col).value == '':
-                new_sheet.write(num, col, style=red_style)
+                new_sheet.write(num, col, style=style)
                 row_error = True
-            elif col == 16 or col == 17:
+            elif (col == 16 or col == 17) and has_date_col is True:
                 try:
                     dt.strptime(sheet.cell(num, col).value, '%Y-%m-%d %H:%M')
                 except Exception as e:
-                    new_sheet.write(num, col, sheet.cell(num, col).value, style=red_style)
+                    new_sheet.write(num, col, sheet.cell(num, col).value, style=style)
                     row_error = True
         return row_error
 
+    @staticmethod
+    def set_excel_style_color(colour_map_key):
+        '''
+        設置單元格背景色
+        :param colour_map_key: 顏色對應鍵值對的key
+        :return:
+        '''
+        style = xlwt.XFStyle()
+        pattern = xlwt.Pattern()
+        pattern.pattern = 1
+        pattern.pattern_fore_colour = xlwt.Style.colour_map[colour_map_key]
+        style.pattern = pattern
+        return style
+
     @http.route('/maintenance_plan/put_in_excel', type='http', csrf=False, auth='user')
     def put_in_excel(self, **kwargs):
+        '''
+        維修計劃管理頁面導入excel按鈕
+        :param kwargs: excel的file信息
+        :return:
+        '''
         file = kwargs['file']
         filename = kwargs['file'].filename
         workbook = xlrd.open_workbook(file_contents=file.read())
@@ -51,17 +79,9 @@ class MaintenancePlan(http.Controller):
         new_sheet = new_workbook.get_sheet(0)
         nrows = sheet.nrows
         # 设置单元格背景色紅色
-        red_style = xlwt.XFStyle()
-        pattern = xlwt.Pattern()
-        pattern.pattern = 1
-        pattern.pattern_fore_colour = xlwt.Style.colour_map['red']
-        red_style.pattern = pattern
+        red_style = self.set_excel_style_color('red')
         # 设置单元格背景色綠色
-        green_style = xlwt.XFStyle()
-        pattern = xlwt.Pattern()
-        pattern.pattern = 1
-        pattern.pattern_fore_colour = xlwt.Style.colour_map['green']
-        green_style.pattern = pattern
+        green_style = self.set_excel_style_color('green')
         error = False
         if [i.value for i in sheet.row(0)] != ROW_1_LIST:
             return json.dumps({'message': '表格不符', 'error': True})
@@ -107,7 +127,7 @@ class MaintenancePlan(http.Controller):
     def down_wrong_file(self, **kwargs):
         '''
         返回错误excel内容
-        :param kwargs:
+        :param kwargs: file_id
         :return:
         '''
         file_id = int(kwargs['file_id'])
@@ -118,7 +138,12 @@ class MaintenancePlan(http.Controller):
         return response
 
     @http.route('/maintenance_plan/export_work_order', auth='user')
-    def export_work_order(self, **kw):
+    def export_work_order(self, **kwargs):
+        '''
+        工單管理頁面導出excel
+        :param kwargs:
+        :return:
+        '''
         return "Hello, world"
 
     @http.route('/maintenance_plan/approval_management', auth='none')

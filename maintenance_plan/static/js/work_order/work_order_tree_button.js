@@ -21,7 +21,16 @@ odoo.define('work_order_tree_button', function (require) {
         },
         _click_tree_buttons: function (event) {
             var self = this;
-            event.stopPropagation();
+            self._rpc({
+                model: self.record.model,
+                method: 'get_ref_id',
+                args: ['maintenance_plan.act_order_approval']
+            }).then(function (act_id) {
+                self.do_action(act_id, {
+                    res_id: self.id,
+                    view_type: 'form',
+                })
+            })
         }
     });
     widget_registry.add('work_order_tree_button', work_order_tree_button);
