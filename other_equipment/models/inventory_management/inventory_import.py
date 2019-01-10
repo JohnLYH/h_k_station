@@ -56,9 +56,9 @@ class InventoryExport(models.Model):
                         cell = [(6, 0, re_list)]
                 row_content.append(cell)
             one_dict = dict(zip(keys, row_content))
-            print(one_dict)
             one_sheet_content.append(one_dict)
         for item in one_sheet_content:
+            # 查看当前的库存编号是否存在 存在就不再创建
             record = self.env['equipment.inventory_management'].search(
                 [('inventory_id', '=', item.get('inventory_id'))])
             if not record.id:

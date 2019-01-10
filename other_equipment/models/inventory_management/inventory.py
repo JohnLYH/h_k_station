@@ -10,7 +10,7 @@ class InventoryManagement(models.Model):
     inventory_description = fields.Char(string='描述')
     work_prepare = fields.Many2many('maintenance_plan.standard.job',
                                     'inventory_standard_ref', 'standard_id', 'inventory_id', string='標準工作')
-    inventory_count = fields.Float(string='库存数量')
+    inventory_count = fields.Integer(string='库存数量')
     lastest_update_time = fields.Datetime(string='最後更新時間')
     _sql_constraints = [('name_unique', 'unique(inventory_id)', "庫存編碼已经存在请重新输入")]
 
