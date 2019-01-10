@@ -1,0 +1,13 @@
+<div id="app">
+    <el-row>
+        <el-button @click="save_group">保存</el-button>
+    </el-row>
+    <h3 v-if="open_type === 'add'">基本信息</h3>
+    <el-row v-if="open_type === 'add'">
+        <div>分组名称:</div>
+        <el-input v-model="group_name" style="width: 200px"></el-input>
+    </el-row>
+    <div style="height:10px;"></div>
+    <h3>角色组权限设置</h3>
+    <el-tree ref="group_tree" :default-checked-keys="checked_groups_ids" node-key="id" :data="group_tree_data" :props="defaultProps" show-checkbox></el-tree>
+</div>

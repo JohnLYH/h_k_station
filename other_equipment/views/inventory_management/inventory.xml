@@ -20,6 +20,7 @@
         <field name="model_id" ref="model_equipment_inventory_management"/>
         <field name="condition">True</field>
         <field name="binding_model_id" ref="model_equipment_inventory_management"/>
+        <field name="binding_group">user.system_fuenc_tester1</field>
         <field name="binding_type">action_button</field>
         <field name="binding_action">庫存管理</field>
         <field name="code">

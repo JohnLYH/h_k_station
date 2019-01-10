@@ -28,6 +28,7 @@
         'views/tool_management.xml',
         'views/menu.xml',
         'views/inventory_management/inventory.xml',
+        'views/inventory_management/inventory_export.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data noupdate="1">
+        <record model="ir.module.category" id="odoo_groups_manage_category_custom_groups">
+            <field name="name">自定义角色组</field>
+        </record>
+    </data>
+</odoo>
