@@ -1,0 +1,38 @@
+<odoo>
+    <record id="email_list_tree" model="ir.ui.view">
+        <field name="郵件列表"></field>
+        <field name="model">user.send_email</field>
+        <field name="arch" type="xml">
+            <tree class="noOpen" create="0">
+                <field name="email_theme"></field>
+                <field name="recipient_person"></field>
+                <field name="send_time"></field>
+                <widget name="treebtns" template="email_dateils" string="操作"></widget>
+            </tree>
+        </field>
+    </record>
+
+    <record id="email_list_form" model="ir.ui.view">
+        <field name="郵件列表"></field>
+        <field name="model">user.send_email</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="email_theme"></field>
+                    <field name="recipient_person"></field>
+                    <field name="send_time"></field>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="email_list_act" model="ir.actions.act_window">
+        <field name="name">郵件列表</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">user.send_email</field>
+        <field name="view_mode">tree,kanban,form</field>
+    </record>
+
+    <menuitem name="郵件列表" id="email_list_menu" action="email_list_act"></menuitem>
+</odoo>

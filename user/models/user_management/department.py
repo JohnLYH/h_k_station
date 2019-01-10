@@ -56,3 +56,26 @@ class Department(models.Model):
             if not record:
                 dic['name'] = item['name']
                 self.create(dic)
+
+    @api.model
+    def get_department_users(self):
+        '''
+        页面初始化的时候 获取角色名称组
+        :return: 角色组
+        '''
+        lis = []  #存放角色组
+        record = self.env['res.users'].search_read([])
+        for i in record:
+            rec = {}
+            rec['name'] = i.get('role')
+            if rec['name']:
+                if not rec['name'] in lis:
+                    lis.append(rec)
+        return lis
+
+    # 權限管理編輯操作
+    @api.model
+    def edit_save(self,**kw):
+        rocord = self.env['res.users'].search([('role','=',kw.get('role_name'))])
+        for i in rocord:
+            i.write({'role': kw.get('modify_name')})

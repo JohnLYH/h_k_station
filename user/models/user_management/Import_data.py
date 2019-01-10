@@ -33,7 +33,7 @@ class ImportDate(models.Model):
             one_sheet_content.append(one_dict)
         for i, item in enumerate(one_sheet_content):
             record = self.env['res.users'].search([('name','=',item.get('login'))])
-            if record:
+            if not record.id:
                 self.env['res.users'].create(item)
         return self.env['user.department'].department_information()
 

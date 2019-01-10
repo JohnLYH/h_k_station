@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+	<!--x詳情按钮和删除按鈕-->
+    <t t-name="email_dateils">
+        <div class="layui-btn-group">
+            <button class="layui-btn layui-btn-sm" type="object"  name="email_edit"
+            >詳情</button>
+            <button class="layui-btn layui-btn-sm layui-btn-danger" type="object"  name="email_delete"
+                    confirm="您确定要删除该条记录吗？">刪除</button>
+        </div>
+    </t>
+</templates>

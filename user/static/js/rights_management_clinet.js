@@ -15,48 +15,52 @@ odoo.define('rights_management', function (require) {
             this._super.apply(this, arguments);
             this.vue_data = {
 
-                                departmentList:[],
+                departmentList: [],
 
-                                defaultProps: {
-                                                  children: 'children',
-                                                  label: 'label'
-                                                },
+                defaultProps: {
+                    children: 'children',
+                    label: 'label'
+                },
 
-                                tableData: [],
-                                multipleSelection: [],
-                                default_checked_keys:[],
-                                input:'',
-                                currentPage4:1,
-                                message:0,
-                                value:[],
-                                options:'',
-                                size_:10,
-                                list_size:[10, 20, 30, 40],
+                tableData: [],
+                multipleSelection: [],
+                default_checked_keys: [],
+                input: '',
+                currentPage4: 1,
+                message: 0,
+                value: '',
+                options: [
+                          {value: 'normal', label: '正常'},
+                          {value: 'disable', label: '禁用'},
+                          {value: 'all', label: '全部'}
+                       ],
+                size_: 10,
+                list_size: [10, 20, 30, 40],
 
-                };
+            };
         },
 
         willStart: function () {
 
-                    var self= this;
+            var self = this;
 
-                    return self._rpc({
-                        model: 'res.users',
-                        method: 'get_department_users',
-                    }).then(function(data){
-                        self.vue_data.tableData = data
-                    })
-            },
+            return self._rpc({
+                model: 'user.department',
+                method: 'get_department_users',
+            }).then(function (data) {
+                self.vue_data.tableData = data
+            })
+        },
 
         start: function () {
             var self = this;
 
             $.when(
-            this._rpc({
-                model: 'html_model.template_manage',
-                method: 'get_template_content',
-                kwargs: {module_name: 'user', template_name: 'rights_management_clinet'}
-            })).then(function (res) {
+                this._rpc({
+                    model: 'html_model.template_manage',
+                    method: 'get_template_content',
+                    kwargs: {module_name: 'user', template_name: 'rights_management_clinet'}
+                })).then(function (res) {
                 self.replaceElement($(res));
                 var vue = new Vue({
                     el: '#rights_management',
@@ -65,21 +69,21 @@ odoo.define('rights_management', function (require) {
                     },
 
                     methods: {
-                                click_node: function(data){
+                        click_node: function (data) {
 
-                                   self._rpc({
-                                              model: 'res.users',
-                                              method:'get_users',
-                                              kwargs: {'department_id':data.id}
-                                            }).then(function(get_data){
-                                              self.vue_data.tableData=get_data.slice(0,10);
-                                              self.vue_data.message=get_data.length;
-                                            });
+                            self._rpc({
+                                model: 'res.users',
+                                method: 'get_users',
+                                kwargs: {'department_id': data.id}
+                            }).then(function (get_data) {
+                                self.vue_data.tableData = get_data.slice(0, 10);
+                                self.vue_data.message = get_data.length;
+                            });
 
 
-                                 },
+                        },
 
-                                 handleSelectionChange: function(data){
+                        handleSelectionChange: function (data) {
 //                                   alert('123');
 //                                   self._rpc({
 //                                              model: 'user.employees_get',
@@ -89,44 +93,49 @@ odoo.define('rights_management', function (require) {
 //                                            });
 
 
-                                 },
+                        },
 
-                                 handleSizeChange: function(data){
-                                   self._rpc({
-                                              model: 'res.users',
-                                              method:'page_size',
-                                              kwargs: {'size':data}
-                                            }).then(function(get_data){
-                                              self.vue_data.tableData=get_data;
-                                            });
-
-
-                                 },
-
-                                 handleCurrentChange: function(page){
-                                   self._rpc({
-                                              model: 'res.users',
-                                              method:'current_change',
-                                              kwargs: {'record':page,'page':self.vue_data.tableData.length}
-                                            }).then(function(get_data){
-                                              self.vue_data.tableData=get_data;
-                                            });
-                                 },
-
-                                 handleEdit: function(data){
-                               self.do_action({
-                                                name: '\u7de8\u8f2f\u4eba\u54e1\u4fe1\u606f',
-                                                type: 'ir.actions.client',
-                                                tag: 'edit_role',
-                                                target: 'new',
-                                            });
+                        handleSizeChange: function (data) {
+                            self._rpc({
+                                model: 'res.users',
+                                method: 'page_size',
+                                kwargs: {'size': data}
+                            }).then(function (get_data) {
+                                self.vue_data.tableData = get_data;
+                            });
 
 
-                                 },
+                        },
 
-                                 handleReset: function(data){
-                                 alert('handleReset')
+                        handleCurrentChange: function (page) {
+                            self._rpc({
+                                model: 'res.users',
+                                method: 'current_change',
+                                kwargs: {'record': page, 'page': self.vue_data.tableData.length}
+                            }).then(function (get_data) {
+                                self.vue_data.tableData = get_data;
+                            });
+                        },
 
+                        handleEdit: function (index, row) {
+                            self.do_action({
+                                name: '\u7de8\u8f2f\u4eba\u54e1\u4fe1\u606f',
+                                type: 'ir.actions.client',
+                                tag: 'edit_role',
+                                target: 'new',
+                                context: {role_name: row.name, per: row.Permission_illustrate,}
+
+                            });
+
+
+                        },
+
+                        handleReset: function (data) {
+                            alert('handleReset')
+                        },
+
+                        handleDisable: function (data) {
+                            alert('handleDisable')
 //                                   self._rpc({
 //                                              model: 'cdtct_dingtalk.cdtct_dingtalk_users',
 //                                              method:'get_users',
@@ -136,46 +145,24 @@ odoo.define('rights_management', function (require) {
 //                                            });
 
 
-                                 },
+                        },
 
-                                 handleDisable: function(data){
-                                    alert('handleDisable')
-//                                   self._rpc({
-//                                              model: 'cdtct_dingtalk.cdtct_dingtalk_users',
-//                                              method:'get_users',
-//                                              kwargs: {'department_id':data.id}
-//                                            }).then(function(get_data){
-//                                              self.vue_data.tableData=get_data;
-//                                            });
-
-
-                                 },
-
-                                 search: function(data){
-                                    alert('handleDisable')
-//                                   self._rpc({
-//                                              model: 'cdtct_dingtalk.cdtct_dingtalk_users',
-//                                              method:'get_users',
-//                                              kwargs: {'department_id':data.id}
-//                                            }).then(function(get_data){
-//                                              self.vue_data.tableData=get_data;
-//                                            });
+                        search: function (data) {
+                            self._rpc({
+                                model: 'res.users',
+                                method: 'permissions_search',
+                                kwargs: {'name': self.vue_data.input, 'chose': self.vue_data.value}
+                            }).then(function (get_data) {
+                                self.vue_data.tableData = get_data
+                            });
 
 
-                                 },
+                        },
 
-                                 reset: function(data){
-                                    alert('handleDisable')
-//                                   self._rpc({
-//                                              model: 'cdtct_dingtalk.cdtct_dingtalk_users',
-//                                              method:'get_users',
-//                                              kwargs: {'department_id':data.id}
-//                                            }).then(function(get_data){
-//                                              self.vue_data.tableData=get_data;
-//                                            });
-
-
-                                 },
+                        reset: function (data) {
+                            self.vue_data.input = '';
+                            self.vue_data.value = '';
+                        },
                     },
 
                 });
