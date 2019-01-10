@@ -9,6 +9,10 @@
         </div>
     </t>
 
-    <!--工器具彈出框-->
+    <t t-name="WidgetWebsiteButton" class="o_stat_info published">
+        <lable>
+            <input name="Fruit" type="radio" value="" />苹果
+        </lable>
+    </t>
 
 </template>
