@@ -5,7 +5,7 @@
             <field name="name">設備管理列表</field>
             <field name="model">maintenance_plan.equipment</field>
             <field name="arch" type="xml">
-                <tree import="false" edit="0" create="0" delete="0" js_class="equipment_tree_domain">
+                <tree import="false" edit="0" create="0" delete="0" js_class="equipment_tree_domain" class="noOpen">
                     <field name="parent_equipment_num"/>
                     <field name="num"/>
                     <field name="description"/>
@@ -18,25 +18,10 @@
             </field>
         </record>
 
-        <!--<record id="maintenance_plan_equipment_form" model="ir.ui.view">-->
-            <!--<field name="name">設備管理詳情</field>-->
-            <!--<field name="model">maintenance_plan.equipment</field>-->
-            <!--<field name="arch" type="xml">-->
-                <!--<form import="false" edit="1" create="1" delete="1">-->
-
-                <!--</form>-->
-            <!--</field>-->
-        <!--</record>-->
-
         <record id="act_equipment_management" model="ir.actions.act_window">
             <field name="name">設備管理</field>
             <field name="res_model">maintenance_plan.equipment</field>
-            <field name="view_mode">tree</field>
+            <field name="view_mode">tree,form</field>
         </record>
-
-        <!--<record id="act_equipment_management" model="ir.actions.client">-->
-            <!--<field name="name">設備管理</field>-->
-            <!--<field name="tag">equipment_management</field>-->
-        <!--</record>-->
     </data>
 </odoo>

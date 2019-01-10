@@ -13,7 +13,7 @@ class EquipmentType(models.Model):
     name = fields.Char('類型名稱')
     equipment_ids = fields.One2many('maintenance_plan.equipment', 'equipment_type_id', string='設備')
 
-    parent_id = fields.Many2one('maintenance_plan.equipment.type', string='上級')
+    parent_id = fields.Many2one('maintenance_plan.equipment.type', string='上級', ondelete='cascade')
     child_ids = fields.One2many('maintenance_plan.equipment.type', 'parent_id', string='下級')
 
     parent_left = fields.Integer(index=True)
