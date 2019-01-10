@@ -9,7 +9,7 @@
                 <!--<tree import="false" edit="0" create="0" delete="0" search_ex_template="maintenance_plan_approval_search_template"-->
                       <!--search_pannel_js_class="plan_search_pannel">-->
                 <tree import="false"  search_ex_template="tool_maintenance_search_template"
-                  search_pannel_js_class="tool_search" >
+                  search_pannel_js_class="tool_search" class="noOpen" limit="4" delete="0" edit="0" create="0">
                     <field name="equipment_name"/>
                     <field name="equipment_num"/>
                     <field name="model"/>
@@ -29,7 +29,7 @@
             <field name="name">工器具管理</field>
             <field name="model">other_equipment.other_equipment</field>
             <field name="arch" type="xml">
-                <form >
+                <form delete="0">
                     <group col="8">
                         <field name="equipment_name"/>
                         <field name="equipment_num"/>

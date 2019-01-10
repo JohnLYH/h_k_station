@@ -42,7 +42,6 @@ class OtherEquipment(http.Controller):
                 try:
                     dt.strptime(sheet.cell(num, col).value, '%Y/%m/%d')
                 except Exception as e:
-                    print('這是時間的')
                     new_sheet.write(num, col, sheet.cell(num, col).value, style=style)
                     row_error = True
             else:
@@ -171,7 +170,6 @@ class OtherEquipment(http.Controller):
                     'file': data
                 })
                 os.remove(file_path)
-            print('我在这儿')
             return json.dumps({'error': error, 'message': '文件有部分錯誤信息，請修改后再次傳入', 'file_id': new_file.id})
         else:
             return json.dumps({'error': error, 'message': '上傳成功'})
@@ -183,21 +181,6 @@ class OtherEquipment(http.Controller):
         :param kwargs: 需要導出的domian條件
         :return:
         '''
-        # if error is True:
-        #     name = str(int(round(time.time() * 1000))) + str(random.randint(1, 1000)) + '.xls'
-        #     path = APP_DIR + '/static/excel/'
-        #     file_path = path + name
-        #     new_workbook.save(file_path)
-        #     with open(file_path, 'rb') as f:
-        #         data = f.read()
-        #         new_file = request.env['other_equipment.trans.excel'].create({
-        #             'name': filename.split('.')[0],
-        #             'file': data
-        #         })
-        #         os.remove(file_path)
-        #     print('我在这儿')
-        #     return json.dumps({'error': error, 'message': '文件有部分錯誤信息，請修改后再次傳入', 'file_id': new_file.id})
-        # else:
         domains = kwargs['domains']
         arr = []
         try:
@@ -210,45 +193,44 @@ class OtherEquipment(http.Controller):
                 other_equipments = request.env['other_equipment.other_equipment'].search(arr)
             else:
                 other_equipments = request.env['other_equipment.other_equipment'].search([])
-            excel_w = xlwt.Workbook(encoding='utf-8')  # 设置编码格式
-            excel_w_sheet = excel_w.add_sheet('MySheet1')  # 添加sheet表
-            style = xlwt.XFStyle()  # 初始化样式
-            font = xlwt.Font()  # 为样式创建字体
-            font.name = 'Times New Roman'
-            # font.bold = True                                  # 黑体
-            # font.underline = True                             # 下划线
-            # font.italic = True                                # 斜体字
-            style.font = font  # 设定样式
-            # 寫入第一行
-            for i in range(len(ROW_1_LIST)):
-                excel_w_sheet.write(0, i, label='%s' % (ROW_1_LIST[i]))  # 参数对应 行, 列, 值
+            wb = Workbook()
+            # 激活 worksheet
+            ws = wb.active
+            ws.append(ROW_1_LIST)
             len_other_equipments = len(other_equipments)
             for i in range(1, len_other_equipments+1):
-                excel_w_sheet.write(i, 0, other_equipments[i-1].equipment_num if other_equipments[i-1].equipment_num else '')
-                excel_w_sheet.write(i, 1, other_equipments[i - 1].departments.department_order if other_equipments[i-1].departments.department_order else '')
-                excel_w_sheet.write(i, 2, other_equipments[i - 1].result_reference if other_equipments[i-1].result_reference else '')
-                excel_w_sheet.write(i, 3, other_equipments[i - 1].equipment_name if other_equipments[i-1].equipment_name else '')
-                excel_w_sheet.write(i, 4, other_equipments[i - 1].brand if other_equipments[i-1].brand else '')
-                excel_w_sheet.write(i, 5, other_equipments[i - 1].model if other_equipments[i-1].model else '')
-                excel_w_sheet.write(i, 6, other_equipments[i - 1].serial_no if other_equipments[i-1].serial_no else '')
-                excel_w_sheet.write(i, 7, other_equipments[i - 1].manual_ref_no if other_equipments[i-1].manual_ref_no else '')
-                excel_w_sheet.write(i, 8, other_equipments[i - 1].equipment_owner if other_equipments[i-1].equipment_owner else '')
-                excel_w_sheet.write(i, 9, other_equipments[i - 1].location_of_equipment if other_equipments[i-1].location_of_equipment else '')
-                excel_w_sheet.write(i, 10, other_equipments[i - 1].freq_of_cal if other_equipments[i-1].freq_of_cal else '')
-                excel_w_sheet.write(i, 11, other_equipments[i - 1].calibration_body if other_equipments[i-1].calibration_body else '')
-                excel_w_sheet.write(i, 12, other_equipments[i - 1].calibration_requipemnets if other_equipments[i-1].calibration_requipemnets else '')
-                excel_w_sheet.write(i, 13, other_equipments[i - 1].last_maintenance_date if other_equipments[i-1].last_maintenance_date else '')
-                excel_w_sheet.write(i, 14, other_equipments[i - 1].maintenance_due_data if other_equipments[i-1].maintenance_due_data else '')
-                excel_w_sheet.write(i, 15, other_equipments[i - 1].status if other_equipments[i-1].status else '')
-                excel_w_sheet.write(i, 16, other_equipments[i - 1].remark if other_equipments[i-1].remark else '')
-            excel_w.save('Excelw.xls')
-            with open('Excelw.xls', 'rb') as f:
+                my_records = [
+                    other_equipments[i-1].equipment_num if other_equipments[i-1].equipment_num else '',
+                    other_equipments[i - 1].departments.department_order if other_equipments[
+                        i - 1].departments.department_order else '',
+                    other_equipments[i - 1].result_reference if other_equipments[i - 1].result_reference else '',
+                    other_equipments[i - 1].equipment_name if other_equipments[i - 1].equipment_name else '',
+                    other_equipments[i - 1].brand if other_equipments[i - 1].brand else '',
+                    other_equipments[i - 1].model if other_equipments[i - 1].model else '',
+                    other_equipments[i - 1].serial_no if other_equipments[i - 1].serial_no else '',
+                    other_equipments[i - 1].manual_ref_no if other_equipments[i - 1].manual_ref_no else '',
+                    other_equipments[i - 1].equipment_owner if other_equipments[i - 1].equipment_owner else '',
+                    other_equipments[i - 1].location_of_equipment if other_equipments[
+                        i - 1].location_of_equipment else '',
+                    other_equipments[i - 1].freq_of_cal if other_equipments[i - 1].freq_of_cal else '',
+                    other_equipments[i - 1].calibration_body if other_equipments[i - 1].calibration_body else '',
+                    other_equipments[i - 1].calibration_requipemnets if other_equipments[
+                        i - 1].calibration_requipemnets else '',
+                    other_equipments[i - 1].last_maintenance_date if other_equipments[
+                        i - 1].last_maintenance_date else '',
+                    other_equipments[i - 1].maintenance_due_data if other_equipments[i - 1].maintenance_due_data else '',
+                    other_equipments[i - 1].status if other_equipments[i - 1].status else '',
+                    other_equipments[i - 1].remark if other_equipments[i - 1].remark else '',
+                ]
+                ws.append(my_records)
+            wb.save("sample.xlsx")
+            with open('sample.xlsx', 'rb') as f:
                 data = f.read()
                 new_file = request.env['other_equipment.trans.excel'].create({
-                    'name': 'Excelw',
+                    'name': '工器具導出數據',
                     'file': data
                 })
-                os.remove('Excelw.xls')
+                os.remove('sample.xlsx')
             return json.dumps({'error': 0, 'message': '下載成功', 'file_id': new_file.id})
         except:
             return json.dumps({'error': 1, 'message': '下載失敗'})
@@ -261,8 +243,13 @@ class OtherEquipment(http.Controller):
         :return:
         '''
         file_id = int(kwargs['file_id'])
+        filetype = kwargs['type']
         wb = request.env['other_equipment.trans.excel'].browse(file_id)
         response = request.make_response(wb.file)
-        response.headers["Content-Disposition"] = "attachment; filename={}". \
-            format((wb.name + '错误.xls').encode().decode('latin-1'))
+        if filetype == '錯誤':
+            response.headers["Content-Disposition"] = "attachment; filename={}". \
+                format((wb.name + '错误.xls').encode().decode('latin-1'))
+        if filetype == '下載':
+            response.headers["Content-Disposition"] = "attachment; filename={}". \
+                format((wb.name + '.xlsx').encode().decode('latin-1'))
         return response

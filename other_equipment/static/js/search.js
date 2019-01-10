@@ -11,6 +11,7 @@ odoo.define("tool_search", function (require) {
         events: _.extend({}, search_pannel_default.prototype.events, {
             'click .search_export': 'search_export',
             'click .search_import': 'search_import',
+            'click .search_new': 'search_new',
         }),
 
         start: function() {
@@ -23,6 +24,7 @@ odoo.define("tool_search", function (require) {
                 }
             });
         },
+
         uploadExcel: function (dom) {
             var file = dom.files[0];
             var self = this;
@@ -54,7 +56,7 @@ odoo.define("tool_search", function (require) {
                             name: '返回錯誤文件',
                             target: 'new',
                             type: 'ir.actions.act_url',
-                            url: '/other_equipment/down_wrong_file?file_id=' + response.file_id
+                            url: '/other_equipment/down_wrong_file?type=錯誤&file_id=' + response.file_id
                         })
                     } else {
                         self.vue.$notify({
@@ -66,7 +68,6 @@ odoo.define("tool_search", function (require) {
                 }
             })
         },
-        
 
         search_export: function() {
             var self = this;
@@ -120,7 +121,7 @@ odoo.define("tool_search", function (require) {
                             name: '返回錯誤文件',
                             target: 'new',
                             type: 'ir.actions.act_url',
-                            url: '/other_equipment/down_wrong_file?file_id=' + response.file_id
+                            url: '/other_equipment/down_wrong_file?type=下載&file_id=' + response.file_id
                         })
                     }
                     else {
@@ -155,6 +156,15 @@ odoo.define("tool_search", function (require) {
                 }
             });
             target.trigger('click');
+        },
+
+        search_new: function () {
+            var self = this;
+            self.do_action({
+                    type: 'ir.actions.act_window',
+                    res_model: 'other_equipment.other_equipment',
+                    views: [[false, "form"]],
+                })
         }
     });
 
