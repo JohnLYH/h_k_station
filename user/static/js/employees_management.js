@@ -130,7 +130,7 @@ odoo.define('employees_management_action', function (require) {
                                 tag: 'change_password_usr',
                                 target: 'new',
                                 context: {paw: row.id},
-                            });
+                            }, {size: 'medium'});
                         },
 
                         handleDisable: function (index, row) {
@@ -159,7 +159,7 @@ odoo.define('employees_management_action', function (require) {
 
                         loaddown: function (data) {
                             self.do_action({
-                                name: '\u5c0e\u5165\u4eba\u54e1\u4fe1\u606f',
+                                name: '導入人員消息',
                                 type: 'ir.actions.act_window',
                                 res_model: 'user.import_date',
                                 views: [[self.vue_data.views, 'form']],

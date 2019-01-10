@@ -27,6 +27,7 @@
         'views/assets.xml',
         'views/tool_management.xml',
         'views/menu.xml',
+        'views/inventory_management/inventory.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

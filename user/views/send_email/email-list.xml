@@ -7,7 +7,7 @@
                 <field name="email_theme"></field>
                 <field name="recipient_person"></field>
                 <field name="send_time"></field>
-                <widget name="treebtns" template="email_dateils" string="操作"></widget>
+                <widget name="user_treebtns" template="email_dateils" string="操作"></widget>
             </tree>
         </field>
     </record>
