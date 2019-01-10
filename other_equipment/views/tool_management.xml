@@ -39,7 +39,7 @@
                         <field name="manual_ref_no"/>
                         <field name="departments"/>
                         <field name="location_of_equipment"/>
-                        <field name="freq_of_cal" widget="freq_of_cal_btn"/>
+                        <field name="freq_of_cal"/>
                         <field name="last_maintenance_date"/>
                         <field name="maintenance_due_data"/>
                         <field name="status"/>

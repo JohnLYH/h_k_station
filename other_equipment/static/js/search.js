@@ -16,7 +16,6 @@ odoo.define("tool_search", function (require) {
 
         start: function() {
             this._super.apply(this, arguments);
-            // this.collapse_search()
             this.vue = new Vue({
                 el: '#app',
                 data() {
@@ -112,24 +111,24 @@ odoo.define("tool_search", function (require) {
                     response = JSON.parse(response);
                     console.log(response)
                     if (response.error === 0) {
-                        // self.vue.$notify({
-                        //     title: '成功',
-                        //     message: '導出成功',
-                        //     type: 'success'
-                        // });
+                        self.vue.$notify({
+                            title: '成功',
+                            message: '導出成功',
+                            type: 'success'
+                        });
                         self.do_action({
-                            name: '返回錯誤文件',
+                            name: '返回導出文件',
                             target: 'new',
                             type: 'ir.actions.act_url',
                             url: '/other_equipment/down_wrong_file?type=下載&file_id=' + response.file_id
                         })
                     }
                     else {
-                        // self.vue.$notify({
-                        //     title: '錯誤',
-                        //     message: response.message,
-                        //     type: 'error'
-                        // });
+                        self.vue.$notify({
+                            title: '錯誤',
+                            message: response.message,
+                            type: 'error'
+                        });
                     }
                 }
             })

@@ -33,7 +33,6 @@ class other_equipment(models.Model):
     model = fields.Char(string='型號', size=500)
     brand = fields.Char(string='品牌', size=500)
     result_reference = fields.Char(string='結果參考', size=500)
-    # equipment_id = fields.Many2one('maintenance_plan.equipment', string='設備')
     equipment_name = fields.Char('設備名稱', size=500, required=True)
     equipment_num = fields.Char('設備編號', size=500, required=True)
     equipment_records_ids = fields.One2many('other_equipment.other_equipment_records', 'other_equipment_id', '操作記錄')
@@ -149,7 +148,6 @@ class other_equipment(models.Model):
             this_env.write({
                 'last_maintenance_date': last_maintenance_date,
                 'maintenance_due_data': maintenance_due_data,
-                # 'remark': remark
             })
             new_records = self.env['other_equipment.other_equipment_records'].create({
                 'other_equipment_id': id,
@@ -178,7 +176,6 @@ class other_equipment(models.Model):
         if this_env:
             this_env.write({
                 'status': '已報廢',
-                # 'remark': remark
             })
             self.env['other_equipment.other_equipment_records'].create({
                 'other_equipment_id': id,
