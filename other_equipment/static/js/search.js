@@ -66,48 +66,7 @@ odoo.define("tool_search", function (require) {
                 }
             })
         },
-
-        downExcel: function(domains){
-            var formData = new FormData();
-            formData.append('domains', domains);
-            $.ajax({
-                url: '/other_equipment/get_in_excel/',
-                type: 'POST',
-                data: formData,
-                processData: false,  //tell jQuery not to process the data
-                contentType: false,  //tell jQuery not to set contentType
-                //这儿的三个参数其实就是XMLHttpRequest里面带的信息。
-                success: function (response) {
-                    response = JSON.parse(response);
-                    console.log(response)
-                    // if (response.error === false) {
-                    //     self.vue.$notify({
-                    //         title: '成功',
-                    //         message: '上傳成功',
-                    //         type: 'success'
-                    //     });
-                    // } else if (response.error === true && response.file_id) {
-                    //     self.vue.$notify({
-                    //         title: '警告',
-                    //         message: response.message,
-                    //         type: 'warning'
-                    //     });
-                    //     self.do_action({
-                    //         name: '返回錯誤文件',
-                    //         target: 'new',
-                    //         type: 'ir.actions.act_url',
-                    //         url: '/other_equipment/down_wrong_file?file_id=' + response.file_id
-                    //     })
-                    // } else {
-                    //     self.vue.$notify({
-                    //         title: '錯誤',
-                    //         message: response.message,
-                    //         type: 'error'
-                    //     });
-                    // }
-                }
-            })
-        },
+        
 
         search_export: function() {
             var self = this;

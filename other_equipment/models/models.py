@@ -60,8 +60,14 @@ class other_equipment(models.Model):
     @api.onchange('last_maintenance_date')
     def _maintenance_due_data(self):
         if self.last_maintenance_date:
-            self.maintenance_due_data = dt.strptime(self.last_maintenance_date, '%Y-%m-%d')\
-                                        + relativedelta(months=int(self.freq_of_cal))
+            if self.freq_of_cal == 'ON CONDITION':
+                pass
+            else:
+                try:
+                    self.maintenance_due_data = dt.strptime(self.last_maintenance_date, '%Y-%m-%d')\
+                                                + relativedelta(months=int(self.freq_of_cal))
+                except:
+                    pass
 
     @api.multi
     def write(self, vals):
