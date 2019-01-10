@@ -1,2 +1,7 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_maintenance_plan_maintenance_plan,maintenance_plan.maintenance_plan,model_maintenance_plan_maintenance_plan,,1,0,0,0
+"access_maintenance_plan_equipment","maintenance_plan_equipment","model_maintenance_plan_equipment",,1,1,1,1
+"access_maintenance_plan_maintenance_plan","maintenance_plan_maintenance_plan","model_maintenance_plan_maintenance_plan",,1,1,1,1
+"access_maintenance_plan_trans_excel","maintenance_plan_trans_excel","model_maintenance_plan_trans_excel",,1,1,1,1
+"access_maintenance_plan_config","maintenance_plan_config","model_maintenance_plan_config",,1,1,1,1
+"access_maintenance_plan_standard_job","maintenance_plan_standard_job","model_maintenance_plan_standard_job",,1,1,1,1
+"access_maintenance_plan_equipment_type","maintenance_plan_equipment_type","model_maintenance_plan_equipment_type",,1,1,1,1

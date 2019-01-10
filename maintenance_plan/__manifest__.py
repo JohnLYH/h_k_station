@@ -19,17 +19,25 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'web', 'layui_theme', 'vue_template_manager'],
+    'depends': ['base', 'web', 'layui_theme', 'vue_template_manager', 'user'],
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
-        'views/views.xml',
+        'security/ir.model.access.csv',
+        'views/assets.xml',
         'views/templates.xml',
+        'views/config/config_view.xml',
+        'views/approval_management/order_approval_view.xml',
+        'views/maintenance_plan/maintenance_plan_view.xml',
+        'views/maintenance_plan/work_order_view.xml',
+        'views/equipment/equipment_view.xml',
+        'views/equipment/equipment_type_view.xml',
+        'views/menu.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
         'demo/demo.xml',
     ],
+    'qweb': ['static/xml/*.xml'],
     'application': True
 }

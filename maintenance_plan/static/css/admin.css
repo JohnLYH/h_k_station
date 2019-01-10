@@ -1,0 +1,35 @@
+.open_div .el-row {
+    padding: 10px 0px;
+}
+
+.el-upload__input {
+    display: none !important;
+}
+
+.o_list_view th, .o_list_view td {
+    text-align: center;
+}
+
+#LAY-system-side-menu .layui-nav-itemed.layui-this, #LAY-system-side-menu .layui-nav-itemed.layui-this > a, #LAY-system-side-menu .layui-nav-bar {
+    background-color: #871317 !important;
+}
+
+#LAY_app .layui-side.layui-side-menu {
+    background-color: #5F0A0F !important;
+}
+
+.layui-logo img {
+    background: #5F0A0F !important;
+}
+
+.custom-tree-node {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    padding-right: 8px;
+}
+.custom-tree-node i{
+    border-radius: 0.3em;
+}

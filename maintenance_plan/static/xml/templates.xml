@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<template>
+    <t t-name="tem_maintenance_plan_tree_button">
+        <div style="text-align: center">
+            <t t-if="widget.record.data.status == false">
+                <a t-attf-record-id="#{widget.id}" class="maintenance_plan_edit" href="javascript: void 0">編輯</a>
+            </t>
+            <t t-else="">
+                <a t-attf-record-id="#{widget.id}" class="maintenance_plan_look" href="javascript: void 0">查看</a>
+            </t>
+        </div>
+    </t>
+
+    <t t-name="tem_work_order_tree_button">
+        <div style="text-align: center">
+            <a t-attf-record-id="#{widget.id}" class="work_order_a" href="javascript: void 0">詳情</a>
+        </div>
+    </t>
+
+    <!-- 工單審批詳情按鈕 -->
+    <t t-name="tem_order_approval_tree_button">
+        <div style="text-align: center">
+            <a t-attf-record-id="#{widget.id}" class="maintenance_plan_detail" href="javascript: void 0">詳情</a>
+        </div>
+    </t>
+
+    <!-- 參考資料審批詳情按鈕 -->
+    <t t-name="tem_maintenance_plan_data_approval_tree_button">
+        <div style="text-align: center">
+            <!--<a t-attf-record-id="#{widget.id}" class="work_order_a" href="javascript: void 0">詳情</a>-->
+            <button type="object" name="_go_to_details" class="btn-primary btn">詳情</button>
+        </div>
+    </t>
+
+    <t t-name="tem_equipment_type_tree_button">
+        <div style="text-align: center">
+            <a t-attf-record-id="#{widget.id}" class="maintenance_plan_detail" href="javascript: void 0">詳情</a>
+            <t t-if="widget.record.data.equipment_ids.count === 0">
+                <a t-attf-record-id="#{widget.id}" class="maintenance_plan_delete" href="javascript: void 0">刪除</a>
+            </t>
+        </div>
+    </t>
+
+    <t t-name="tem_equipment_tree_button">
+        <div style="text-align: center">
+            <a t-attf-record-id="#{widget.id}" class="maintenance_plan_detail" href="javascript: void 0">查看詳情</a>
+        </div>
+    </t>
+</template>

@@ -1,3 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from . import models
+from . import maintenance_plan
+from . import equipment
+from . import config
+from . import approval_management
+from . import trans_excel
