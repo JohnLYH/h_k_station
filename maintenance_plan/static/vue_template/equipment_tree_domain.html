@@ -1,5 +1,5 @@
 <div id="user_tree">
-    <el-tree :load="loadNode" lazy :props="defaultProps" @node-click="handleNodeClick" :expand-on-click-node="false">
+    <el-tree ref="tree" node-key="id" :load="loadNode" highlight-current lazy :props="defaultProps" @node-click="handleNodeClick" :expand-on-click-node="false">
         <span class="custom-tree-node" slot-scope="{ node, data }">
         <span>{{ node.label }}</span>
         <span>
@@ -7,7 +7,7 @@
                        <i class="el-icon-plus" style="border: 1px solid"/>
           </el-button>
 
-          <el-button type="text" size="mini" @click="del_equipment($event, node)">
+          <el-button v-if="node.level !== 1" type="text" size="mini" @click="del_equipment($event, node)">
                        <i class="el-icon-minus" style="border: 1px solid"/>
           </el-button>
         </span>
