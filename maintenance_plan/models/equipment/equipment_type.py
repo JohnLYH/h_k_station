@@ -28,10 +28,10 @@ class EquipmentType(models.Model):
         '''
         if type_id is False:
             result = [{
-                'id': None, 'name': '信號系統', 'leaf': True if self.search_count([]) == 0 else False
+                'id': 0, 'name': '信號系統', 'leaf': True if self.search_count([]) == 0 else False
             }]
         else:
-            records = self.search([('parent_id', '=', type_id)])
+            records = self.search([('parent_id', '=', None if type_id == 0 else type_id)])
             result = [{
                 'id': i.id, 'name': i.name, 'leaf': True if len(i.child_ids) == 0 else False,
                 'parent_left': i.parent_left, 'parent_right': i.parent_right
@@ -41,12 +41,12 @@ class EquipmentType(models.Model):
     @api.model
     def get_type_route(self, type_id=None):
         current_type = self.browse(type_id)
-        if type_id is not None:
-            root = '信號系統>>'
-            route = current_type.name
-        else:
+        if type_id == 0:
             root = '信號系統'
             route = ''
+        else:
+            root = '信號系統>>'
+            route = current_type.name
         while len(current_type.parent_id) > 0:
             current_type = current_type.parent_id
             route = current_type.name + '>>' + route
