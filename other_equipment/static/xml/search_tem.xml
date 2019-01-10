@@ -7,7 +7,7 @@
                 <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
                     <span class="search_label" style="float:left;">設備名稱:</span>
                     <div class="col-md-8 col-sm-12 col-xs-12">
-                        <div for="equipment_id" class="form-widget-item"/>
+                        <div for="equipment_name" class="form-widget-item"/>
                     </div>
                 </div>
 
@@ -52,12 +52,18 @@
 
                 <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
                     <div class="form-widget-item col-md-12 col-sm-12 col-xs-12">
-                        <button type="button" class="btn search_import">
+                        <button type="button" class="btn search_import btn-primary">
                             導入
                         </button>
-                        <button type="button" class="btn search_export">
+                        <button type="button" class="btn search_export btn-primary">
                             導出
                         </button>
+                        <button type="button" class="btn search_new btn-primary">
+                            新增
+                        </button>
+                        <form style="display:none" action="/other_equipment/put_in_excel" method="post" enctype="multipart/form-data">
+                            <input type="file" name="file" value=""/>
+                        </form>
                     </div>
                 </div>
             </div>

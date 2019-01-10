@@ -19,7 +19,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'web', 'layui_theme', 'maintenance_plan'],
+    'depends': ['base', 'web', 'layui_theme', 'maintenance_plan', 'user'],
 
     # always loaded
     'data': [

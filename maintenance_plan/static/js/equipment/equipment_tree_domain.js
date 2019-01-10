@@ -8,6 +8,7 @@ odoo.define('equipment_tree_domain', function (require) {
     var view_registry = require("web.view_registry");
     var ListRenderer = require("web.ListRenderer");
     var ListController = require("web.ListController");
+    var core = require('web.core');
 
     var equipment_tree_domain = ListRenderer.extend({
         app: undefined,
@@ -115,13 +116,14 @@ odoo.define('equipment_tree_domain', function (require) {
                                     id: "id",
                                     isLeaf: 'leaf'
                                 },
-                                current_id: null
+                                current_id: null,
+                                resolve: null
                             };
                         },
                         methods: {
                             handleNodeClick(data) {
                                 var domains;
-                                if (data.id == null) {
+                                if (data.id == 0) {
                                     domains = []
                                 }
                                 else {
@@ -146,9 +148,10 @@ odoo.define('equipment_tree_domain', function (require) {
                             loadNode(node, resolve) {
                                 var id;
                                 if (node.level === 0) {
-                                    id = false
+                                    id = false;
+                                    this.resolve = resolve
                                 } else {
-                                    id = (node.data && node.data.id) || null
+                                    id = (node.data && node.data.id) || 0
                                 }
                                 self._rpc({
                                     model: 'maintenance_plan.equipment.type',
@@ -160,6 +163,7 @@ odoo.define('equipment_tree_domain', function (require) {
                             },
 
                             add_equipment(event, node) {
+                                var this_vue = this;
                                 event.stopPropagation();
                                 self.do_action({
                                     type: "ir.actions.act_window",
@@ -167,11 +171,8 @@ odoo.define('equipment_tree_domain', function (require) {
                                     views: [[false, "form"]],
                                     target: "new",
                                     context: {
-                                        "default_parent_id": node.data.id
-                                    }
-                                }, {
-                                    on_close: function () {
-                                        self.trigger_up('reload')
+                                        "default_parent_id": node.data.id,
+                                        "node": node.data.id
                                     }
                                 })
                             },
@@ -179,25 +180,40 @@ odoo.define('equipment_tree_domain', function (require) {
                                 var this_vue = this;
                                 event.stopPropagation();
                                 this_vue.$confirm('設備類型刪除后不可修改，是否確認刪除？', '提示', {
-                                        confirmButtonText: '确定',
-                                        cancelButtonText: '取消',
-                                        type: 'warning'
-                                    }).then(() => {
-                                        self._rpc({
-                                            model: 'maintenance_plan.equipment.type',
-                                            method: 'unlink',
-                                            args: [node.data.id]
-                                        }).then(function () {
-                                            this_vue.$message({
-                                                type: 'success',
-                                                message: '刪除成功!'
-                                            });
-                                            self.trigger_up('reload')
-                                        })
-                                    });
+                                    confirmButtonText: '确定',
+                                    cancelButtonText: '取消',
+                                    type: 'warning'
+                                }).then(() => {
+                                    self._rpc({
+                                        model: 'maintenance_plan.equipment.type',
+                                        method: 'unlink',
+                                        args: [node.data.id]
+                                    }).then(function () {
+                                        this_vue.$message({
+                                            type: 'success',
+                                            message: '刪除成功!'
+                                        });
+                                        // 刪除節點并恢復到頂層節點
+                                        this_vue.$refs.tree.remove(node);
+                                        this_vue.$refs.tree.setCurrentKey(0);
+                                        self.$('#type_route').html(this_vue.$refs.tree.getCurrentNode().name);
+                                        self.getParent().reload({domain: []})
+                                    })
+                                });
                             }
                         }
                     });
+                    core.bus.on('update_type_tree', this, function (data) {
+                        var this_vue = self.app;
+                        var parent_node = this_vue.$refs.tree.getNode(data.node_id);
+                        // 父節點下添加子節點并設置父節點為isLeaf = false狀態
+                        this_vue.$refs.tree.append(data, parent_node);
+                        parent_node.isLeaf = false;
+                        // 重新定位到頂節點為點擊狀態
+                        this_vue.$refs.tree.setCurrentKey(0);
+                        self.$('#type_route').html(this_vue.$refs.tree.getCurrentNode().name);
+                        self.getParent().reload({domain: []})
+                    })
                 });
 
                 _.invoke(this.pagers, 'destroy');
