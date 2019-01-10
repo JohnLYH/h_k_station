@@ -30,8 +30,14 @@ odoo.define('tool_management', function (require) {
             event.stopPropagation();
             if ($(event.target).hasClass('tool_detail')) {
                 // TODO: 詳情
-                console.log('詳情')
-            } else if ($(event.target).hasClass('tool_inspection')) {
+                self.do_action({
+                    type: 'ir.actions.act_window',
+                    res_model: 'other_equipment.other_equipment',
+                    res_id: self.id,
+                    views: [[false, "form"]],
+                })
+            }
+            else if ($(event.target).hasClass('tool_inspection')) {
                 // TODO: 检验
                 self.do_action({
                     "name": "檢驗",
@@ -150,9 +156,9 @@ odoo.define('tool_management_inspection', function (require) {
                                 });
                                     });
                             },
-                            cancel: function () {
-                                self.getParent().destroy()
-                            }
+                        cancel: function () {
+                            self.getParent().destroy()
+                        }
                     }
                 })
             })
@@ -250,7 +256,6 @@ odoo.define('tool_management_scrap', function (require) {
                                     }
                                 });
                                     });
-
                             },
                             cancel: function () {
                                 self.getParent().destroy()

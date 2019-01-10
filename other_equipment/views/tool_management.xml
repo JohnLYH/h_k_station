@@ -9,7 +9,7 @@
                 <!--<tree import="false" edit="0" create="0" delete="0" search_ex_template="maintenance_plan_approval_search_template"-->
                       <!--search_pannel_js_class="plan_search_pannel">-->
                 <tree import="false"  search_ex_template="tool_maintenance_search_template"
-                  search_pannel_js_class="tool_search" >
+                  search_pannel_js_class="tool_search" class="noOpen" limit="4" delete="0" edit="0" create="0">
                     <field name="equipment_name"/>
                     <field name="equipment_num"/>
                     <field name="model"/>
@@ -29,7 +29,7 @@
             <field name="name">工器具管理</field>
             <field name="model">other_equipment.other_equipment</field>
             <field name="arch" type="xml">
-                <form >
+                <form delete="0">
                     <group col="8">
                         <field name="equipment_name"/>
                         <field name="equipment_num"/>
@@ -46,7 +46,8 @@
                         <field name="calibration_body"/>
                         <field name="calibration_requipemnets"/>
                     </group>
-                    <group string="操作记录">
+                    <group >
+                        <field name="equipment_records_ids"/>
                     </group>
                 </form>
             </field>
@@ -62,7 +63,7 @@
 			<field name="name">操作記錄</field>
 			<field name="model">other_equipment.other_equipment_records</field>
 			<field name="arch" type="xml">
-				<tree default_order="create_date desc">
+				<tree default_order="create_date desc" limit="4" edit="0" create="0" delete="0">
 					<field name="operation_type"/>
 					<field name="content"/>
 					<field name="user_id"/>
