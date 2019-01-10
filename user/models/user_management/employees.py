@@ -122,6 +122,6 @@ class EmployeesGet(models.Model):
 
     # 搜索权限页面的数据
     @api.model
-    def permissions_search(self):
-        pass
+    def permissions_search(self, **kw):
+        print(kw)
 

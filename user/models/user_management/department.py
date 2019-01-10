@@ -19,6 +19,7 @@ class Department(models.Model):
     department_hierarchy = fields.Integer(string='部门层级')
     parent_id = fields.Many2one('user.department', string='父部门', ondelete='cascade')
     child_ids = fields.One2many('user.department', 'parent_id', string='子部门')
+    department_hierarchy = fields.Integer(string='部门层级')  # 用于计算
 
     parent_left = fields.Integer(index=True)
     parent_right = fields.Integer(index=True)
