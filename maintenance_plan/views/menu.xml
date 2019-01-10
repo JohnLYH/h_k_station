@@ -5,7 +5,7 @@
 
         <menuitem id="work_order_management" name="工單管理" sequence="2" action="act_work_order_management"/>
 
-        <menuitem id="equipment_management" name="設備管理" sequence="3" action="act_device_management"/>
+        <menuitem id="equipment_management" name="設備管理" sequence="3" action="act_equipment_management"/>
         
         <menuitem id="approval_management" name="審批管理" sequence="4" />
                 <menuitem id="job_approval" name="工單審批"  parent="approval_management" action="act_order_approval"/>

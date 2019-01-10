@@ -4,6 +4,10 @@ odoo.define("treebtns", function (require) {
 	var listRenderer = require("web.ListRenderer");
 	var config = require("web.config");
 
+	var Widget = require('web.Widget');
+    var core = require('web.core');
+    var QWeb = core.qweb;
+
 	listRenderer.include({
 		_renderHeaderCell: function (node) {
 			var name = node.attrs.name;
@@ -56,4 +60,31 @@ odoo.define("treebtns", function (require) {
 			return $th;
 		}
 	});
+
+	var tree_button = Widget.extend({
+        events: {
+            'click': '_click_tree_buttons'
+        },
+		template: '',
+        init: function (parent, record, node) {
+            this._super(parent, record, node);
+            this.id = record.res_id;
+            this.record = record;
+        },
+        start: function () {
+            var $el = $(QWeb.render(this.template, {widget: this}).trim());
+            this.replaceElement($el);
+            this.vue = new Vue({
+                el: '#app',
+                data() {
+                    return {}
+                }
+            });
+        },
+        _click_tree_buttons: function (event) {
+            var self = this;
+            event.stopPropagation();
+        }
+    });
+    return tree_button
 });

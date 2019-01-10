@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 import json
-import xlrd
-import xlwt
 from datetime import datetime as dt
-import time
 import os
-import random
-from xlutils3.copy import copy as xl_copy
+import openpyxl
+from openpyxl.styles import PatternFill
+from openpyxl.writer.excel import save_virtual_workbook
 
 
 from odoo import http
@@ -26,12 +24,11 @@ APP_DIR = os.path.dirname(os.path.dirname(__file__))
 class MaintenancePlan(http.Controller):
 
     @staticmethod
-    def excel_validate(sheet, new_sheet, num, cols_list, style, has_date_col=True):
+    def excel_validate(sheet, num, cols_list, style, has_date_col=True):
         '''
         驗證excel的一行的錯誤性
         :param sheet: sheet活動表
-        :param new_sheet: 用來變更顏色的複製sheet活動表
-        :param num: 行數，0開始
+        :param num: 行數，1開始
         :param cols_list: 需要驗證的列數列表
         :param style: sheet顏色style
         :param has_date_col: 是否驗證第17、18列的時間格式
@@ -39,30 +36,16 @@ class MaintenancePlan(http.Controller):
         '''
         row_error = False
         for col in cols_list:
-            if sheet.cell(num, col).value == '':
-                new_sheet.write(num, col, style=style)
+            if sheet.cell(num, col).value is None:
+                sheet.cell(num, col).fill = style
                 row_error = True
-            elif (col == 16 or col == 17) and has_date_col is True:
+            elif (col == 17 or col == 18) and has_date_col is True:
                 try:
                     dt.strptime(sheet.cell(num, col).value, '%Y-%m-%d %H:%M')
                 except Exception as e:
-                    new_sheet.write(num, col, sheet.cell(num, col).value, style=style)
+                    sheet.cell(num, col).fill = style
                     row_error = True
         return row_error
-
-    @staticmethod
-    def set_excel_style_color(colour_map_key):
-        '''
-        設置單元格背景色
-        :param colour_map_key: 顏色對應鍵值對的key
-        :return:
-        '''
-        style = xlwt.XFStyle()
-        pattern = xlwt.Pattern()
-        pattern.pattern = 1
-        pattern.pattern_fore_colour = xlwt.Style.colour_map[colour_map_key]
-        style.pattern = pattern
-        return style
 
     @http.route('/maintenance_plan/put_in_excel', type='http', csrf=False, auth='user')
     def put_in_excel(self, **kwargs):
@@ -73,52 +56,45 @@ class MaintenancePlan(http.Controller):
         '''
         file = kwargs['file']
         filename = kwargs['file'].filename
-        workbook = xlrd.open_workbook(file_contents=file.read())
-        sheet = workbook.sheets()[0]
-        new_workbook = xl_copy(workbook)
-        new_sheet = new_workbook.get_sheet(0)
-        nrows = sheet.nrows
+        workbook = openpyxl.load_workbook(file)
+        sheet = workbook.active
         # 设置单元格背景色紅色
-        red_style = self.set_excel_style_color('red')
+        red_style = PatternFill(fill_type='solid', fgColor="FF3030")
         # 设置单元格背景色綠色
-        green_style = self.set_excel_style_color('green')
+        green_style = PatternFill(fill_type='solid', fgColor="458B74")
         error = False
-        if [i.value for i in sheet.row(0)] != ROW_1_LIST:
-            return json.dumps({'message': '表格不符', 'error': True})
-        else:
-            for num in range(1, nrows):
-                row_error = self.excel_validate(sheet, new_sheet, num, [0, 1, 15, 16, 17], red_style)
+        n_row = 0
+        for row in sheet.rows:
+            n_row += 1
+            if n_row == 1:
+                if [i.value for i in row] != ROW_1_LIST:
+                    return json.dumps({'message': '表格不符', 'error': True})
+            else:
+                row_error = self.excel_validate(sheet, n_row, [1, 2, 4, 16, 17, 18], red_style)
                 work_order_count = request.env['maintenance_plan.maintenance.plan'].search_count([
-                    ('num', '=', sheet.cell(num, 0).value)
+                    ('num', '=', sheet.cell(n_row, 1).value)
                 ])
                 equipment_record = request.env['maintenance_plan.equipment'].search([
-                    ('num', '=', sheet.cell(num, 3).value)
+                    ('num', '=', sheet.cell(n_row, 4).value)
                 ])
-                if work_order_count != 0 and sheet.cell(num, 0).value != '':
-                    new_sheet.write(num, 0, sheet.cell(num, 0).value, style=green_style)
-                if len(equipment_record) == 0 and sheet.cell(num, 3).value != '':
-                    new_sheet.write(num, 3, sheet.cell(num, 3).value, style=red_style)
+                if work_order_count != 0 and sheet.cell(n_row, 1).value is not None:
+                    sheet.cell(n_row, 1).fill = green_style
+                if len(equipment_record) == 0:
+                    sheet.cell(n_row, 4).fill = red_style
                 if work_order_count == 0 and len(equipment_record) != 0:
                     request.env['maintenance_plan.maintenance.plan'].create({
-                        'num': sheet.cell(num, 0).value, 'work_order_type': sheet.cell(num, 1).value,
-                        'work_order_description': sheet.cell(num, 15).value, 'equipment_id': equipment_record.id,
-                        'plan_start_time': sheet.cell(num, 16).value.split(' ')[0],
-                        'plan_end_time': sheet.cell(num, 17).value.split(' ')[0],
+                        'num': sheet.cell(n_row, 1).value, 'work_order_type': sheet.cell(n_row, 2).value,
+                        'work_order_description': sheet.cell(n_row, 16).value, 'equipment_id': equipment_record.id,
+                        'plan_start_time': sheet.cell(n_row, 17).value.split(' ')[0],
+                        'plan_end_time': sheet.cell(n_row, 18).value.split(' ')[0],
                     })
                 if row_error is True:
                     error = True
         if error is True:
-            name = str(int(round(time.time() * 1000))) + str(random.randint(1, 1000)) + '.xls'
-            path = APP_DIR + '/static/excel/'
-            file_path = path + name
-            new_workbook.save(file_path)
-            with open(file_path, 'rb') as f:
-                data = f.read()
-                new_file = request.env['maintenance_plan.trans.excel'].create({
-                    'name': filename.split('.')[0],
-                    'file': data
-                })
-                os.remove(file_path)
+            new_file = request.env['maintenance_plan.trans.excel'].create({
+                'name': filename.split('.')[0],
+                'file': save_virtual_workbook(workbook)
+            })
             return json.dumps({'error': error, 'message': '文件有部分錯誤信息，請修改后再次傳入', 'file_id': new_file.id})
         else:
             return json.dumps({'error': error, 'message': '上傳成功'})
@@ -134,7 +110,7 @@ class MaintenancePlan(http.Controller):
         wb = request.env['maintenance_plan.trans.excel'].browse(file_id)
         response = request.make_response(wb.file)
         response.headers["Content-Disposition"] = "attachment; filename={}". \
-            format((wb.name + '错误.xls').encode().decode('latin-1'))
+            format((wb.name + '錯誤.xlsx').encode().decode('latin-1'))
         return response
 
     @http.route('/maintenance_plan/export_work_order', auth='user')
