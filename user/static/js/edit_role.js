@@ -14,8 +14,8 @@ odoo.define('edit_role', function (require) {
             var self = this;
             this._super.apply(this, arguments);
             this.vue_data = {
-                            input:'',
-                            textarea:'',
+                            input:action.context.role_name,
+                            textarea:action.context.per,
                             user_name:'',
                             departmentList:[],
                             default_checked_keys:[],
@@ -23,6 +23,9 @@ odoo.define('edit_role', function (require) {
                                               children: 'children',
                                               label: 'label'
                                             },
+                            role:action.context.role_name,
+                            per:action.context.per,
+
 
                 };
         },
@@ -57,6 +60,21 @@ odoo.define('edit_role', function (require) {
                     methods: {
                                 click_node: function(data){
                                  },
+
+                                onSubmit: function (date) {
+                                    self._rpc({
+                                                    model: 'user.department',
+                                                    method: 'edit_save',
+                                                    kwargs: {role_name: self.vue_data.role,
+                                                            Permission_illustrate: self.vue_data.per,
+                                                            modify_name:self.vue_data.input,
+                                                            modify_per:self.vue_data.textarea}
+                                                })
+                                    self.do_action({"type":"ir.actions.act_window_close"})
+                                },
+                                cancel: function () {
+                                        self.do_action({"type":"ir.actions.act_window_close"})
+                                }
 
                     },
 

@@ -6,7 +6,7 @@
                 </el-form-item>
                 <el-form-item>
                     <span>狀態</span>
-                  <el-select v-model="value" placeholder="请选择">
+                  <el-select v-model="value" placeholder="请选择" size="small">
                     <el-option
                       v-for="item in options"
                       :key="item.value"
@@ -22,35 +22,10 @@
                 <el-button type="primary" size="small" @click="reset"> 重置</el-button>
               </el-form-item>
             </el-form>
-		<!--<el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6">-->
-			<!--<div class="grid-content bg-purple">-->
-				<!--<el-card class="box-card">-->
-					<!--<div slot="header" class="clearfix">-->
-					<!--</div>-->
-					<!--<div class="text item">-->
-						<!--<el-tree-->
-								<!--:data="departmentList"-->
-								<!--show-checkbox-->
-								<!--node-key="id"-->
-								<!--ref="tree"-->
-								<!--highlight-current-->
-								<!--:default-expanded-keys="[]"-->
-								<!--:default-checked-keys="[]"-->
-								<!--:props="defaultProps"-->
-								<!--@node-click="click_node"-->
-						<!--&gt;-->
-						<!--</el-tree>-->
-					<!--</div>-->
-				<!--</el-card>-->
-			<!--</div>-->
-		<!--</el-col>-->
-		<!--<el-col :xs="24" :sm="24" :md="18" :lg="18" :xl="18">-->
 			<div class="grid-content bg-purple-light">
 				<el-card class="box-card">
 					<div slot="header" class="clearfix">
 					</div>
-					<!--<el-form :inline="true"  class="demo-form-inline">-->
-					<!--</el-form>-->
 					<div class="text item">
 						<template>
 						<el-table
@@ -69,7 +44,7 @@
 									label="角色名稱">
 							</el-table-column>
 							<el-table-column
-									prop="Permission_illustrate"
+									prop="permission_illustrate"
 									label="權限說明">
 							</el-table-column>
 							<el-table-column
@@ -111,6 +86,5 @@
                     </el-pagination>
                   </div>
 			</div>
-		<!--</el-col>-->
 	</el-row>
 </div>

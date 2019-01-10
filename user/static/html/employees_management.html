@@ -6,12 +6,14 @@
                 </el-form-item>
                 <el-form-item>
                     <span>狀態</span>
-                  <el-select v-model="value" placeholder="请选择">
+                  <el-select v-model="value" placeholder="请选择" size="small">
                     <el-option
+
                       v-for="item in options"
                       :key="item.value"
                       :label="item.label"
-                      :value="item.value">
+                      :value="item.value"
+					  size="small">
                     </el-option>
                   </el-select>
               </el-form-item>
@@ -72,11 +74,11 @@
 									label="姓名">
 							</el-table-column>
 							<el-table-column
-									prop="account"
+									prop="login"
 									label="賬號">
 							</el-table-column>
 							<el-table-column
-									prop="site"
+									prop="post"
 									label="崗位">
 							</el-table-column>
 							<el-table-column

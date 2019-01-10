@@ -23,13 +23,13 @@
     <el-table-column
       prop="name"
       label="使用人姓名"
-      width="180">
+      width="100%">
     </el-table-column>
   </el-table>
 
     </template></div></el-col>
   <el-col :span="12"><div class="grid-content bg-purple-light"> <div>
-	  <h2>權限列表</h2>
+	  <h2 style='text-align:center'>權限列表</h2>
 			<div class="grid-content bg-purple">
 				<el-card class="box-card">
 					<div slot="header" class="clearfix">
@@ -52,4 +52,8 @@
 			</div>
     </div></div></el-col>
 </el-row>
+	<div style='text-align:center'>
+		<el-button type="primary" @click="onSubmit">確認</el-button>
+		<el-button @click="cancel">取消</el-button>
+	</div>
 </div>
