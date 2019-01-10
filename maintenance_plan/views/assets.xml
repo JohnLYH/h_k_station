@@ -15,6 +15,7 @@
                 <script type="text/javascript" src="/maintenance_plan/static/js/equipment/equipment_type_tree_button.js"/>
                 <script type="text/javascript" src="/maintenance_plan/static/js/equipment/equipment_tree_domain.js"/>
                 <script type="text/javascript" src="/maintenance_plan/static/js/equipment/equipment_tree_button.js"/>
+                <script type="text/javascript" src="/maintenance_plan/static/js/equipment/create_equipment_type_to_core_bus.js"/>
                 <script type="text/javascript" src="/maintenance_plan/static/js/layui/layui_pager.js"/>
                 <script type="text/javascript" src="/maintenance_plan/static/js/layui/layui_theme_list_renderer.js"/>
             </xpath>
