@@ -203,7 +203,7 @@ odoo.define('equipment_tree_domain', function (require) {
                             }
                         }
                     });
-                    core.bus.on('update_type_tree', this, function (data) {
+                    core.bus.on('update_type_tree', self, function (data) {
                         var this_vue = self.app;
                         var parent_node = this_vue.$refs.tree.getNode(data.node_id);
                         // 父節點下添加子節點并設置父節點為isLeaf = false狀態

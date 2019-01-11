@@ -7,7 +7,7 @@
                        <i class="el-icon-plus" style="border: 1px solid"/>
           </el-button>
 
-          <el-button v-if="node.level !== 1" type="text" size="mini" @click="del_equipment($event, node)">
+          <el-button :disabled="!node.isLeaf" v-if="node.level !== 1" type="text" size="mini" @click="del_equipment($event, node)">
                        <i class="el-icon-minus" style="border: 1px solid"/>
           </el-button>
         </span>
