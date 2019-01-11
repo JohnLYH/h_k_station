@@ -2,24 +2,43 @@ odoo.define('freq_of_cal_btn', function (require) {
     "use strict";
 
     var core = require('web.core');
-    var Widget = require('web.Widget');
-    var widgetRegistry = require('web.widget_registry');
-    console.log('我進來了按鈕')
-    var freq_of_cal_btn = Widget.extend({
-        template: 'WidgetWebsiteButton',
+    var AbstractField = require('web.AbstractField');
+    var registry = require('web.field_registry');
+    var freq_of_cal_btn = AbstractField.extend({
+        init: function (parent, name, record, options) {
+            this.content = record.data[name];
 
-        init: function (parent) {
-            this._super(parent, arguments);
+            this._super(parent, name, record, options)
         },
 
-        // 替換模板
         renderElement: function () {
-            var $el = '<input name="Fruit" type="radio" value="" />苹果 </label>';
-            this.replaceElement($el);
+            var self = this;
+            var $el = $(core.qweb.render('freq_of_cal_radio_btn', {widget: this}));
+            self.replaceElement($el)
+        },
+
+        start: function () {
+            var self = this;
+            if (self.mode === 'readonly') {
+                return
+            } else {
+                return
+            }
+        },
+
+        commitChanges: function () {
+            var self = this;
+            var req_value = self.$el.find('input#freq_of_cal_id').val();
+            $('input[name="testradio"]:checked').val();
+            var freq_of_cal_type = self.$el.find('input[name="freq_of_cal"]:checked').val();
+            if (freq_of_cal_type === 'ON CONDITION'){
+                self._setValue('ON CONDITION')
+            }else{
+                self._setValue(req_value)
+            }
+
         },
     });
-
-    widgetRegistry.add("freq_of_cal_btn", freq_of_cal_btn);
-
+    registry.add("freq_of_cal_btn", freq_of_cal_btn);
     return freq_of_cal_btn
 });

@@ -46,7 +46,7 @@ class other_equipment(models.Model):
                                   ]) > 1:
                 raise ValidationError("設備編號已存在，請重新輸入")
 
-    @api.depends('last_maintenance_date')
+    @api.depends('maintenance_due_data')
     def _com_last_maintenance_date(self):
         for record in self:
             if record.maintenance_due_data:

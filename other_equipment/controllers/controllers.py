@@ -42,13 +42,13 @@ class OtherEquipment(http.Controller):
                 row_error = True
             elif (col == 14 or col == 15) and has_date_col is True:
                 try:
-                    print()
-                    dt.strptime(new_sheet.cell(num, col).value, '%Y/%m/%d %H:%M')
+                    dt.strptime(new_sheet.cell(num, col).value, '%Y/%m/%d')
                 except Exception as e:
-                    new_sheet.cell(num, col).fill = style
-                    row_error = True
-                    print(new_sheet.cell(num, col).value)
-                    print('这个时间格式不对')
+                    try:
+                        dt.strptime(new_sheet.cell(num, col).value, '%Y-%m-%d')
+                    except:
+                        new_sheet.cell(num, col).fill = style
+                        row_error = True
             else:
                 if col == 1:
                     # 設備編號
@@ -178,7 +178,6 @@ class OtherEquipment(http.Controller):
             return json.dumps({'error': error, 'message': '文件有部分錯誤信息，請修改后再次傳入', 'file_id': new_file.id})
         else:
             return json.dumps({'error': error, 'message': '上傳成功'})
-
 
     @http.route('/other_equipment/get_in_excel', type='http', csrf=False, auth='user')
     def get_in_excel(self, **kwargs):
