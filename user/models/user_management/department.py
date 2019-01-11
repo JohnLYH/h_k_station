@@ -17,8 +17,8 @@ class Department(models.Model):
     department_order = fields.Integer('部门编号', readonly=True)
     parent_order = fields.Integer('父部门编号', readonly=True)
     department_hierarchy = fields.Integer(string='部门层级')
-    parent_id = fields.Many2one('user.department', string='父部门', ondelete='cascade')
-    child_ids = fields.One2many('user.department', 'parent_id', string='子部门')
+    # parent_id = fields.Many2one('user.department', string='父部门', ondelete='cascade')
+    # child_ids = fields.One2many('user.department', 'parent_id', string='子部门')
     department_hierarchy = fields.Integer(string='部门层级')  # 用于计算
 
     parent_left = fields.Integer(index=True)
@@ -33,30 +33,61 @@ class Department(models.Model):
     @api.model
     def department_information(self):
         '''
-
         导入人员信息
         '''
+
         data = xlrd.open_workbook(file_contents=base64.decodebytes(self.env['user.import_date'].search([])[-1].file))
         sheet_data = data.sheet_by_name(data.sheet_names()[0])
         rows = sheet_data.nrows  # 获取有多好行
         cols = sheet_data.ncols
-        keys = ('name',) # 用来作为父部门 和 子部门装载器
-        one_sheet_content =[]
+        keys = ('name',)  # 用来作为父部门 和 子部门装载器
+        one_sheet_content = []
+        # for i in range(1, rows):
+        #     row_content = []
+        #     k = 4
+        #     for j in range(2):
+        #         cell = sheet_data.cell_value(i, k)
+        #         row_content.append(cell)
+        #         one_dict = dict(zip(keys, row_content))
+        #
+        #     one_sheet_content.append(one_dict)
+        # for i, item in enumerate(one_sheet_content):
+        #     dic = {}
+        #     record = self.search([('name', '=', item['name'])])
+        #     if not record:
+        #         dic['name'] = item['name']
+        #         self.create(dic)
         for i in range(1, rows):
-            row_content = []
-            k = 4
-            for j in range(2):
-                cell = sheet_data.cell_value(i, k)
-                row_content.append(cell)
-                one_dict = dict(zip(keys, row_content))
-
-            one_sheet_content.append(one_dict)
-        for i, item in enumerate(one_sheet_content):
-            dic = {}
-            record = self.search([('name','=',item['name'])])
-            if not record:
-                dic['name'] = item['name']
-                self.create(dic)
+            for j in range(cols):
+                cell = sheet_data.cell_value(i, j)
+                if cell:
+                    if j == 0:
+                        one_record = self.search([('name', '=', cell)])
+                        if not one_record:
+                            one_class = self.create({'name': cell, 'department_hierarchy': 1})
+                            one_class.department_order = one_class.id
+                        else:
+                            one_class = one_record
+                    if j == 1:
+                        two_record = self.search([('name', '=', cell)])
+                        if not two_record:
+                            two_class = self.create({
+                                'name': cell,
+                                'parent_order': one_class.id,
+                                'department_hierarchy': 2
+                            })
+                            two_class.department_order = two_class.id
+                        else:
+                            two_class = two_record
+                    if j == 2:
+                        three_record = self.search([('name', '=', cell)])
+                        if not three_record:
+                            three_class = self.create({
+                                'name': cell,
+                                'parent_order': two_class.id,
+                                'department_hierarchy': 3
+                            })
+                            three_class.department_order = three_class.id
 
     @api.model
     def get_department_users(self):
@@ -64,7 +95,7 @@ class Department(models.Model):
         页面初始化的时候 获取角色名称组
         :return: 角色组
         '''
-        lis = []  #存放角色组
+        lis = []  # 存放角色组
         record = self.env['res.users'].search_read([])
         for i in record:
             rec = {}
@@ -76,7 +107,7 @@ class Department(models.Model):
 
     # 權限管理編輯操作
     @api.model
-    def edit_save(self,**kw):
-        rocord = self.env['res.users'].search([('role','=',kw.get('role_name'))])
+    def edit_save(self, **kw):
+        rocord = self.env['res.users'].search([('role', '=', kw.get('role_name'))])
         for i in rocord:
             i.write({'role': kw.get('modify_name')})

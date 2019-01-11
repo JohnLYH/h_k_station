@@ -18,23 +18,23 @@ class ImportDate(models.Model):
         用來導入人員的個人信息
 
         '''
-        data = xlrd.open_workbook(file_contents=base64.decodebytes(self.file))
-        sheet_data = data.sheet_by_name(data.sheet_names()[0])
-        rows = sheet_data.nrows
-        cols = sheet_data.ncols
-        keys = ('login', 'name', 'email', 'role', 'post')
-        one_sheet_content =[]
-        for i in range(1, rows):
-            row_content = []
-            for j in range(cols):
-                cell = sheet_data.cell_value(i, j)
-                row_content.append(cell)
-                one_dict = dict(zip(keys, row_content))
-            one_sheet_content.append(one_dict)
-        for i, item in enumerate(one_sheet_content):
-            record = self.env['res.users'].search([('name','=',item.get('login'))])
-            if not record.id:
-                self.env['res.users'].create(item)
+        # data = xlrd.open_workbook(file_contents=base64.decodebytes(self.file))
+        # sheet_data = data.sheet_by_name(data.sheet_names()[0])
+        # rows = sheet_data.nrows
+        # cols = sheet_data.ncols
+        # keys = ('login', 'name', 'email', 'role', 'post')
+        # one_sheet_content =[]
+        # for i in range(1, rows):
+        #     row_content = []
+        #     for j in range(cols):
+        #         cell = sheet_data.cell_value(i, j)
+        #         row_content.append(cell)
+        #         one_dict = dict(zip(keys, row_content))
+        #     one_sheet_content.append(one_dict)
+        # for i, item in enumerate(one_sheet_content):
+        #     record = self.env['res.users'].search([('name','=',item.get('login'))])
+        #     if not record.id:
+        #         self.env['res.users'].create(item)
         return self.env['user.department'].department_information()
 
 
