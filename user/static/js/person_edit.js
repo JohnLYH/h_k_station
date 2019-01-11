@@ -68,8 +68,17 @@ odoo.define('person_edit', function (require) {
                                     role: self.vue_data.role,
                                     role_email: self.vue_data.role_email
                                 }
+                            }).then(function () {
+                                core.bus.trigger('person_edit_return',{
+                                    name: self.vue_data.role_name,
+                                    login: self.vue_data.role_id,
+                                    deparment: self.vue_data.deparment,
+                                    post: self.vue_data.post,
+                                    role: self.vue_data.role,
+                                    email: self.vue_data.role_email
+                                });
+                                self.do_action({"type": "ir.actions.act_window_close"})
                             })
-                            self.do_action({"type": "ir.actions.act_window_close"})
 
                         },
                         cancel: function () {

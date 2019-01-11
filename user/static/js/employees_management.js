@@ -30,10 +30,10 @@ odoo.define('employees_management_action', function (require) {
                 message: 0,
                 value: [],
                 options: [
-                          {value: 'normal', label: '正常'},
-                          {value: 'disable', label: '禁用'},
-                          {value: 'all', label: '全部'}
-                          ],
+                    {value: 'normal', label: '正常'},
+                    {value: 'disable', label: '禁用'},
+                    {value: 'all', label: '全部'}
+                ],
                 size_: 10,
                 list_size: [10, 20, 30, 40],
 
@@ -54,7 +54,13 @@ odoo.define('employees_management_action', function (require) {
 
         start: function () {
             var self = this;
-
+            core.bus.on('person_edit_return', self, function (data) {
+                console.log(data)
+                self.vue_data.tableData = [data]
+            });
+            core.bus.on('info_disable', self, function (data) {
+                self.vue_data.tableData = [data]
+            });
             $.when(
                 this._rpc({
                     model: 'html_model.template_manage',
@@ -139,6 +145,14 @@ odoo.define('employees_management_action', function (require) {
                                 method: 'disable_info',
                                 kwargs: {'disable_id': row.login}
                             }).then(function (get_data) {
+                                core.bus.trigger('info_disable', {
+                                    'name': row.name,
+                                    'login': row.login,
+                                    'post': row.post,
+                                    'role': row.role,
+                                    'email': row.email,
+                                    'state': '禁用',
+                                });
                             });
                         },
 
@@ -159,7 +173,7 @@ odoo.define('employees_management_action', function (require) {
 
                         loaddown: function (data) {
                             self.do_action({
-                                name: '導入人員消息',
+                                name: '\u5c0e\u5165\u4eba\u54e1\u4fe1\u606f',
                                 type: 'ir.actions.act_window',
                                 res_model: 'user.import_date',
                                 views: [[self.vue_data.views, 'form']],
