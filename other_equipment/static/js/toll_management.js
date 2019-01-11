@@ -54,7 +54,7 @@ odoo.define('tool_management', function (require) {
                     "tag": "tool_management_scrap",
                     "target": "new",
                     "params": {record: self.record, id: self.id}
-                },{
+                }, {
                     on_close: function () {
                         self.trigger_up('reload')
                     },
@@ -149,9 +149,6 @@ odoo.define('tool_management_inspection', function (require) {
                                 }).then(function (e) {
                                     if (e) {
                                         self.do_action(false);
-                                        // self.getParent().destroy();
-                                        // window.location.reload();
-                                        // return this.parent.load(['invitations']);
                                     } else {
                                         self.vue.$message({
                                             message: '未找到這條記錄',
@@ -163,7 +160,20 @@ odoo.define('tool_management_inspection', function (require) {
                         },
                         cancel: function () {
                             self.getParent().destroy()
+                        },
+                        reverse_maintenance_due_data: function () {
+                            var this_vue = this;
+                            console.log(moment(this_vue.last_maintenance_date).format('l'));
+                            var freq_of_cal = this_vue.freq_of_cal;
+                            if (freq_of_cal === 'ON CONDITION') {
+                                return
+                            } else {
+                                // l是 YYYY-MM-DD格式
+                                var new_maintenance_due_data = moment(this_vue.last_maintenance_date).add(Number(freq_of_cal), 'months').format('l');
+                                this_vue.maintenance_due_data = new_maintenance_due_data
+                            }
                         }
+
                     }
                 })
             })

@@ -15,7 +15,6 @@ class Equipment(models.Model):
     _description = '設備'
     _rec_name = 'num'
 
-    @staticmethod
     def generate_2_code(self, arr):
         '''
             获取二维码二进制
@@ -57,15 +56,10 @@ class Equipment(models.Model):
     supplier = fields.Char('供應商')
     oem_manufacturer = fields.Char('原始設備製造商')
     lead_maintainer = fields.Char('設備維護者')
-    qr_code = fields.Text('二維碼', compute='get_qrcode', store=True)
+    qr_code = fields.Text('二維碼')
 
-    @api.depends('num', 'parent_equipment_num', 'serial_number', 'equipment_type_id')
-    def get_qrcode(self):
-        for record in self:
-            num = record.num
-            parent_equipment_num = record.parent_equipment_num
-            serial_number = record.serial_number
-            equipment_type_id = record.equipment_type_id
-            arr = [num, parent_equipment_num, serial_number, equipment_type_id]
-            record.qr_code = self.generate_2_code(arr)
-
+    @api.model
+    def create(self, vals):
+        equipment = super(Equipment, self).create(vals)
+        print(self.generate_2_code(equipment.id))
+        equipment.qr_code = self.generate_2_code(equipment.id)

@@ -26,17 +26,16 @@ odoo.define('freq_of_cal_btn', function (require) {
             }
         },
 
+        <!--保存的时候更改值-->
         commitChanges: function () {
             var self = this;
             var req_value = self.$el.find('input#freq_of_cal_id').val();
-            $('input[name="testradio"]:checked').val();
             var freq_of_cal_type = self.$el.find('input[name="freq_of_cal"]:checked').val();
-            if (freq_of_cal_type === 'ON CONDITION'){
+            if (freq_of_cal_type === 'ON CONDITION') {
                 self._setValue('ON CONDITION')
-            }else{
+            } else {
                 self._setValue(req_value)
             }
-
         },
     });
     registry.add("freq_of_cal_btn", freq_of_cal_btn);
