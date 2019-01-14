@@ -101,6 +101,7 @@ class other_equipment(models.Model):
             'operation_type': '新建',
             'content': '工器具新增',
             'user_id': self._uid,
+            'remark': records.remark,
         })
         return records
 

@@ -99,8 +99,6 @@ odoo.define("tool_search", function (require) {
                     domains.push([domain])
                 }
             });
-            // var formData = new FormData();
-            // formData.append('domains', domains);
             this._rpc({
                 model: 'other_equipment.other_equipment',
                 method: 'get_in_excel',
