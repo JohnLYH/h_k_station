@@ -16,13 +16,10 @@ odoo.define('create_equipment_type_to_core_bus', function (require) {
         }),
         _create_type: function () {
             var self = this;
-            console.log(this)
-            console.log(this.getParent())
-            console.log(this.getParent().getParent())
             var contoller = this.getParent().getParent();
             contoller.saveRecord().then(function () {
                 var record = contoller.model.get(self.record.id);
-                // self.do_action(false);
+                self.do_action(false);
                 core.bus.trigger('update_type_tree', {
                     id: record.res_id,
                     name: record.data.name,
