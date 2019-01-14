@@ -9,13 +9,17 @@ odoo.define('equipment_tree_domain', function (require) {
     var ListRenderer = require("web.ListRenderer");
     var ListController = require("web.ListController");
     var core = require('web.core');
+    var Dialog = require('web.Dialog');
+
+
+    var _t = core._t;
 
     var equipment_tree_domain = ListRenderer.extend({
         app: undefined,
         $tree_list_box: undefined,
 
         events: _.extend({}, ListRenderer.prototype.events, {
-            'click #add_quipment_type_bt': '_add_quipment_type',
+            'click #add_quipment_bt': '_add_quipment',
         }),
 
         init: function (parent, state, params) {
@@ -23,7 +27,7 @@ odoo.define('equipment_tree_domain', function (require) {
             this.record = state
         },
 
-        _add_quipment_type: function () {
+        _add_quipment: function () {
             var self = this;
             self.do_action({
                 type: "ir.actions.act_window",
@@ -32,7 +36,7 @@ odoo.define('equipment_tree_domain', function (require) {
                 target: "new",
                 context: {
                     "default_equipment_type_id": self.app.current_id
-                }
+                },
             })
         },
 
@@ -88,14 +92,14 @@ odoo.define('equipment_tree_domain', function (require) {
                     .removeClass('table-responsive')
                     .empty();
                 $('<div class="container-fluid" style="padding: 0px">' +
-                    '<div class="col-lg-3 col-md-4 col-md-sm-12 col-md-xs-12" style="padding: 0px 5px 5px 0px; min-height: 100%; overflow-x: hidden" id="tree_box"></div>' +
+                    '<div class="col-lg-3 col-md-4 col-md-sm-12 col-md-xs-12" style="padding: 0px 5px 5px 0px; min-height: 100%; overflow-x: hidden" id="equipment_tree_box"></div>' +
                     '<div class="col-lg-9 col-md-8 col-md-sm-12 col-md-xs-12" style="padding: 0px; min-height: 100%"><div>' +
                     '<div style="margin-bottom: 20px">' +
-                    '<span id="type_route">信號系統</span><button id="add_quipment_type_bt" style="float: right" class="btn btn-primary btn-sm">添加</button>' +
+                    '<span id="type_route">信號系統</span><button id="add_quipment_bt" style="float: right" class="btn btn-primary btn-sm">添加</button>' +
                     '</div></div><div id="list_box"></div></div>' +
                     '</div>').appendTo(self.$el);
                 self.$tree_list_box = self.$("#list_box");
-                self.$tree_box = self.$("#tree_box");
+                self.$tree_box = self.$("#equipment_tree_box");
 
                 self._rpc({
                     model: 'vue_template_manager.template_manage',
@@ -107,7 +111,7 @@ odoo.define('equipment_tree_domain', function (require) {
                 }).then(function (el) {
                     $(el).appendTo(self.$tree_box);
                     self.app = new Vue({
-                        el: "#tree_box",
+                        el: "#equipment_tree_box",
                         data() {
                             return {
                                 defaultProps: {
@@ -173,7 +177,7 @@ odoo.define('equipment_tree_domain', function (require) {
                                     context: {
                                         "default_parent_id": node.data.id,
                                         "node": node.data.id
-                                    }
+                                    },
                                 })
                             },
                             del_equipment(event, node) {

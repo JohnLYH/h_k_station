@@ -9,7 +9,6 @@ odoo.define('create_equipment_type_to_core_bus', function (require) {
         init: function (parent, record, node) {
             this._super(parent, record, node);
             this.record = record;
-            console.log(parent)
             this.node_id = parent.state.context.node;
         },
         events: _.extend({}, Widget.prototype.events, {
@@ -17,11 +16,19 @@ odoo.define('create_equipment_type_to_core_bus', function (require) {
         }),
         _create_type: function () {
             var self = this;
+            console.log(this)
+            console.log(this.getParent())
+            console.log(this.getParent().getParent())
             var contoller = this.getParent().getParent();
             contoller.saveRecord().then(function () {
                 var record = contoller.model.get(self.record.id);
-                self.do_action(false);
-                core.bus.trigger('update_type_tree', {id: record.res_id, name: record.data.name, leaf: true, node_id: self.node_id});
+                // self.do_action(false);
+                core.bus.trigger('update_type_tree', {
+                    id: record.res_id,
+                    name: record.data.name,
+                    leaf: true,
+                    node_id: self.node_id
+                });
             })
         },
         renderElement: function () {
@@ -29,6 +36,8 @@ odoo.define('create_equipment_type_to_core_bus', function (require) {
         },
     });
     widget_registry.add('create_equipment_type_to_core_bus', create_equipment_type_to_core_bus);
-    return {create_equipment_type_to_core_bus: create_equipment_type_to_core_bus}
+    return {
+        create_equipment_type_to_core_bus: create_equipment_type_to_core_bus
+    }
 
 });

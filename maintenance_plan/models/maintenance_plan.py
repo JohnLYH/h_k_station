@@ -60,11 +60,6 @@ class MaintenancePlan(models.Model):
                 record.display_action_time = record.action_time.replace('-', '/')
 
     @api.model
-    def get_ref_id(self, act_name):
-        act_id = self.env.ref(act_name).id
-        return act_id
-
-    @api.model
     def get_config(self):
         config = self.env['maintenance_plan.config'].sudo().get_values()
         return config

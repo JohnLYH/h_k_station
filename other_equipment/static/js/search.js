@@ -45,6 +45,7 @@ odoo.define("tool_search", function (require) {
                             message: '上傳成功',
                             type: 'success'
                         });
+                        self.trigger_up('reload')
                     } else if (response.error === true && response.file_id) {
                         self.vue.$notify({
                             title: '警告',
@@ -70,7 +71,7 @@ odoo.define("tool_search", function (require) {
 
         search_export: function() {
             var self = this;
-            var domains = []
+            var domains = [];
             _.each(this.propositions, function (proposition) {
                 var domain = proposition.get_domain()
                 if (!domain) {
@@ -98,40 +99,50 @@ odoo.define("tool_search", function (require) {
                     domains.push([domain])
                 }
             });
-            var formData = new FormData();
-            formData.append('domains', domains);
-            $.ajax({
-                url: '/other_equipment/get_in_excel/',
-                type: 'POST',
-                data: formData,
-                processData: false,  //tell jQuery not to process the data
-                contentType: false,  //tell jQuery not to set contentType
-                //这儿的三个参数其实就是XMLHttpRequest里面带的信息。
-                success: function (response) {
-                    response = JSON.parse(response);
-                    console.log(response)
-                    if (response.error === 0) {
-                        self.vue.$notify({
-                            title: '成功',
-                            message: '導出成功',
-                            type: 'success'
-                        });
-                        self.do_action({
-                            name: '返回導出文件',
-                            target: 'new',
-                            type: 'ir.actions.act_url',
-                            url: '/other_equipment/down_wrong_file?type=下載&file_id=' + response.file_id
-                        })
-                    }
-                    else {
-                        self.vue.$notify({
-                            title: '錯誤',
-                            message: response.message,
-                            type: 'error'
-                        });
-                    }
-                }
-            })
+            // var formData = new FormData();
+            // formData.append('domains', domains);
+            console.log(domains)
+            this._rpc({
+                    model: 'other_equipment.other_equipment',
+                    method: 'get_in_excel',
+                    kwargs: {domains:domains},
+                })
+                .then(function() {
+                    // self.reload();
+                    console.log('xxx')
+                })
+            // $.ajax({
+            //     url: '/other_equipment/get_in_excel/',
+            //     type: 'POST',
+            //     data: formData,
+            //     processData: false,  //tell jQuery not to process the data
+            //     contentType: false,  //tell jQuery not to set contentType
+            //     //这儿的三个参数其实就是XMLHttpRequest里面带的信息。
+            //     success: function (response) {
+            //         response = JSON.parse(response);
+            //         console.log(response)
+            //         if (response.error === 0) {
+            //             self.vue.$notify({
+            //                 title: '成功',
+            //                 message: '導出成功',
+            //                 type: 'success'
+            //             });
+            //             self.do_action({
+            //                 name: '返回導出文件',
+            //                 target: 'new',
+            //                 type: 'ir.actions.act_url',
+            //                 url: '/other_equipment/down_wrong_file?type=下載&file_id=' + response.file_id
+            //             })
+            //         }
+            //         else {
+            //             self.vue.$notify({
+            //                 title: '錯誤',
+            //                 message: response.message,
+            //                 type: 'error'
+            //             });
+            //         }
+            //     }
+            // })
         },
 
         search_import: function() {

@@ -49,7 +49,7 @@ class Equipment(models.Model):
     direction = fields.Char('方向')
     start_chainage = fields.Char('起始公里標')
     end_chainage = fields.Char('終點公里標')
-    last_installation_data = fields.Date('最近安裝時間')
+    last_installation_date = fields.Date('最近安裝時間')
     service_since = fields.Date('啟用時間')
     expected_asset_life = fields.Integer('使用壽命')
     warranty = fields.Integer('保修期')

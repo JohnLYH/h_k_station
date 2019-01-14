@@ -200,6 +200,13 @@ class other_equipment(models.Model):
             if nowtime > maintenance_due_data:
                 record.status = '失效'
 
+    @api.model
+    def get_in_excel(self,**kwargs):
+        print(kwargs['domains'])
+        other_equipments = self.env['other_equipment.other_equipment'].search(kwargs['domains'])
+        print(other_equipments)
+        return True
+
 
 class other_equipment_records(models.Model):
     _name = 'other_equipment.other_equipment_records'

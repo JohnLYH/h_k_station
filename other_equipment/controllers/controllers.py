@@ -55,6 +55,7 @@ class OtherEquipment(http.Controller):
                     equipment_num = new_sheet.cell(num, col).value
                     # 組號
                     if new_sheet.cell(num, 2).value == '':
+                        new_sheet.cell(num, col).fill = style
                         row_error = True
                     else:
                         departments = new_sheet.cell(num, 2).value
@@ -62,19 +63,19 @@ class OtherEquipment(http.Controller):
                         if request.env['other_equipment.other_equipment'].sudo().search_count(
                                 [('equipment_num', '=', equipment_num),
                                  ('departments.department_order', '=', departments)]) > 0:
+                            new_sheet.cell(num, col).fill = style
                             row_error = True
                         else:
-                            new_sheet.cell(num, col).fill = style
+                            pass
                 # 驗證這個組是否存在
                 if col == 2:
                     departments = new_sheet.cell(num, 2).value
                     if not request.env['user.department'].sudo().search([
                              ('department_order', '=', departments)]):
-                        row_error = True
-                        print(new_sheet.cell(num, col).value)
-                        print('没得这个组的')
-                    else:
                         new_sheet.cell(num, col).fill = style
+                        row_error = True
+                    else:
+                        pass
         return row_error
 
     @staticmethod
