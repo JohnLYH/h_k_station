@@ -16,6 +16,7 @@ odoo.define('change_password_usr', function (require) {
             this.vue_data = {
                 input: '',
                 user_id: action.context.paw,
+                login: action.context.login
             };
         },
         start: function () {
@@ -39,7 +40,11 @@ odoo.define('change_password_usr', function (require) {
                             self._rpc({
                                 model: 'res.users',
                                 method: 'change_password_usr',
-                                kwargs: {user_id: self.vue_data.user_id, paw: self.vue_data.input}
+                                kwargs: {
+                                    user_id: self.vue_data.user_id,
+                                    paw: self.vue_data.input,
+                                    login: self.vue_data.login
+                                    }
                             })
                             self.do_action({"type": "ir.actions.act_window_close"})
                         },

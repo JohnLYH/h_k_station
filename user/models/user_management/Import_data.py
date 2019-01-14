@@ -18,6 +18,7 @@ class ImportDate(models.Model):
         用來導入人員的個人信息
 
         '''
+        # TODO: 暫時的數據
         # data = xlrd.open_workbook(file_contents=base64.decodebytes(self.file))
         # sheet_data = data.sheet_by_name(data.sheet_names()[0])
         # rows = sheet_data.nrows
@@ -35,7 +36,18 @@ class ImportDate(models.Model):
         #     record = self.env['res.users'].search([('name','=',item.get('login'))])
         #     if not record.id:
         #         self.env['res.users'].create(item)
-        return self.env['user.department'].department_information()
+        # return self.env['user.department'].department_information()
+
+        for i in range(100):
+            rec = {
+                'name': i,
+                'login': i,
+                'post': i,
+                'role': i,
+                'email': i,
+                'branch': i,
+            }
+            self.env['res.users'].create(rec)
 
 
 

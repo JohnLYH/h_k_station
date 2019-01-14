@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 
 from odoo import api, models, fields
+import smtplib
+from email.mime.text import MIMEText
+from email.header import Header
 
 
 class EmployeesGet(models.Model):
@@ -13,15 +16,16 @@ class EmployeesGet(models.Model):
     branch = fields.Char(string='員工部門')
 
     @api.model
-    def get_users_info(self, department_id, page=1, limit=10):
+    def get_users_info(self, **kw):
         '''
-          部门下的人员
+        部门下的人员
         :return:
         '''
-        count = self.env['res.users'].search_count([('post', '=', department_id)])
-        users = self.env['res.users'].search_read(
-            [('post', '=', department_id)], limit=limit, offset=(page - 1) * limit,
-            fields=['name', 'login', 'post', 'role', 'state', 'branch', 'email'])
+        count = self.env['res.users'].search_count([])
+        # users = self.env['res.users'].search_read(
+        #     [('post', '=', department_id)], limit=limit, offset=(page - 1) * limit,
+        #     fields=['name', 'login', 'post', 'role', 'state', 'branch', 'email'])
+        users = self.search_read([], limit=10*kw.get('page'))[-10:]
         return {'users': users, 'count': count}
 
     @api.model
@@ -29,7 +33,7 @@ class EmployeesGet(models.Model):
         users = self.env['res.users'].search_read([])
         return users[:kw['size']]
 
-    @ api.model
+    @api.model
     def init_record(self, **kw):
         users = self.env['res.users'].search_read([])
         return users[:10]
@@ -57,7 +61,8 @@ class EmployeesGet(models.Model):
 
             # 二级部门
             two_department_ids = self.env['user.department'].sudo(1).search_read(
-                [('parent_order', '=', parent_department_id.department_order)], ['parent_order', 'name', 'id', 'department_order'])
+                [('parent_order', '=', parent_department_id.department_order)],
+                ['parent_order', 'name', 'id', 'department_order'])
             child_departments = []
             for two_department_id in two_department_ids:
                 department_map = {}
@@ -67,7 +72,8 @@ class EmployeesGet(models.Model):
 
                 # 三级部门
                 three_department_ids = self.env['user.department'].sudo(1).search_read(
-                    [('parent_order', '=', two_department_department_id)], ['parent_order', 'name', 'id', 'department_order'])
+                    [('parent_order', '=', two_department_department_id)],
+                    ['parent_order', 'name', 'id', 'department_order'])
                 three_department_list = []
                 for three_department_id in three_department_ids:
                     three_department_map = {}
@@ -92,9 +98,8 @@ class EmployeesGet(models.Model):
 
     @api.model
     def disable_info(self, **kw):
-        print(kw.get('disable_id'))
         record = self.search([('login', '=', kw.get('disable_id'))])
-        record.write({'state': 'disable'})
+        record.write({'state': '禁用'})
 
     # 编辑人员信息
     @api.model
@@ -120,19 +125,19 @@ class EmployeesGet(models.Model):
         for post in record:
             dic = {}
             if post.get('post'):
-                dic['value'] = post.get('id')
+                dic['value'] = post.get('post')
                 dic['label'] = post.get('post')
                 post_lis.append(dic)
         for dep in record:
             dep_dic = {}
             if dep.get('branch'):
-                dep_dic['value'] = dep.get('id')
+                dep_dic['value'] = dep.get('branch')
                 dep_dic['label'] = dep.get('branch')
                 dep_lis.append(dep_dic)
         for role in record:
             role_dic = {}
             if role.get('role'):
-                role_dic['value'] = role.get('id')
+                role_dic['value'] = role.get('role')
                 role_dic['label'] = role.get('role')
                 role_lis.append(role_dic)
         lis.append(post_lis)
@@ -143,8 +148,29 @@ class EmployeesGet(models.Model):
     # 修改密码
     @api.model
     def change_password_usr(self, **kw):
+        usr_record = self.search([('login', '=', kw.get('login'))])
         record = self.search([('id', '=', kw.get('user_id'))])
         record.write({'password': kw.get('paw')})
+
+        # TODO: 密碼重置發送郵件
+        # 重置密碼的時候發送郵件
+        sender = 'businessempire@163.com'  # 发送人的邮箱
+        receiver = usr_record.email  # 接收人的邮箱 是list
+        subject = '密碼重置'  # 标题
+        email_name = '密碼重置'  # 邮箱的标题
+        smtpserver = 'smtp.163.com'  # 邮箱的server
+        username = 'businessempire@163.com'  # 发送人的邮箱
+        password = '57624530asd'  # 发送人的授权码,不是密码
+
+        msg = MIMEText('管理員已經將您MTR移動管理應用密碼重置為初始密碼', 'plain', 'utf-8')  # 中文需参数‘utf-8'，单字节字符不需要
+        msg['Subject'] = Header(subject, 'utf-8')  # 标题
+        msg['From'] = '%s<xxxx@163.com>' % email_name
+        msg['To'] = usr_record.email
+        smtp = smtplib.SMTP()
+        smtp.connect(smtpserver, 25)
+        smtp.login(username, password)
+        smtp.sendmail(sender, [receiver], msg.as_string())
+        smtp.quit()  # 退出
 
     # 搜索权限页面的数据
     @api.model
