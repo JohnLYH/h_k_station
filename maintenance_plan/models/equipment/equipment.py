@@ -61,5 +61,5 @@ class Equipment(models.Model):
     @api.model
     def create(self, vals):
         equipment = super(Equipment, self).create(vals)
-        print(self.generate_2_code(equipment.id))
         equipment.qr_code = self.generate_2_code(equipment.id)
+        return equipment
