@@ -15,12 +15,15 @@ class Config(models.TransientModel):
 
     max_advance_days = fields.Integer('最大提前天數')
     max_delay_days = fields.Integer('最大延遲天數')
+    send_email_time = fields.Datetime('逾期工單郵件發送時間')
 
     def set_values(self):
         self.env['ir.config_parameter'] \
             .sudo().set_param('maintenance_plan_max_advance_days', self.max_advance_days)
         self.env['ir.config_parameter'] \
             .sudo().set_param('maintenance_plan_max_delay_days', self.max_delay_days)
+        self.env['ir.config_parameter'] \
+            .sudo().set_param('maintenance_plan_send_email_time', self.send_email_time)
 
     def get_values(self):
         max_advance_days = self.env['ir.config_parameter'] \
