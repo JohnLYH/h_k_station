@@ -11,18 +11,19 @@ odoo.define('person_edit', function (require) {
         is_update: false,
         dom_id: 'person_edit' + construct_id++,
         init: function (parent, action) {
+            alert(action.context.node);
             var self = this;
             this._super.apply(this, arguments);
             this.vue_data = {
                 role_name: action.context.name,
                 role_id: action.context.login,
-                deparment: '',
-                deparments: '',
                 post: action.context.post,
                 posts: '',
                 role: action.context.role,
                 roles: '',
                 role_email: action.context.email,
+                department_list: [],
+                selectedOptions: action.context.edit_id,
 
             };
         },
@@ -35,6 +36,13 @@ odoo.define('person_edit', function (require) {
                 }).then(function (get_data) {
                     self.vue_data.posts = get_data[0];
                     self.vue_data.roles = get_data[2];
+                }),
+
+                self._rpc({
+                    model: 'res.users',
+                    method: 'get_department_edit',
+                }).then(function (data) {
+                    self.vue_data.department_list = data
                 })
             )
         },
@@ -63,7 +71,7 @@ odoo.define('person_edit', function (require) {
                                 kwargs: {
                                     name: self.vue_data.role_name,
                                     role_id: self.vue_data.role_id,
-                                    deparment: self.vue_data.deparment,
+                                    deparment: self.vue_data.selectedOptions,
                                     post: self.vue_data.post,
                                     role: self.vue_data.role,
                                     role_email: self.vue_data.role_email
@@ -72,8 +80,18 @@ odoo.define('person_edit', function (require) {
                                 self.do_action({"type": "ir.actions.act_window_close"})
                             })
                         },
+
                         cancel: function () {
                             self.do_action({"type": "ir.actions.act_window_close"})
+                        },
+
+                        handleChange: function () {
+                            self._rpc({
+                                model: 'res.users',
+                                method: 'get_department_edit',
+                            }).then(function (data) {
+                                self.vue_data.department_list = data
+                            })
                         }
                     },
                 });

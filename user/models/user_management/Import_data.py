@@ -12,7 +12,6 @@ class ImportDate(models.Model):
 
     file = fields.Binary(string='選擇需要導入的文件')
 
-
     def import_record(self):
         '''
         用來導入人員的個人信息
@@ -36,18 +35,7 @@ class ImportDate(models.Model):
         #     record = self.env['res.users'].search([('name','=',item.get('login'))])
         #     if not record.id:
         #         self.env['res.users'].create(item)
-        # return self.env['user.department'].department_information()
-
-        for i in range(100):
-            rec = {
-                'name': i,
-                'login': i,
-                'post': i,
-                'role': i,
-                'email': i,
-                'branch': i,
-            }
-            self.env['res.users'].create(rec)
-
-
-
+        # return self.env['user.department'].department_information()\
+        category_id = self.env.ref('{}.{}'.format('user','myself_catetory_id'))
+        category_id.ensure_one()
+        self.env['res.groups'].create({'name': '123321', 'category_id': category_id.id, 'implied_ids': [(6, 0, [14,12])]})

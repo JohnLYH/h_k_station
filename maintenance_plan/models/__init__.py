@@ -6,3 +6,4 @@ from . import config
 from . import approval_management
 from . import trans_excel
 from . import standard_Job
+from . import inventory_management

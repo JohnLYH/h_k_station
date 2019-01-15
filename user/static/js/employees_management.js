@@ -36,7 +36,8 @@ odoo.define('employees_management_action', function (require) {
                 ],
                 size_: 10,
                 list_size: [10, 20, 30, 40],
-
+                node_record: '',
+                edit_department_id: '',
             };
         },
 
@@ -69,6 +70,7 @@ odoo.define('employees_management_action', function (require) {
 
                     methods: {
                         click_node: function (data) {
+                            self.vue_data.node_record = data.id;
                             self.vue_data.currentPage4 = 1;
                             self._rpc({
                                 model: 'res.users',
@@ -77,7 +79,9 @@ odoo.define('employees_management_action', function (require) {
                             }).then(function (get_data) {
                                 self.vue_data.tableData = get_data.users;
                                 self.vue_data.message = get_data.count;
+                                self.vue_data.edit_department_id = get_data.department;
                             });
+                            console.log(data);
                         },
 
                         click_node_page: function (data) {
@@ -131,6 +135,8 @@ odoo.define('employees_management_action', function (require) {
                                     'role': row.role,
                                     'email': row.email,
                                     'page': self.vue_data.currentPage4,
+                                    'node': self.vue_data.node_record,
+                                    'edit_id': self.vue_data.edit_department_id,
                                 }
                             }, {
                                 on_close: function () {
@@ -141,7 +147,7 @@ odoo.define('employees_management_action', function (require) {
 
                         handleReset: function (index, row) {
                             self.do_action({
-                                name: '修改密码',
+                                name: '重置密码',
                                 type: 'ir.actions.client',
                                 tag: 'change_password_usr',
                                 target: 'new',

@@ -17,8 +17,8 @@ class Department(models.Model):
     department_order = fields.Integer('部门编号', readonly=True)
     parent_order = fields.Integer('父部门编号', readonly=True)
     department_hierarchy = fields.Integer(string='部门层级') # 用于计算
-    # parent_id = fields.Many2one('user.department', string='父部门', ondelete='cascade')
-    # child_ids = fields.One2many('user.department', 'parent_id', string='子部门')
+    parent_id = fields.Many2one('user.department', string='父部门', ondelete='cascade')
+    child_ids = fields.One2many('user.department', 'parent_id', string='子部门')
     parent_left = fields.Integer(index=True)
     parent_right = fields.Integer(index=True)
 
@@ -28,6 +28,7 @@ class Department(models.Model):
         'user_id',
         'udepartment_id', readonly=True)
 
+    # TODO： 导入人员信息后面修改
     @api.model
     def department_information(self):
         '''
@@ -72,6 +73,7 @@ class Department(models.Model):
                             two_class = self.create({
                                 'name': cell,
                                 'parent_order': one_class.id,
+                                'parent_id': one_class.id,
                                 'department_hierarchy': 2
                             })
                             two_class.department_order = two_class.id
@@ -83,6 +85,7 @@ class Department(models.Model):
                             three_class = self.create({
                                 'name': cell,
                                 'parent_order': two_class.id,
+                                'parent_id': two_class.id,
                                 'department_hierarchy': 3
                             })
                             three_class.department_order = three_class.id

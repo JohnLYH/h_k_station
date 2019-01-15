@@ -22,11 +22,22 @@ class EmployeesGet(models.Model):
         :return:
         '''
         count = self.env['res.users'].search_count([])
-        # users = self.env['res.users'].search_read(
-        #     [('post', '=', department_id)], limit=limit, offset=(page - 1) * limit,
-        #     fields=['name', 'login', 'post', 'role', 'state', 'branch', 'email'])
-        users = self.search_read([], limit=10*kw.get('page'))[-10:]
-        return {'users': users, 'count': count}
+        role_ids = self.env['user.department'].search([('id', '=', kw.get('department_id'))])
+
+        users = self.env['res.users'].search_read(
+            [('id', 'in', role_ids.users.ids)],
+            fields=['name', 'login', 'post', 'role', 'state', 'branch', 'email'
+                    ])
+        lis = []  # 用来存放部门
+        lis.append(kw.get('department_id'))
+        dep_id = self.env['user.department'].search_read([('id', '=', kw.get('department_id'))], ['parent_id'])
+        if dep_id[0].get('parent_id'):
+            lis.append(dep_id[0].get('parent_id')[0])
+            two_id = self.env['user.department'].search_read([('id', '=', dep_id[0].get('parent_id')[0])],
+                                                             ['parent_id'])
+            if two_id[0].get('parent_id'):
+                lis.append(two_id[0].get('parent_id')[0])
+        return {'users': users, 'count': count, 'department': lis[::-1]}
 
     @api.model
     def page_size(self, **kw):
@@ -86,6 +97,26 @@ class EmployeesGet(models.Model):
             department_tree.append(parent_department)
 
         return department_tree
+
+    @api.model
+    def get_department_edit(self, id=False):
+        '''
+        获取分组
+        :return:
+        '''
+        rst = []
+        class_a = self.env['user.department'].search_read([('parent_id', '=', id)],
+                                                          fields=['child_ids', 'name'])
+        for record in class_a:
+            vals = {
+                'value': record['id'],
+                'label': record['name'],
+            }
+            children = self.get_department_edit(record['id'])
+            if children:
+                vals['children'] = children
+            rst.append(vals)
+        return rst
 
     @api.model
     def get_chose_user_info(self, name, chose):
@@ -150,27 +181,27 @@ class EmployeesGet(models.Model):
     def change_password_usr(self, **kw):
         usr_record = self.search([('login', '=', kw.get('login'))])
         record = self.search([('id', '=', kw.get('user_id'))])
-        record.write({'password': kw.get('paw')})
+        record.write({'password': 123456})
 
         # TODO: 密碼重置發送郵件
         # 重置密碼的時候發送郵件
-        sender = 'businessempire@163.com'  # 发送人的邮箱
-        receiver = usr_record.email  # 接收人的邮箱 是list
-        subject = '密碼重置'  # 标题
-        email_name = '密碼重置'  # 邮箱的标题
-        smtpserver = 'smtp.163.com'  # 邮箱的server
-        username = 'businessempire@163.com'  # 发送人的邮箱
-        password = '57624530asd'  # 发送人的授权码,不是密码
-
-        msg = MIMEText('管理員已經將您MTR移動管理應用密碼重置為初始密碼', 'plain', 'utf-8')  # 中文需参数‘utf-8'，单字节字符不需要
-        msg['Subject'] = Header(subject, 'utf-8')  # 标题
-        msg['From'] = '%s<xxxx@163.com>' % email_name
-        msg['To'] = usr_record.email
-        smtp = smtplib.SMTP()
-        smtp.connect(smtpserver, 25)
-        smtp.login(username, password)
-        smtp.sendmail(sender, [receiver], msg.as_string())
-        smtp.quit()  # 退出
+        # sender = 'businessempire@163.com'  # 发送人的邮箱
+        # receiver = usr_record.email  # 接收人的邮箱 是list
+        # subject = '密碼重置'  # 标题
+        # email_name = '密碼重置'  # 邮箱的标题
+        # smtpserver = 'smtp.163.com'  # 邮箱的server
+        # username = 'businessempire@163.com'  # 发送人的邮箱
+        # password = '57624530asd'  # 发送人的授权码,不是密码
+        #
+        # msg = MIMEText('管理員已經將您MTR移動管理應用密碼重置為初始密碼', 'plain', 'utf-8')  # 中文需参数‘utf-8'，单字节字符不需要
+        # msg['Subject'] = Header(subject, 'utf-8')  # 标题
+        # msg['From'] = '%s<xxxx@163.com>' % email_name
+        # msg['To'] = usr_record.email
+        # smtp = smtplib.SMTP()
+        # smtp.connect(smtpserver, 25)
+        # smtp.login(username, password)
+        # smtp.sendmail(sender, [receiver], msg.as_string())
+        # smtp.quit()  # 退出
 
     # 搜索权限页面的数据
     @api.model
