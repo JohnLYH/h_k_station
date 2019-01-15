@@ -30,4 +30,7 @@ class Config(models.TransientModel):
             .sudo().get_param('maintenance_plan_max_advance_days', default=0)
         max_delay_days = self.env['ir.config_parameter'] \
             .sudo().get_param('maintenance_plan_max_delay_days', default=0)
-        return dict(max_advance_days=int(max_advance_days), max_delay_days=int(max_delay_days))
+        send_email_time = self.env['ir.config_parameter'] \
+            .sudo().get_param('maintenance_plan_send_email_time', default=None)
+        return dict(max_advance_days=int(max_advance_days), max_delay_days=int(max_delay_days),
+                    send_email_time=send_email_time)
