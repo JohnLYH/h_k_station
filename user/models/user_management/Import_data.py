@@ -35,7 +35,19 @@ class ImportDate(models.Model):
         #     record = self.env['res.users'].search([('name','=',item.get('login'))])
         #     if not record.id:
         #         self.env['res.users'].create(item)
-        # return self.env['user.department'].department_information()\
-        category_id = self.env.ref('{}.{}'.format('user','myself_catetory_id'))
-        category_id.ensure_one()
-        self.env['res.groups'].create({'name': '123321', 'category_id': category_id.id, 'implied_ids': [(6, 0, [14,12])]})
+        # return self.env['user.department'].department_information()
+        lis = []
+        for i in range(35):
+            rec = self.env['user.permiss_management'].create({
+                'name': i,
+                'permission_illustrate': i,
+                'user_person': i,
+            })
+            lis.append(rec)
+            record = self.env['user.department'].search([('id', '=', 43)])
+            record.write({'users': [(6, 0, lis)]})
+            #
+            # category_id = self.env.ref('{}.{}'.format('user', 'myself_catetory_id'))
+            # category_id.ensure_one()
+            # self.env['res.groups'].create(
+            #     {'name': i, 'category_id': category_id.id, 'implied_ids': [(6, 0, [])]})

@@ -24,10 +24,13 @@ class EmployeesGet(models.Model):
         count = self.env['res.users'].search_count([])
         role_ids = self.env['user.department'].search([('id', '=', kw.get('department_id'))])
 
-        users = self.env['res.users'].search_read(
-            [('id', 'in', role_ids.users.ids)],
-            fields=['name', 'login', 'post', 'role', 'state', 'branch', 'email'
-                    ])
+        # todo: 后面使用
+        # users = self.env['res.users'].search_read(
+        #     [('id', 'in', role_ids.users.ids)],
+        #     fields=['name', 'login', 'post', 'role', 'state', 'branch', 'email'
+        #             ])
+
+        users = self.search_read([])
         lis = []  # 用来存放部门
         lis.append(kw.get('department_id'))
         dep_id = self.env['user.department'].search_read([('id', '=', kw.get('department_id'))], ['parent_id'])

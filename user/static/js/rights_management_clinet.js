@@ -30,10 +30,10 @@ odoo.define('rights_management', function (require) {
                 message: 0,
                 value: '',
                 options: [
-                          {value: 'normal', label: '正常'},
-                          {value: 'disable', label: '禁用'},
-                          {value: 'all', label: '全部'}
-                       ],
+                    {value: 'normal', label: '正常'},
+                    {value: 'disable', label: '禁用'},
+                    {value: 'all', label: '全部'}
+                ],
                 size_: 10,
                 list_size: [10, 20, 30, 40],
 
@@ -45,8 +45,8 @@ odoo.define('rights_management', function (require) {
             var self = this;
 
             return self._rpc({
-                model: 'user.department',
-                method: 'get_department_users',
+                model: 'res.groups',
+                method: 'get_permiss_role',
             }).then(function (data) {
                 self.vue_data.tableData = data
             })
@@ -119,11 +119,11 @@ odoo.define('rights_management', function (require) {
 
                         handleEdit: function (index, row) {
                             self.do_action({
-                                name: '\u7de8\u8f2f\u4eba\u54e1\u4fe1\u606f',
+                                name: '權限管理編輯',
                                 type: 'ir.actions.client',
                                 tag: 'edit_role',
                                 target: 'new',
-                                context: {role_name: row.name, per: row.Permission_illustrate,}
+                                context: {role_name: row.name, per: row.permission_illustrate,}
 
                             });
 
@@ -134,17 +134,17 @@ odoo.define('rights_management', function (require) {
                             alert('handleReset')
                         },
 
-                        handleDisable: function (data) {
-                            alert('handleDisable')
-//                                   self._rpc({
-//                                              model: 'cdtct_dingtalk.cdtct_dingtalk_users',
-//                                              method:'get_users',
-//                                              kwargs: {'department_id':data.id}
-//                                            }).then(function(get_data){
-//                                              self.vue_data.tableData=get_data;
-//                                            });
+                        handleDisable: function (index,row) {
+                            self._rpc({
+                                model: 'res.groups',
+                                method: 'get_disable_info_act',
+                                kwargs: {'name': row.name}
+                            }).then(function (get_data) {
+                            });
+                        },
 
-
+                        handleDelete: function(index, row){
+                            alert('删除')
                         },
 
                         search: function (data) {
@@ -155,8 +155,6 @@ odoo.define('rights_management', function (require) {
                             }).then(function (get_data) {
                                 self.vue_data.tableData = get_data
                             });
-
-
                         },
 
                         reset: function (data) {

@@ -21,7 +21,7 @@ odoo.define('edit_role', function (require) {
                 default_checked_keys: [],
                 defaultProps: {
                     children: 'children',
-                    label: 'label'
+                    label: 'name'
                 },
                 role: action.context.role_name,
                 per: action.context.per,
@@ -34,10 +34,11 @@ odoo.define('edit_role', function (require) {
             var self = this;
 
             return self._rpc({
-                model: 'res.users',
-                method: 'get_department_users',
+                model: 'user.department',
+                method: 'get_pers_group',
             }).then(function (data) {
                 self.vue_data.departmentList = data
+                console.log('666', data)
             })
         },
 
@@ -63,7 +64,7 @@ odoo.define('edit_role', function (require) {
 
                         onSubmit: function (date) {
                             self._rpc({
-                                model: 'user.department',
+                                model: 'res.groups',
                                 method: 'edit_save',
                                 kwargs: {
                                     role_name: self.vue_data.role,
