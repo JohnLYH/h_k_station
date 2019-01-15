@@ -6,7 +6,7 @@ from odoo import models, fields, api
 from .approval_management.order_approval import STATUS as APPROVER_STATUS
 
 STATUS = [
-    ('be_executed', '待執行'), ('pending_approval', '待審批'), ('closed', '已關閉')
+    ('be_executed', '待執行'), ('executing', '執行中'), ('pending_approval', '待審批'), ('closed', '已關閉')
 ]
 
 
@@ -30,34 +30,50 @@ class MaintenancePlan(models.Model):
     actual_start_time = fields.Datetime('實際開始時間')
     actual_end_time = fields.Datetime('實際結束時間')
     status = fields.Selection(STATUS, string='狀態')
-    # TODO: compute
+    executor_id = fields.Many2one('res.users', string='執行人')  # 執行人一旦開始填表，則不可更改，執行人只能在執行班組中
+    # 審批關聯
     order_approval_ids = fields.One2many('maintenance_plan.order.approval', 'work_order_id', string='審批')
-    approver_status = fields.Selection(APPROVER_STATUS, string='審批狀態')
-    submit_user_id = fields.Many2one('res.users', string='提交人')
-    approver_user_id = fields.Many2one('res.users', string='審批人')
-    last_submit_date = fields.Datetime('最後提交時間')
-    last_approver_date = fields.Datetime('最後審批時間')
+    approver_status = fields.Selection(APPROVER_STATUS, string='審批狀態', compute='_com_approval', store=True)
+    submit_user_id = fields.Many2one('res.users', string='提交人', compute='_com_approval', store=True)
+    approver_user_id = fields.Many2one('res.users', string='審批人', compute='_com_approval', store=True)
+    last_submit_date = fields.Datetime('最後提交時間', compute='_com_approval', store=True)
+    last_approver_date = fields.Datetime('最後審批時間', compute='_com_approval', store=True)
 
+    @api.one
+    @api.depends('order_approval_ids')
+    def _com_approval(self):
+        if len(self.order_approval_ids) != 0:
+            # 最後提交審批的記錄
+            last_submit_approver = self.order_approval_ids.filtered(lambda r: r.to_status == 'pending_approval')[-1]
+            approver_approver_ids = self.order_approval_ids.filtered(lambda r: r.old_status == 'pending_approval')
+            # 最後審批的記錄，可能為空記錄
+            last_approver_approver = approver_approver_ids[-1] if len(approver_approver_ids) > 0 else None
+            self.approver_status = last_approver_approver.to_status if last_approver_approver is not None else None
+            self.submit_user_id = last_submit_approver.executer_id
+            self.approver_user_id = last_approver_approver.executer_id if last_approver_approver is not None else None
+            self.last_submit_date = last_submit_approver.create_date
+            self.last_approver_date = last_approver_approver.create_date if last_approver_approver is not None else None
+
+    @api.one
     @api.depends('equipment_id')
     def _com_equipment(self):
-        for record in self:
-            if len(record.equipment_id) != 0:
-                record.equipment_num = record.equipment_id.num
+        if len(self.equipment_id) != 0:
+            self.equipment_num = self.equipment_id.num
 
+    @api.one
     @api.depends('plan_start_time', 'plan_end_time')
     def _com_plan_time(self):
-        for record in self:
-            if record.plan_start_time is not False and record.plan_end_time is not False:
-                record.display_plan_time = '{}至{}'.format(
-                    record.plan_start_time.replace('-', '/'),
-                    record.plan_end_time.replace('-', '/')
-                )
+        if self.plan_start_time is not False and self.plan_end_time is not False:
+            self.display_plan_time = '{}至{}'.format(
+                self.plan_start_time.replace('-', '/'),
+                self.plan_end_time.replace('-', '/')
+            )
 
+    @api.one
     @api.depends('action_time')
     def _com_action_time(self):
-        for record in self:
-            if record.action_time is not False:
-                record.display_action_time = record.action_time.replace('-', '/')
+        if self.action_time is not False:
+            self.display_action_time = self.action_time.replace('-', '/')
 
     @api.model
     def get_config(self):
