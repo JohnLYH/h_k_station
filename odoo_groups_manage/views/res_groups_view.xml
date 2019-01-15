@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+        <record model="ir.actions.client" id="add_group_config">
+            <field name="name">添加角色组</field>
+            <field name="type">ir.actions.client</field>
+            <field name="model_id" ref="model_res_groups"/>
+            <field name="binding_model_id" ref="model_res_groups"/>
+            <field name="binding_type">action_button</field>
+            <field name="tag">odoo_groups_manage_group_config_client</field>
+            <field name="target">new</field>
+            <field name="params">{'type': 'add'}</field>
+        </record>
+
+        <record id="update_group_config" model="ir.actions.client">
+            <field name="name">角色组设置</field>
+            <field name="tag">odoo_groups_manage_group_config_client</field>
+            <field name="target">new</field>
+            <field name="params">{'type': 'update'}</field>
+        </record>
+
+        <record model="ir.ui.view" id="odoo_groups_manage_res_groups_tree">
+            <field name="name">角色组列表</field>
+            <field name="model">res.groups</field>
+            <field name="arch" type="xml">
+                <tree create="0">
+                    <field name="name" string="角色组名称"/>
+                    <button name="%(update_group_config)d" type="action" string="设置"
+                            class="layui-btn layui-btn-sm"/>
+                </tree>
+            </field>
+        </record>
+    </data>
+</odoo>

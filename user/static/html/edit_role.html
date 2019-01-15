@@ -1,10 +1,11 @@
 <div id="edit_role">
-<el-row>
+	<h2 style="text-align: center">編輯角色</h2>
+<el-row :gutter="20">
   <el-col :span="12"><div class="grid-content bg-purple">    <div class="demo-input-suffix">
   <el-col :span="6"><div class="grid-content bg-purple"><span>角色名称</span></div></el-col>
-  <el-col :span="18"><div class="grid-content bg-purple-light"><el-input v-model="input" placeholder="请输入内容"></el-input></div></el-col>
+  <el-col :span="18" style="padding-right: 0px"><div class="grid-content bg-purple-light"><el-input v-model="input" placeholder="请输入内容" style='padding: 0px'></el-input></div></el-col>
   <el-col :span="6"><div class="grid-content bg-purple"><span>權限說明</span></div></el-col>
-  <el-col :span="18"><div class="grid-content bg-purple">    <el-input
+  <el-col :span="18" style="padding-right: 0px"><div class="grid-content bg-purple">    <el-input
       type="textarea"
       :rows="2"
       placeholder="请输入内容"
@@ -19,11 +20,13 @@
     :data="user_name"
     height="250"
     border
+
+
     >
     <el-table-column
+	  align="center"
       prop="name"
-      label="使用人姓名"
-      width="100%">
+      label="使用人姓名">
     </el-table-column>
   </el-table>
 
