@@ -11,49 +11,6 @@ odoo.define("plan_search_pannel", function (require) {
             'click .export_excel': 'export_excel',
             'click .put_in_excel': 'put_in_excel',
         }),
-        uploadExcel: function (dom) {
-            var file = dom.files[0];
-            var self = this;
-            // new一个FormData实例
-            var formData = new FormData();
-            formData.append('file', file);
-            $.ajax({
-                url: '/maintenance_plan/put_in_excel/',
-                type: 'POST',
-                data: formData,
-                processData: false,  //tell jQuery not to process the data
-                contentType: false,  //tell jQuery not to set contentType
-                //这儿的三个参数其实就是XMLHttpRequest里面带的信息。
-                success: function (response) {
-                    response = JSON.parse(response);
-                    if (response.error === false) {
-                        self.vue.$notify({
-                            title: '成功',
-                            message: '上傳成功',
-                            type: 'success'
-                        });
-                    } else if (response.error === true && response.file_id) {
-                        self.vue.$notify({
-                            title: '警告',
-                            message: response.message,
-                            type: 'warning'
-                        });
-                        self.do_action({
-                            name: '返回錯誤文件',
-                            target: 'new',
-                            type: 'ir.actions.act_url',
-                            url: '/maintenance_plan/down_wrong_file?file_id=' + response.file_id
-                        })
-                    } else {
-                        self.vue.$notify({
-                            title: '錯誤',
-                            message: response.message,
-                            type: 'error'
-                        });
-                    }
-                }
-            })
-        },
 
         start: function () {
             var self = this;
@@ -80,13 +37,59 @@ odoo.define("plan_search_pannel", function (require) {
                         $(this).val("");
                         return
                     }
-                    // $(this).parent().submit();
                     self.uploadExcel(this);
                     $(this).val("");
                 }
             });
             target.trigger('click');
         },
+
+        uploadExcel: function (dom) {
+            var file = dom.files[0];
+            var self = this;
+            // new一个FormData实例
+            var formData = new FormData();
+            formData.append('file', file);
+            $.ajax({
+                url: '/maintenance_plan/put_in_excel/',
+                type: 'POST',
+                data: formData,
+                processData: false,  //tell jQuery not to process the data
+                contentType: false,  //tell jQuery not to set contentType
+                //这儿的三个参数其实就是XMLHttpRequest里面带的信息。
+                success: function (response) {
+                    response = JSON.parse(response);
+                    if (response.error === false) {
+                        self.vue.$notify({
+                            title: '成功',
+                            message: '上傳成功',
+                            type: 'success'
+                        });
+                        self.trigger_up('reload')
+                    } else if (response.error === true && response.file_id) {
+                        self.vue.$notify({
+                            title: '警告',
+                            message: response.message,
+                            type: 'warning'
+                        });
+                        self.trigger_up('reload');
+                        self.do_action({
+                            name: '返回錯誤文件',
+                            target: 'new',
+                            type: 'ir.actions.act_url',
+                            url: '/maintenance_plan/down_wrong_file?file_id=' + response.file_id
+                        })
+                    } else {
+                        self.vue.$notify({
+                            title: '錯誤',
+                            message: response.message,
+                            type: 'error'
+                        });
+                    }
+                }
+            })
+        },
+
         export_excel: function (event) {
             // TODO: 導出excel
             console.log(event)

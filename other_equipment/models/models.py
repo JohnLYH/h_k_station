@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 import datetime
 import json
+import os
 from datetime import datetime, timedelta
 
 from dateutil.relativedelta import relativedelta
+from openpyxl import Workbook
+
 from odoo import models, fields, api
 from datetime import datetime as dt
 
@@ -13,8 +16,14 @@ from odoo.osv import osv
 STATUS = [
     ('正常', '正常'), ('失效', '失效'), ('已報廢', '已報廢')
 ]
+ROW_1_LIST = ['EQUIPMENT No.', 'TEAM NO.', 'RESULT \nREFERENCE', 'EQUIPMENT',
+              'BRAND', 'MODEL', 'SERIAL_NO', 'MANUAL REF. NO.',
+              'EQUIPMENT OWNER', 'LOCATION OF EQUIPMENT', 'FREQ. OF CAL.', 'CALIBRATION BODY',
+              'CALIBRATION REQUIPEMNETS  (SEE NOTE)', 'LAST MAINTENANCE DATE', 'MAINTENANCE DUE DATE', 'STATUS',
+              'REMARK']
 
-class other_equipment(models.Model):
+
+class OtherEquipment(models.Model):
     _name = 'other_equipment.other_equipment'
 
     departments = fields.Many2one('user.department', string='所屬班組', required=True)
@@ -33,11 +42,11 @@ class other_equipment(models.Model):
     model = fields.Char(string='型號', size=500)
     brand = fields.Char(string='品牌', size=500)
     result_reference = fields.Char(string='結果參考', size=500)
-    # equipment_id = fields.Many2one('maintenance_plan.equipment', string='設備')
     equipment_name = fields.Char('設備名稱', size=500, required=True)
     equipment_num = fields.Char('設備編號', size=500, required=True)
-    equipment_records_ids = fields.One2many('other_equipment.other_equipment_records', 'other_equipment_id', '操作記錄')
-    remark = fields.Char(string='備註')
+    equipment_records_ids = fields.One2many('other_equipment.other_equipment_records', 'other_equipment_id',
+                                            string='操作記錄')
+    remark = fields.Char(string='備註', size=500)
 
     @api.constrains('equipment_num')
     def _check_equipment_num(self):
@@ -47,7 +56,7 @@ class other_equipment(models.Model):
                                   ]) > 1:
                 raise ValidationError("設備編號已存在，請重新輸入")
 
-    @api.depends('last_maintenance_date')
+    @api.depends('maintenance_due_data')
     def _com_last_maintenance_date(self):
         for record in self:
             if record.maintenance_due_data:
@@ -94,6 +103,7 @@ class other_equipment(models.Model):
             'operation_type': '新建',
             'content': '工器具新增',
             'user_id': self._uid,
+            'remark': records.remark,
         })
         return records
 
@@ -149,7 +159,6 @@ class other_equipment(models.Model):
             this_env.write({
                 'last_maintenance_date': last_maintenance_date,
                 'maintenance_due_data': maintenance_due_data,
-                # 'remark': remark
             })
             new_records = self.env['other_equipment.other_equipment_records'].create({
                 'other_equipment_id': id,
@@ -178,7 +187,6 @@ class other_equipment(models.Model):
         if this_env:
             this_env.write({
                 'status': '已報廢',
-                # 'remark': remark
             })
             self.env['other_equipment.other_equipment_records'].create({
                 'other_equipment_id': id,
@@ -203,8 +211,61 @@ class other_equipment(models.Model):
             if nowtime > maintenance_due_data:
                 record.status = '失效'
 
+    @api.model
+    def get_in_excel(self,**kwargs):
+        try:
+            arr = []
+            if kwargs:
+                for kw in kwargs['domains']:
+                    arr.append(kw[0])
+                other_equipments = self.env['other_equipment.other_equipment'].search(arr)
+            else:
+                other_equipments = self.env['other_equipment.other_equipment'].search([])
+            wb = Workbook()
+            # 激活 worksheet
+            ws = wb.active
+            ws.append(ROW_1_LIST)
+            len_other_equipments = len(other_equipments)
+            for i in range(1, len_other_equipments + 1):
+                my_records = [
+                    other_equipments[i - 1].equipment_num if other_equipments[i - 1].equipment_num else '',
+                    other_equipments[i - 1].departments.department_order if other_equipments[
+                        i - 1].departments.department_order else '',
+                    other_equipments[i - 1].result_reference if other_equipments[i - 1].result_reference else '',
+                    other_equipments[i - 1].equipment_name if other_equipments[i - 1].equipment_name else '',
+                    other_equipments[i - 1].brand if other_equipments[i - 1].brand else '',
+                    other_equipments[i - 1].model if other_equipments[i - 1].model else '',
+                    other_equipments[i - 1].serial_no if other_equipments[i - 1].serial_no else '',
+                    other_equipments[i - 1].manual_ref_no if other_equipments[i - 1].manual_ref_no else '',
+                    other_equipments[i - 1].equipment_owner if other_equipments[i - 1].equipment_owner else '',
+                    other_equipments[i - 1].location_of_equipment if other_equipments[
+                        i - 1].location_of_equipment else '',
+                    other_equipments[i - 1].freq_of_cal if other_equipments[i - 1].freq_of_cal else '',
+                    other_equipments[i - 1].calibration_body if other_equipments[i - 1].calibration_body else '',
+                    other_equipments[i - 1].calibration_requipemnets if other_equipments[
+                        i - 1].calibration_requipemnets else '',
+                    other_equipments[i - 1].last_maintenance_date if other_equipments[
+                        i - 1].last_maintenance_date else '',
+                    other_equipments[i - 1].maintenance_due_data if other_equipments[
+                        i - 1].maintenance_due_data else '',
+                    other_equipments[i - 1].status if other_equipments[i - 1].status else '',
+                    other_equipments[i - 1].remark if other_equipments[i - 1].remark else '',
+                ]
+                ws.append(my_records)
+            wb.save("sample.xlsx")
+            with open('sample.xlsx', 'rb') as f:
+                data = f.read()
+                new_file = self.env['other_equipment.trans.excel'].create({
+                    'name': '工器具導出數據',
+                    'file': data
+                })
+                os.remove('sample.xlsx')
+            return json.dumps({'error': 0, 'message': '下載成功', 'file_id': new_file.id})
+        except:
+            return json.dumps({'error': 1, 'message': '失败'})
 
-class other_equipment_records(models.Model):
+
+class OtherEquipmentRecords(models.Model):
     _name = 'other_equipment.other_equipment_records'
     _description = '工器具操作記錄'
 

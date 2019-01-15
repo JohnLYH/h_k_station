@@ -5,9 +5,9 @@
             <xpath expr="." position="inside">
                 <link rel="stylesheet" type="text/css" href="/maintenance_plan/static/css/admin.css"/>
                 <link rel="stylesheet" type="text/css" href="/maintenance_plan/static/css/red_layui.css"/>
+                <link rel="stylesheet" type="text/css" href="/maintenance_plan/static/css/element_css/index.css"/>
                 <script type="text/javascript" src="/maintenance_plan/static/js/plan_search_pannel.js"/>
                 <script type="text/javascript" src="/maintenance_plan/static/js/tree_buttons.js"/>
-                <script type="text/javascript" src="/maintenance_plan/static/js/import_and_download_demo.js"/>
                 <script type="text/javascript" src="/maintenance_plan/static/js/maintenance_plan/maintenance_plan_tree_button.js"/>
                 <script type="text/javascript" src="/maintenance_plan/static/js/maintenance_plan/maintenance_plan_edit.js"/>
                 <script type="text/javascript" src="/maintenance_plan/static/js/approval_management/order_approval_form_widget.js"/>
