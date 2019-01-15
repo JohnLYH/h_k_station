@@ -29,24 +29,24 @@ odoo.define('tool_management', function (require) {
             var self = this;
             event.stopPropagation();
             if ($(event.target).hasClass('tool_detail')) {
-                // TODO: 詳情
                 self.do_action({
                     type: 'ir.actions.act_window',
                     res_model: 'other_equipment.other_equipment',
                     res_id: self.id,
                     views: [[false, "form"]],
                 })
-            }
-            else if ($(event.target).hasClass('tool_inspection')) {
-                // TODO: 检验
+            } else if ($(event.target).hasClass('tool_inspection')) {
                 self.do_action({
                     "name": "檢驗",
                     "type": "ir.actions.client",
                     "tag": "tool_management_inspection",
                     "target": "new",
                     "params": {record: self.record, id: self.id}
+                }, {
+                    on_close: function () {
+                        self.trigger_up('reload')
+                    },
                 })
-                // console.log('检验')
             } else {
                 self.do_action({
                     "name": "報廢",
@@ -54,6 +54,10 @@ odoo.define('tool_management', function (require) {
                     "tag": "tool_management_scrap",
                     "target": "new",
                     "params": {record: self.record, id: self.id}
+                }, {
+                    on_close: function () {
+                        self.trigger_up('reload')
+                    },
                 });
             }
         }
@@ -74,13 +78,13 @@ odoo.define('tool_management_inspection', function (require) {
             this._super(parent, model);
             this.vue_data = {
                 id: model.params.id,
-                equipment_name:'',
+                equipment_name: '',
                 equipment_num: '',
                 model: '',
                 freq_of_cal: '',
                 last_maintenance_date: '',
                 maintenance_due_data: '',
-                remark :''
+                remark: ''
             };
         },
         start: function () {
@@ -123,16 +127,17 @@ odoo.define('tool_management_inspection', function (require) {
                             });
                         },
                         save: function () {
-                                var this_vue = this;
-                                this_vue.$confirm('是否確認保存校驗信息？', '提示', {
-                                        confirmButtonText: '确定',
-                                        cancelButtonText: '取消',
-                                        type: 'warning'
-                                    }).then(() => {
-                                        self._rpc({
+                            var this_vue = this;
+                            this_vue.$confirm('是否確認保存校驗信息？', '提示', {
+                                confirmButtonText: '确定',
+                                cancelButtonText: '取消',
+                                type: 'warning'
+                            }).then(() => {
+                                self._rpc({
                                     model: 'other_equipment.other_equipment',
                                     method: 'save_tool_management_inspection',
-                                    kwargs: {'id':this_vue.id,
+                                    kwargs: {
+                                        'id': this_vue.id,
                                         'equipment_name': this_vue.equipment_name,
                                         'equipment_num': this_vue.equipment_num,
                                         'model': this_vue.model,
@@ -142,23 +147,33 @@ odoo.define('tool_management_inspection', function (require) {
                                         'remark': this_vue.remark
                                     }
                                 }).then(function (e) {
-                                    if(e){
+                                    if (e) {
                                         self.do_action(false);
-                                       // self.getParent().destroy();
-                                       // window.location.reload();
-                                       // return this.parent.load(['invitations']);
-                                    }else{
+                                    } else {
                                         self.vue.$message({
-                                          message: '未找到這條記錄',
-                                          type: 'warning'
+                                            message: '未找到這條記錄',
+                                            type: 'warning'
                                         });
                                     }
                                 });
-                                    });
-                            },
+                            });
+                        },
                         cancel: function () {
                             self.getParent().destroy()
+                        },
+                        reverse_maintenance_due_data: function () {
+                            var this_vue = this;
+                            console.log(moment(this_vue.last_maintenance_date).format('l'));
+                            var freq_of_cal = this_vue.freq_of_cal;
+                            if (freq_of_cal === 'ON CONDITION') {
+                                return
+                            } else {
+                                // l是 YYYY-MM-DD格式
+                                var new_maintenance_due_data = moment(this_vue.last_maintenance_date).add(Number(freq_of_cal), 'months').format('l');
+                                this_vue.maintenance_due_data = new_maintenance_due_data
+                            }
                         }
+
                     }
                 })
             })
@@ -182,11 +197,11 @@ odoo.define('tool_management_scrap', function (require) {
             this._super(parent, model);
             this.vue_data = {
                 id: model.params.id,
-                equipment_name:'',
+                equipment_name: '',
                 equipment_num: '',
                 model: '',
                 brand: '',
-                remark :''
+                remark: ''
             };
         },
         start: function () {
@@ -226,16 +241,17 @@ odoo.define('tool_management_scrap', function (require) {
                             });
                         },
                         save: function () {
-                                var this_vue = this;
-                                this_vue.$confirm('是否確認該設備已報廢？', '提示', {
-                                        confirmButtonText: '确定',
-                                        cancelButtonText: '取消',
-                                        type: 'warning'
-                                    }).then(() => {
-                                        self._rpc({
+                            var this_vue = this;
+                            this_vue.$confirm('是否確認該設備已報廢？', '提示', {
+                                confirmButtonText: '确定',
+                                cancelButtonText: '取消',
+                                type: 'warning'
+                            }).then(() => {
+                                self._rpc({
                                     model: 'other_equipment.other_equipment',
                                     method: 'save_tool_management_scrap',
-                                    kwargs: {'id':this_vue.id,
+                                    kwargs: {
+                                        'id': this_vue.id,
                                         'equipment_name': this_vue.equipment_name,
                                         'equipment_num': this_vue.equipment_num,
                                         'model': this_vue.model,
@@ -243,23 +259,23 @@ odoo.define('tool_management_scrap', function (require) {
                                         'remark': this_vue.remark
                                     }
                                 }).then(function (e) {
-                                    if(e){
+                                    if (e) {
                                         self.do_action(false);
-                                       // self.getParent().destroy();
-                                       // window.location.reload();
-                                       // return this.parent.load(['invitations']);
-                                    }else{
+                                        // self.getParent().destroy();
+                                        // window.location.reload();
+                                        // return this.parent.load(['invitations']);
+                                    } else {
                                         self.vue.$message({
-                                          message: '未找到這條記錄',
-                                          type: 'warning'
+                                            message: '未找到這條記錄',
+                                            type: 'warning'
                                         });
                                     }
                                 });
-                                    });
-                            },
-                            cancel: function () {
-                                self.getParent().destroy()
-                            }
+                            });
+                        },
+                        cancel: function () {
+                            self.getParent().destroy()
+                        }
                     }
                 })
             })

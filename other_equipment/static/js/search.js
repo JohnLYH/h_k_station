@@ -14,9 +14,8 @@ odoo.define("tool_search", function (require) {
             'click .search_new': 'search_new',
         }),
 
-        start: function() {
+        start: function () {
             this._super.apply(this, arguments);
-            // this.collapse_search()
             this.vue = new Vue({
                 el: '#app',
                 data() {
@@ -46,6 +45,7 @@ odoo.define("tool_search", function (require) {
                             message: '上傳成功',
                             type: 'success'
                         });
+                        self.trigger_up('reload')
                     } else if (response.error === true && response.file_id) {
                         self.vue.$notify({
                             title: '警告',
@@ -69,9 +69,9 @@ odoo.define("tool_search", function (require) {
             })
         },
 
-        search_export: function() {
+        search_export: function () {
             var self = this;
-            var domains = []
+            var domains = [];
             _.each(this.propositions, function (proposition) {
                 var domain = proposition.get_domain()
                 if (!domain) {
@@ -99,43 +99,36 @@ odoo.define("tool_search", function (require) {
                     domains.push([domain])
                 }
             });
-            var formData = new FormData();
-            formData.append('domains', domains);
-            $.ajax({
-                url: '/other_equipment/get_in_excel/',
-                type: 'POST',
-                data: formData,
-                processData: false,  //tell jQuery not to process the data
-                contentType: false,  //tell jQuery not to set contentType
-                //这儿的三个参数其实就是XMLHttpRequest里面带的信息。
-                success: function (response) {
-                    response = JSON.parse(response);
-                    console.log(response)
+            this._rpc({
+                model: 'other_equipment.other_equipment',
+                method: 'get_in_excel',
+                kwargs: {domains: domains},
+            })
+                .then(function (data) {
+                    var response = JSON.parse(data);
                     if (response.error === 0) {
-                        // self.vue.$notify({
-                        //     title: '成功',
-                        //     message: '導出成功',
-                        //     type: 'success'
-                        // });
+                        self.vue.$notify({
+                            title: '成功',
+                            message: '導出成功',
+                            type: 'success'
+                        });
                         self.do_action({
-                            name: '返回錯誤文件',
+                            name: '返回導出文件',
                             target: 'new',
                             type: 'ir.actions.act_url',
                             url: '/other_equipment/down_wrong_file?type=下載&file_id=' + response.file_id
                         })
+                    } else {
+                        self.vue.$notify({
+                            title: '錯誤',
+                            message: response.message,
+                            type: 'error'
+                        });
                     }
-                    else {
-                        // self.vue.$notify({
-                        //     title: '錯誤',
-                        //     message: response.message,
-                        //     type: 'error'
-                        // });
-                    }
-                }
-            })
+                })
         },
 
-        search_import: function() {
+        search_import: function () {
             var self = this;
             var target = this.$el.find('[name="file"]');
             target.change(function () {
@@ -161,10 +154,10 @@ odoo.define("tool_search", function (require) {
         search_new: function () {
             var self = this;
             self.do_action({
-                    type: 'ir.actions.act_window',
-                    res_model: 'other_equipment.other_equipment',
-                    views: [[false, "form"]],
-                })
+                type: 'ir.actions.act_window',
+                res_model: 'other_equipment.other_equipment',
+                views: [[false, "form"]],
+            })
         }
     });
 

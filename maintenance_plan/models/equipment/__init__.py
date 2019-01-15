@@ -3,3 +3,4 @@
 # Author: Artorias
 from . import equipment
 from . import equipment_type
+from . import equipment_model
