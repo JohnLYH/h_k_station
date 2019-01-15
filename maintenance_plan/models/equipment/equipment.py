@@ -40,7 +40,7 @@ class Equipment(models.Model):
     parent_equipment_num = fields.Char('父設備編號')
     serial_number = fields.Char('設備序列號')
     equipment_type_id = fields.Many2one('maintenance_plan.equipment.type', string='設備類別')
-    equipment_model = fields.Char('設備型號')
+    equipment_model = fields.Many2one('maintenance_plan.equipment_model', '設備型號')
     description = fields.Char('設備描述')
     status = fields.Char('狀態')
     item_code = fields.Char('庫存編碼')
@@ -63,3 +63,4 @@ class Equipment(models.Model):
         equipment = super(Equipment, self).create(vals)
         equipment.qr_code = self.generate_2_code(equipment.id)
         return equipment
+

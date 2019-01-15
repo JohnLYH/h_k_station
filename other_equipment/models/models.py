@@ -43,7 +43,7 @@ class other_equipment(models.Model):
     result_reference = fields.Char(string='結果參考', size=500)
     equipment_name = fields.Char('設備名稱', size=500, required=True)
     equipment_num = fields.Char('設備編號', size=500, required=True)
-    equipment_records_ids = fields.One2many('other_equipment.other_equipment_records', 'other_equipment_id', '操作記錄')
+    equipment_records_ids = fields.One2many('other_equipment.other_equipment_records', 'other_equipment_id', string='操作記錄')
     remark = fields.Char(string='備註', size=500)
 
     @api.constrains('equipment_num')
