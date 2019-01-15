@@ -30,13 +30,14 @@ odoo.define('employees_management_action', function (require) {
                 message: 0,
                 value: [],
                 options: [
-                          {value: 'normal', label: '正常'},
-                          {value: 'disable', label: '禁用'},
-                          {value: 'all', label: '全部'}
-                          ],
+                    {value: 'normal', label: '正常'},
+                    {value: 'disable', label: '禁用'},
+                    {value: 'all', label: '全部'}
+                ],
                 size_: 10,
                 list_size: [10, 20, 30, 40],
-
+                node_record: '',
+                edit_department_id: '',
             };
         },
 
@@ -54,7 +55,6 @@ odoo.define('employees_management_action', function (require) {
 
         start: function () {
             var self = this;
-
             $.when(
                 this._rpc({
                     model: 'html_model.template_manage',
@@ -70,12 +70,26 @@ odoo.define('employees_management_action', function (require) {
 
                     methods: {
                         click_node: function (data) {
+                            self.vue_data.node_record = data.id;
+                            self.vue_data.currentPage4 = 1;
                             self._rpc({
                                 model: 'res.users',
                                 method: 'get_users_info',
                                 kwargs: {'department_id': data.id, 'page': 1, 'limit': 10}
                             }).then(function (get_data) {
-                                console.log(get_data)
+                                self.vue_data.tableData = get_data.users;
+                                self.vue_data.message = get_data.count;
+                                self.vue_data.edit_department_id = get_data.department;
+                            });
+                            console.log(data);
+                        },
+
+                        click_node_page: function (data) {
+                            self._rpc({
+                                model: 'res.users',
+                                method: 'get_users_info',
+                                kwargs: {'department_id': data.id, 'page': self.vue_data.currentPage4, 'limit': 10}
+                            }).then(function (get_data) {
                                 self.vue_data.tableData = get_data.users;
                                 self.vue_data.message = get_data.count;
                             });
@@ -96,6 +110,7 @@ odoo.define('employees_management_action', function (require) {
                         },
 
                         handleCurrentChange: function (page) {
+                            self.vue_data.currentPage4 = page
                             self._rpc({
                                 model: 'res.users',
                                 method: 'current_change',
@@ -106,6 +121,8 @@ odoo.define('employees_management_action', function (require) {
                         },
 
                         handleEdit: function (index, row) {
+
+                            var this_vue = this;
                             self.do_action({
                                 name: '員工編輯',
                                 type: 'ir.actions.client',
@@ -117,28 +134,35 @@ odoo.define('employees_management_action', function (require) {
                                     'post': row.post,
                                     'role': row.role,
                                     'email': row.email,
+                                    'page': self.vue_data.currentPage4,
+                                    'node': self.vue_data.node_record,
+                                    'edit_id': self.vue_data.edit_department_id,
+                                }
+                            }, {
+                                on_close: function () {
+                                    this_vue.click_node_page(this_vue.$refs.tree.getCurrentNode())
                                 }
                             });
-
-
                         },
 
                         handleReset: function (index, row) {
                             self.do_action({
-                                name: '修改密码',
+                                name: '重置密码',
                                 type: 'ir.actions.client',
                                 tag: 'change_password_usr',
                                 target: 'new',
-                                context: {paw: row.id},
+                                context: {paw: row.id, login: row.login},
                             }, {size: 'medium'});
                         },
 
                         handleDisable: function (index, row) {
+                            var current_info = this
                             self._rpc({
                                 model: 'res.users',
                                 method: 'disable_info',
                                 kwargs: {'disable_id': row.login}
                             }).then(function (get_data) {
+                                current_info.click_node(current_info.$refs.tree.getCurrentNode())
                             });
                         },
 
@@ -159,7 +183,7 @@ odoo.define('employees_management_action', function (require) {
 
                         loaddown: function (data) {
                             self.do_action({
-                                name: '導入人員消息',
+                                name: '導入數據',
                                 type: 'ir.actions.act_window',
                                 res_model: 'user.import_date',
                                 views: [[self.vue_data.views, 'form']],

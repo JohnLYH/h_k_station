@@ -1,2 +1,8 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_user_user,user.user,model_user_user,,1,0,0,0
+access_user_user,user_user,model_user_user,,1,1,1,1
+access_res_groups,res_groups,model_res_groups,,1,1,1,1
+access_html_model_template_manage,html_model.template_manage,model_html_model_template_manage,,1,1,1,1
+access_user_send_email,user_send_email,model_user_send_email,,1,1,1,1
+access_user_department,user_department,model_user_department,,1,1,1,1
+access_user_import_date,user.import_date,model_user_import_date,,1,1,1,1
+access_use_permiss_management,user_permiss_management,model_user_permiss_management,,1,1,1,1

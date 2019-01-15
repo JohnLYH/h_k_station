@@ -1,61 +1,95 @@
 <div id="per_edit">
     <el-row>
-  <el-col :span="2"><div class="grid-content bg-purple">員工姓名</div></el-col>
-  <el-col :span="22"><div class="grid-content bg-purple-light"><el-input v-model="role_name" placeholder="请输入内容"></el-input></div></el-col>
-</el-row>
+        <el-col :span="2">
+            <div class="grid-content bg-purple">員工姓名</div>
+        </el-col>
+        <el-col :span="22">
+            <div class="grid-content bg-purple-light">
+                <el-input v-model="role_name" placeholder="请输入内容"></el-input>
+            </div>
+        </el-col>
+    </el-row>
 
-<el-row>
-  <el-col :span="2"><div class="grid-content bg-purple">員工賬號</div></el-col>
-  <el-col :span="22"><div class="grid-content bg-purple-light"><el-input v-model="role_id" placeholder="请输入内容" :disabled="true"></el-input></div></el-col>
-</el-row>
+    <el-row>
+        <el-col :span="2">
+            <div class="grid-content bg-purple">員工賬號</div>
+        </el-col>
+        <el-col :span="22">
+            <div class="grid-content bg-purple-light">
+                <el-input v-model="role_id" placeholder="请输入内容" :disabled="true"></el-input>
+            </div>
+        </el-col>
+    </el-row>
 
-<el-row>
-  <el-col :span="2"><div class="grid-content bg-purple">所屬部門</div></el-col>
-  <el-col :span="22"><div class="grid-content bg-purple-light">    <template>
-      <el-select v-model="deparment" placeholder="请选择" style="width: 100%">
-        <el-option
-          v-for="item in deparments"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"
-          >
-        </el-option>
-      </el-select>
-    </template></div></el-col>
-</el-row>
-<el-row>
-  <el-col :span="2"><div class="grid-content bg-purple">崗位</div></el-col>
-  <el-col :span="22"><div class="grid-content bg-purple-light">    <template>
-      <el-select v-model="post" placeholder="请选择" style="width: 100%">
-        <el-option
-          v-for="item in posts"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value">
-        </el-option>
-      </el-select>
-    </template></div></el-col>
-</el-row>
-<el-row>
-  <el-col :span="2"><div class="grid-content bg-purple">員工角色</div></el-col>
-  <el-col :span="22"><div class="grid-content bg-purple-light">    <template>
-      <el-select v-model="role" placeholder="请选择" style="width: 100%">
-        <el-option
-          v-for="item in roles"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value">
-        </el-option>
-      </el-select>
-    </template></div></el-col>
-</el-row>
-<el-row>
-  <el-col :span="2"><div class="grid-content bg-purple">郵箱</div></el-col>
-  <el-col :span="22"><div class="grid-content bg-purple-light"><el-input v-model="role_email" placeholder="请输入内容"></el-input></div></el-col>
-</el-row>
-	<div style='text-align:center'>
-		<el-button type="primary" @click="onSubmit">確認</el-button>
-		<el-button @click="cancel">取消</el-button>
-	</div>
+    <el-row>
+        <el-col :span="2">
+            <div class="grid-content bg-purple">所屬部門</div>
+        </el-col>
+        <el-col :span="22">
+            <div class="grid-content bg-purple-light">
+                <template>
+                    <el-cascader
+                            :options="department_list"
+                            change-on-select
+                            v-model="selectedOptions"
+                            @focus="handleChange"
+                            style="width: 100%">
+                    </el-cascader>
+                </template>
+            </div>
+        </el-col>
+    </el-row>
+    <el-row>
+        <el-col :span="2">
+            <div class="grid-content bg-purple">崗位</div>
+        </el-col>
+        <el-col :span="22">
+            <div class="grid-content bg-purple-light">
+                <template>
+                    <el-select v-model="post" placeholder="请选择" style="width: 100%">
+                        <el-option
+                                v-for="item in posts"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
+                        </el-option>
+                    </el-select>
+                </template>
+            </div>
+        </el-col>
+    </el-row>
+    <el-row>
+        <el-col :span="2">
+            <div class="grid-content bg-purple">員工角色</div>
+        </el-col>
+        <el-col :span="22">
+            <div class="grid-content bg-purple-light">
+                <template>
+                    <el-select v-model="role" placeholder="请选择" style="width: 100%">
+                        <el-option
+                                v-for="item in roles"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
+                        </el-option>
+                    </el-select>
+                </template>
+            </div>
+        </el-col>
+    </el-row>
+    <el-row>
+        <el-col :span="2">
+            <div class="grid-content bg-purple">郵箱</div>
+        </el-col>
+        <el-col :span="22">
+            <div class="grid-content bg-purple-light">
+                <el-input v-model="role_email" placeholder="请输入内容"></el-input>
+            </div>
+        </el-col>
+    </el-row>
+    <div style='text-align:center'>
+        <el-button type="primary" @click="onSubmit">確認</el-button>
+        <el-button @click="cancel">取消</el-button>
+    </div>
 
 </div>

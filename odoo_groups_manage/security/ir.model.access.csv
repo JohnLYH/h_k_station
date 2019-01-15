@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_odoo_groups_manage_odoo_groups_manage,odoo_groups_manage.odoo_groups_manage,model_odoo_groups_manage_odoo_groups_manage,,1,0,0,0

@@ -4,5 +4,10 @@
         <record model="ir.module.category" id="myself_catetory_id">
             <field name="name">自定义角色组</field>
         </record>
+        <!--职位角色组-->
+        <record model="res.groups" id="module_position_manager_10">
+            <field name="name">经理</field>
+            <field name="category_id" ref="myself_catetory_id"/>
+        </record>
     </data>
 </odoo>

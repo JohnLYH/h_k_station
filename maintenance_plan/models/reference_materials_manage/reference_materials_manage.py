@@ -22,8 +22,6 @@ class ReferenceMaterialsManage(models.Model):
     select_file = fields.Binary(string='文件', attachment=True, required=True)
     edition = fields.Char(string='版本', required=True)
     numbering = fields.Char(string='編號', required=True)
-    reference_materials_manage_records = fields.One2many('maintenance_plan.reference_materials_manage_record',
-                                                         'reference_materials_manage_id', string='操作記錄')
 
 
 class ReferenceMaterialsManageRecord(models.Model):
