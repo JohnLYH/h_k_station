@@ -185,4 +185,36 @@
             </div>
         </div>
     </t>
+
+    <!--參考資料管理-->
+    <t t-name="materials_manage_search_template">
+        <div class="form-inline custom_search_box" search_pannel_js_class="plan_search_pannel">
+            <div class="container-fluid">
+                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;">設備名稱:</span>
+                    <div class="col-md-8 col-sm-12 col-xs-12">
+                        <div for="description" class="form-widget-item"/>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;">設備型號:</span>
+                    <div class="col-md-8 col-sm-12 col-xs-12">
+                        <div for="equipment_model" class="form-widget-item"/>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
+                    <div class="form-widget-item col-md-12 col-sm-12 col-xs-12">
+                        <button type="button" class="btn btn-primary search_extend_apply">
+                            搜索
+                        </button>
+                        <button type="button" class="btn btn-default search_extend_reset">
+                            重置
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
 </template>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+        <record id="equipment_model_tree" model="ir.ui.view">
+            <field name="name">參考資料管理</field>
+            <field name="model">maintenance_plan.equipment_model</field>
+            <field name="arch" type="xml">
+                <tree import="false" search_ex_template="materials_manage_search_template"
+                      search_pannel_js_class="plan_search_pannel">
+                    <field name="description"/>
+                    <field name="equipment_model"/>
+                    <field name="wi"/>
+                    <field name="edoc"/>
+                    <field name="m_tube"/>
+                    <field name="fault_finding"/>
+                    <field name="recovery_procedur"/>
+                    <widget name="materials_tree_button" string="操作"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="act_equipment_model" model="ir.actions.act_window">
+            <field name="name">參考資料管理</field>
+            <field name="res_model">maintenance_plan.equipment_model</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!--上傳資料的form-->
+        <record id="reference_materials_manage_upload_form" model="ir.ui.view">
+            <field name="name">上傳文件</field>
+            <field name="model">maintenance_plan.reference_materials_manage</field>
+            <field name="arch" type="xml">
+                <form>
+                    <field name="field_type"/>
+                    <field name="select_file"/>
+                    <field name="edition"/>
+                    <field name="numbering"/>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

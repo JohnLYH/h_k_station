@@ -46,4 +46,14 @@
             <a t-attf-record-id="#{widget.id}" class="maintenance_plan_detail" href="javascript: void 0">查看詳情</a>
         </div>
     </t>
+
+    <t t-name="tem_materials_manage_tree_button">
+        <div style="text-align: center">
+            <a t-attf-record-id="#{widget.id}" class="materials_manage_detail" href="javascript: void 0">詳情</a>
+            <a t-attf-record-id="#{widget.id}" class="upload_materials_manage" href="javascript: void 0">上傳文件</a>
+            <!--<form style="display:none" action="/other_equipment/put_in_excel" method="post" enctype="multipart/form-data">-->
+                <!--<input type="file" name="file" value=""/>-->
+            <!--</form>-->
+        </div>
+    </t>
 </template>

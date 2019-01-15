@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_other_equipment_other_equipment,other_equipment.other_equipment,model_other_equipment_other_equipment,,1,1,1,1
+access_other_equipment_other_equipment_records,other_equipment.other_equipment_records,model_other_equipment_other_equipment_records,,1,1,1,1
+access_other_equipment_trans_excel,other_equipment.trans_excel,model_other_equipment_trans_excel,,1,1,1,1
