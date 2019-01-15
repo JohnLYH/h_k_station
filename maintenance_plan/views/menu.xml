@@ -13,7 +13,7 @@
         
         <menuitem id="equipment_type_management" name="設備類型管理" sequence="5" action="act_maintenance_plan_equipment_type"/>
 
-        <menuitem id="reference_materials" name="參考資料管理" sequence="6"/>
+        <menuitem id="equipment_model" name="參考資料管理" sequence="6" action="act_equipment_model"/>
 
         <menuitem id="reference_materials" name="參數設置" sequence="7" action="act_maintenance_plan_config"/>
     </data>

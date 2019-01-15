@@ -85,18 +85,18 @@ class OtherEquipment(models.Model):
             old_value = self[i]
             field_string = self._fields[i].get_description(self.env)['string']
             content += '修改{}{}為{}'.format(field_string, old_value, vals[i])
-        new_records = self.env['other_equipment.other_equipment_records'].create({
+            new_records = self.env['other_equipment.other_equipment_records'].create({
             'other_equipment_id': self.id,
             'operation_time': datetime.now(),
             'operation_type': '編輯',
             'content': content,
             'user_id': self._uid,
         })
-        return super(other_equipment, self).write(vals)
+        return super(OtherEquipment, self).write(vals)
 
     @api.model
     def create(self, vals):
-        records = super(other_equipment, self).create(vals)
+        records = super(OtherEquipment, self).create(vals)
         new_records = self.env['other_equipment.other_equipment_records'].create({
             'other_equipment_id': records.id,
             'operation_time': datetime.now(),

@@ -1,0 +1,85 @@
+<div id="app" style="margin-top: 30px">
+    <el-row>
+        <el-col :span="2">
+            文件類型
+        </el-col>
+        <el-col :span="21" :offset="1">
+            <el-select v-model="field_type" placeholder="請選擇">
+                <el-option
+                        v-for="item in options"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value">
+                </el-option>
+            </el-select>
+        </el-col>
+
+    </el-row>
+    <div style="margin: 20px 0;"></div>
+    <el-row>
+        <el-col :span="2">
+            選擇文件
+        </el-col>
+        <el-col :span="21" :offset="1">
+            <el-upload
+                    class="upload-demo"
+                    ref="upload"
+                    action="/maintenance_plan/materials_upload_files/"
+                    :auto-upload="false"
+                    :limit="1"
+                    :on-change="handleChange"
+                    :file-list="fileList">
+                <el-button slot="trigger" size="small" type="primary">上傳文件</el-button>
+            </el-upload>
+        </el-col>
+
+    </el-row>
+    <div style="margin: 20px 0;"></div>
+    <el-row>
+        <el-col :span="2">
+            版本
+        </el-col>
+        <el-col :span="21" :offset="1">
+            <el-input v-model="edition" placeholder="請輸入版本"></el-input>
+        </el-col>
+    </el-row>
+    <div style="margin: 20px 0;"></div>
+    <el-row>
+        <el-col :span="2">
+            編號
+        </el-col>
+        <el-col :span="21" :offset="1">
+            <el-input v-model="numbering" placeholder="請輸入編號"></el-input>
+        </el-col>
+    </el-row>
+    <div style="margin: 20px 0;"></div>
+    <el-row>
+        <el-col :span="2">
+            變更原因
+        </el-col>
+        <el-col :span="21" :offset="1">
+            <el-input v-model="reasons_change" placeholder="請輸入變更原因"></el-input>
+        </el-col>
+
+    </el-row>
+    <div style="margin: 20px 0;"></div>
+    <el-row>
+        <el-col :span="2">
+            變更細節
+        </el-col>
+        <el-col :span="21" :offset="1">
+            <el-input
+                    type="textarea"
+                    :rows="2"
+                    placeholder="請輸入變更細節"
+                    v-model="reasons_details">
+            </el-input>
+        </el-col>
+
+    </el-row>
+    <div style="margin: 20px 0;"></div>
+    <el-col :span="6" :offset="9">
+        <el-button round @click="cancel" size="small">取消</el-button>
+        <el-button type="danger" round @click="save" size="small">確認</el-button>
+    </el-col>
+</div>

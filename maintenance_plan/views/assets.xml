@@ -12,6 +12,7 @@
                 <script type="text/javascript" src="/maintenance_plan/static/js/maintenance_plan/maintenance_plan_edit.js"/>
                 <script type="text/javascript" src="/maintenance_plan/static/js/approval_management/order_approval_form_widget.js"/>
                 <script type="text/javascript" src="/maintenance_plan/static/js/work_order/work_order_tree_button.js"/>
+                <script type="text/javascript" src="/maintenance_plan/static/js/reference_materials_manage/materials.js"/>
                 <script type="text/javascript" src="/maintenance_plan/static/js/equipment/equipment_type_tree_button.js"/>
                 <script type="text/javascript" src="/maintenance_plan/static/js/equipment/equipment_tree_domain.js"/>
                 <script type="text/javascript" src="/maintenance_plan/static/js/equipment/equipment_tree_button.js"/>

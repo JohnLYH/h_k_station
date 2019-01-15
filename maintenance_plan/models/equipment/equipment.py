@@ -3,6 +3,8 @@
 # Author: Artorias
 import base64
 import os
+import random
+import time
 
 import qrcode
 from PIL import Image
@@ -16,7 +18,7 @@ class Equipment(models.Model):
     _rec_name = 'num'
 
     @staticmethod
-    def generate_2_code(self, arr):
+    def generate_2_code(arr):
         '''
             获取二维码二进制
             :param arr:显示内容
@@ -31,10 +33,11 @@ class Equipment(models.Model):
         )
         qr.make(arr)
         img = qr.make_image()
-        img.save('simpleqrcode.jpg')
-        open_icon = open("simpleqrcode.jpg", "rb")
+        file_name = str(time.time) + str(random.randint(1000)) + 'simpleqrcode.jpg'
+        img.save(file_name)
+        open_icon = open(file_name, "rb")
         b64str = base64.b64encode(open_icon.read())
-        os.remove("simpleqrcode.jpg")
+        os.remove(file_name)
         return b64str
 
     num = fields.Char('設備編號')
