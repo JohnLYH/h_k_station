@@ -40,7 +40,7 @@ class Equipment(models.Model):
         os.remove(file_name)
         return b64str
 
-    num = fields.Char('設備編號')
+    num = fields.Char('設備編號')  # 設備座位號，一個座位會有多個放過的設備
     parent_equipment_num = fields.Char('父設備編號')
     serial_number = fields.Char('設備序列號')
     equipment_type_id = fields.Many2one('maintenance_plan.equipment.type', string='設備類別')
@@ -48,11 +48,10 @@ class Equipment(models.Model):
     description = fields.Char('設備描述')
     status = fields.Char('狀態')
     item_code = fields.Char('庫存編碼')
-    line_id = fields.Many2one('maintenance_plan.line', string='線別')
-    station_id = fields.Many2one('maintenance_plan.station', string='車站')
     direction = fields.Char('方向')
     start_chainage = fields.Char('起始公里標')
     end_chainage = fields.Char('終點公里標')
+    detailed_location = fields.Char('設備詳細位置')
     last_installation_date = fields.Date('最近安裝時間')
     service_since = fields.Date('啟用時間')
     expected_asset_life = fields.Integer('使用壽命')
@@ -67,4 +66,3 @@ class Equipment(models.Model):
         equipment = super(Equipment, self).create(vals)
         equipment.qr_code = self.generate_2_code(equipment.id)
         return equipment
-

@@ -1,0 +1,15 @@
+<odoo>
+    <data>
+        <record id="act_odoo_groups_manage_menu" model="ir.actions.act_window">
+            <field name="name">角色组</field>
+            <field name="res_model">res.groups</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain"
+                   eval="[('category_id', '=', ref('odoo_groups_manage.odoo_groups_manage_category_custom_groups'))]"/>
+            <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'tree', 'view_id': ref('odoo_groups_manage.odoo_groups_manage_res_groups_tree')})]"/>
+        </record>
+
+        <menuitem id="odoo_groups_manage_menu" name="角色组管理" action="odoo_groups_manage.act_odoo_groups_manage_menu"/>
+    </data>
+</odoo>

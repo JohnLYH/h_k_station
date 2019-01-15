@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from odoo import models, fields, api
 
 file_type = [
@@ -31,7 +30,8 @@ class ReferenceMaterialsManageRecord(models.Model):
 
     reasons_change = fields.Char(string='變更原因')
     reasons_details = fields.Text(string='變更細節')
-    reference_materials_manage_id = fields.Many2one('maintenance_plan.reference_materials_manage', '對應的參考資料管理的詳細管理', ondelete='cascade')
+    reference_materials_manage_id = fields.Many2one(
+        'maintenance_plan.reference_materials_manage', '對應的參考資料管理的詳細管理', ondelete='cascade')
     user_id = fields.Many2one('res.users', '操作人')
     operation_time = fields.Datetime('操作時間')
     field_type = fields.Selection(file_type, '文件類型', required=True, compute='_get_value', store=True)
