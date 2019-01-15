@@ -22,7 +22,8 @@ ROW_1_LIST = ['EQUIPMENT No.', 'TEAM NO.', 'RESULT \nREFERENCE', 'EQUIPMENT',
               'CALIBRATION REQUIPEMNETS  (SEE NOTE)', 'LAST MAINTENANCE DATE', 'MAINTENANCE DUE DATE', 'STATUS',
               'REMARK']
 
-class other_equipment(models.Model):
+
+class OtherEquipment(models.Model):
     _name = 'other_equipment.other_equipment'
 
     departments = fields.Many2one('user.department', string='所屬班組', required=True)
@@ -43,7 +44,8 @@ class other_equipment(models.Model):
     result_reference = fields.Char(string='結果參考', size=500)
     equipment_name = fields.Char('設備名稱', size=500, required=True)
     equipment_num = fields.Char('設備編號', size=500, required=True)
-    equipment_records_ids = fields.One2many('other_equipment.other_equipment_records', 'other_equipment_id', string='操作記錄')
+    equipment_records_ids = fields.One2many('other_equipment.other_equipment_records', 'other_equipment_id',
+                                            string='操作記錄')
     remark = fields.Char(string='備註', size=500)
 
     @api.constrains('equipment_num')
@@ -262,7 +264,8 @@ class other_equipment(models.Model):
         except:
             return json.dumps({'error': 1, 'message': '失败'})
 
-class other_equipment_records(models.Model):
+
+class OtherEquipmentRecords(models.Model):
     _name = 'other_equipment.other_equipment_records'
     _description = '工器具操作記錄'
 

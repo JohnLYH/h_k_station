@@ -15,6 +15,7 @@ class Equipment(models.Model):
     _description = '設備'
     _rec_name = 'num'
 
+    @staticmethod
     def generate_2_code(self, arr):
         '''
             获取二维码二进制
