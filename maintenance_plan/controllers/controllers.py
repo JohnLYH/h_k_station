@@ -131,3 +131,9 @@ class MaintenancePlan(http.Controller):
         #     'tag': 'maintenance_plan.maintenance_plan_approval_management',
         # }
         return http.request.render('maintenance_plan.maintenance_plan_approval_management', {})
+
+    @http.route('/maintenance_plan/materials_upload_files', auth='user', csrf=False)
+    def approval_management(self, **kw):
+        file = kw['file']
+        filename = kw['file'].filename
+        return json.dumps({'error': 0,'file':kw['file']})
