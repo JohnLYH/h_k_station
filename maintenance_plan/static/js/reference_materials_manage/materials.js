@@ -123,6 +123,7 @@ odoo.define('materials_detail_btn', function (require) {
                     },
                     methods: {
                         save: function () {
+                            var self = this;
                             alert('保存')
 
                         },

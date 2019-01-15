@@ -1,0 +1,57 @@
+<div id="tool_management_inspection">
+    <el-row>
+        <el-col :span="12">
+            名稱：{{ equipment_name }}
+        </el-col>
+        <el-col :span="12">
+            編號：{{ equipment_num }}
+        </el-col>
+    </el-row>
+    <div style="margin: 20px 0;"></div>
+    <el-row>
+        <el-col :span="12">
+            型號：{{ model }}
+        </el-col>
+        <el-col :span="12">
+            檢驗週期：{{ freq_of_cal }}
+        </el-col>
+    </el-row>
+    <div style="margin: 20px 0;"></div>
+    <el-row>
+        <el-col :span="12">
+            檢驗日期：
+            <el-date-picker
+                    v-model="last_maintenance_date"
+                    type="date"
+                    placeholder="檢驗日期" @change="reverse_maintenance_due_data">
+            </el-date-picker>
+        </el-col>
+        <el-col :span="12">
+            有效期：
+            <el-date-picker
+                    v-model="maintenance_due_data"
+                    type="date"
+                    placeholder="有效期">
+            </el-date-picker>
+        </el-col>
+    </el-row>
+    <div style="margin: 20px 0;"></div>
+    <el-row>
+        <el-col :span="2">
+            備註：
+        </el-col>
+        <el-col :span="17">
+            <el-input
+                    type="textarea"
+                    :rows="2"
+                    placeholder="請輸入備註"
+                    v-model="remark">
+            </el-input>
+        </el-col>
+    </el-row>
+    <hr class="vue_hr">
+    <el-col :span="4" :offset="10">
+        <el-button round @click="cancel" size="small">取消</el-button>
+        <el-button type="danger" round @click="save" size="small">確認</el-button>
+    </el-col>
+</div>
