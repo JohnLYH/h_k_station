@@ -6,7 +6,7 @@ from odoo import models, fields, api
 from .approval_management.order_approval import STATUS as APPROVER_STATUS
 
 STATUS = [
-    ('be_executed', '待執行'), ('pending_approval', '待審批'), ('closed', '已關閉')
+    ('be_executed', '待執行'), ('executing', '執行中'), ('pending_approval', '待審批'), ('closed', '已關閉')
 ]
 
 
