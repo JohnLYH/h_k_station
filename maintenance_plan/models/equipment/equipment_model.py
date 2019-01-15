@@ -23,11 +23,12 @@ class Equipment_model(models.Model):
     eodc = fields.Char(string='EDOC', compute='_get_eodc', store=True)
     m_tube_ids = fields.One2many('maintenance_plan.reference_materials_manage', 'equipment_id', string='M-tube')
     m_tube = fields.Char(string='M-tube', compute='_get_m_tube', store=True)
-    fault_finding_ids = fields.One2many('maintenance_plan.reference_materials_manage', 'equipment_id', string='Fault finding')
+    fault_finding_ids = fields.One2many('maintenance_plan.reference_materials_manage', 'equipment_id',
+                                        string='Fault finding')
     fault_finding = fields.Char(string='Fault finding', compute='_get_fault_finding', store=True)
-    recovery_procedur_ids = fields.One2many('maintenance_plan.reference_materials_manage', 'equipment_id', string='Recovery procedur')
+    recovery_procedur_ids = fields.One2many('maintenance_plan.reference_materials_manage', 'equipment_id',
+                                            string='Recovery procedur')
     recovery_procedur = fields.Char(string='Recovery procedur', compute='_get_recovery_procedur', store=True)
-
 
     @api.depends('wi_ids')
     def _get_wi(self):

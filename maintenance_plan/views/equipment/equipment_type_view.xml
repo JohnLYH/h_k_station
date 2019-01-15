@@ -7,6 +7,8 @@
             <field name="arch" type="xml">
                 <tree import="false" edit="0" create="0" delete="0" search_ex_template="equipment_type_search_template">
                     <field name="name"/>
+                    <field name="line_id"/>
+                    <field name="station_id"/>
                     <field name="parent_id"/>
                     <field name="child_ids"/>
                     <field name="equipment_ids"/>
