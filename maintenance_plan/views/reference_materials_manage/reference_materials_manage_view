@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+        <record id="work_order_tree" model="ir.ui.view">
+            <field name="name">參考資料管理</field>
+            <field name="model">maintenance_plan.equipment_model</field>
+            <field name="arch" type="xml">
+                <tree import="false" edit="0" create="0" delete="0" search_ex_template="work_order_search_template"
+                      search_pannel_js_class="plan_search_pannel">
+                    <field name="description"/>
+                    <field name="equipment_model"/>
+                    <field name="wi"/>
+                    <field name="eodc"/>
+                    <field name="m_tube"/>
+                    <field name="fault_finding"/>
+                    <field name="recovery_procedur"/>
+                    <widget name="work_order_tree_button" string="操作"/>
+                </tree>
+            </field>
+        </record>
+    </data>
+</odoo>
