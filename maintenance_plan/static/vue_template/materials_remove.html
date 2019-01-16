@@ -1,0 +1,50 @@
+<div id="materials_remove_btn" style="margin-top: 30px">
+    <el-row>
+        <el-col :span="8" :offset="8" style="font-size: 20px">
+            是否確認刪除文件？
+        </el-col>
+    </el-row>
+    <div style="margin: 20px 0;"></div>
+    <el-row>
+        <el-col :span="2">
+            文件
+        </el-col>
+        <el-col :span="22">
+            文件
+        </el-col>
+    </el-row>
+    <div style="margin: 20px 0;"></div>
+    <el-row>
+        <el-col :span="2">
+            版本：
+        </el-col>
+        <el-col :span="10">
+            {{edition}}
+        </el-col>
+        <el-col :span="2">
+            編號：
+        </el-col>
+        <el-col :span="10">
+            {{numbering}}
+        </el-col>
+    </el-row>
+    <div style="margin: 20px 0;"></div>
+    <el-row>
+        <el-col :span="2">
+            變更原因
+        </el-col>
+        <el-col :span="22">
+            <el-input
+                    type="textarea"
+                    :rows="4"
+                    placeholder="請輸入變更原因"
+                    v-model="reasons_details">
+            </el-input>
+        </el-col>
+    </el-row>
+    <div style="margin: 20px 0;"></div>
+    <el-col :span="8" :offset="8">
+        <el-button round @click="cancel" size="small">取消</el-button>
+        <el-button type="danger" round @click="save" size="small">確認</el-button>
+    </el-col>
+</div>

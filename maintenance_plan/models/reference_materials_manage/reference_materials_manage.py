@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import json
+
 from odoo import models, fields, api
 
 file_type = [
@@ -11,7 +13,7 @@ class ReferenceMaterialsManage(models.Model):
     _name = 'maintenance_plan.reference_materials_manage'
     _description = '參考資料管理的詳細管理'
 
-    equipment_id = fields.Many2one('maintenance_plan.equipment','設備編號', ondelete='cascade')
+    equipment_id = fields.Many2one('maintenance_plan.equipment_model','設備型號')
     field_type = fields.Selection(file_type, '文件類型', required=True)
     select_file_name = fields.Char('文件名稱')
     select_file = fields.Binary(string='文件', attachment=True, required=True)
@@ -20,8 +22,18 @@ class ReferenceMaterialsManage(models.Model):
 
     @api.model
     def create(self, vals):
-        print(vals)
         return super(ReferenceMaterialsManage, self).create(vals)
+
+    @api.model
+    def get_remove_value(self,**kwargs):
+        reference_materials_manage = self.env['maintenance_plan.reference_materials_manage'].browse(kwargs['id'])
+        if reference_materials_manage:
+            numbering = reference_materials_manage.numbering
+            edition = reference_materials_manage.edition
+            file_name = reference_materials_manage.select_file_name
+            return json.dumps({'error': 0, 'numbering': numbering,'edition': edition, 'file_name': file_name})
+        else:
+            return json.dumps({'error': 1})
 
 
 class ReferenceMaterialsManageRecord(models.Model):
@@ -30,8 +42,9 @@ class ReferenceMaterialsManageRecord(models.Model):
 
     reasons_change = fields.Char(string='變更原因')
     reasons_details = fields.Text(string='變更細節')
+    operation_type = fields.Char(string='操作类型')
     reference_materials_manage_id = fields.Many2one(
-        'maintenance_plan.reference_materials_manage', '對應的參考資料管理的詳細管理', ondelete='cascade')
+        'maintenance_plan.reference_materials_manage', '對應的參考資料管理的詳細管理')
     user_id = fields.Many2one('res.users', '操作人')
     operation_time = fields.Datetime('操作時間')
     field_type = fields.Selection(file_type, '文件類型', required=True, compute='_get_value', store=True)
