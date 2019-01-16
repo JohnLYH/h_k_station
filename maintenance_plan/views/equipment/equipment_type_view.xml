@@ -36,10 +36,5 @@
             </field>
         </record>
 
-        <record id="act_maintenance_plan_equipment_type" model="ir.actions.act_window">
-            <field name="name">設備類別列表</field>
-            <field name="res_model">maintenance_plan.equipment.type</field>
-            <field name="view_mode">tree,form</field>
-        </record>
     </data>
 </odoo>

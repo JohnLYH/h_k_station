@@ -8,3 +8,4 @@ from . import standard_job
 from . import inventory_management
 from . import reference_materials_manage
 from . import binary_file
+from . import order

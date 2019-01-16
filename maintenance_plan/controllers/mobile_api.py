@@ -249,6 +249,21 @@ class WorkOrder(http.Controller):
         :return:
         '''
         params = request.jsonrequest
+        no = params['key']
+        domain = [('status', '=', '正常')]
+        if no != '':
+            domain.append(('equipment_name', 'ilike', no))
+        tools_records = request.env['maintenance_plan.other_equipment'].search(domain)
+        result = {
+            'errcode': 0, 'data': {
+                'list': [{
+                    'id': tool.id, 'no': tool.equipment_num, 'name': tool.equipment_name,
+                    'modle': tool.model, 'expired': False if tool.status == '正常' else True
+                } for tool in tools_records]
+            },
+            'msg': ''
+        }
+        return to_json(result)
 
     @http.route('/mtr/wo/test/save', type='json', auth='user')
     def auto_save_form(self, **kwargs):
