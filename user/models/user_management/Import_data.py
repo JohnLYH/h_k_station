@@ -40,7 +40,7 @@ class ImportDate(models.Model):
         for i in range(35):
             rec = self.env['user.permiss_management'].create({
                 'name': i,
-                'permission_illustrate': i,
+                'permission_illust': i,
                 'user_person': i,
             })
             lis.append(rec)

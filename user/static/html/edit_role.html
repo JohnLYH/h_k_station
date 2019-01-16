@@ -30,7 +30,8 @@
                 </div>
 
                 <div>
-                    <el-button type="primary" style="text-align: center">添加<i class="el-icon-circle-plus"></i>
+                    <el-button type="primary" style="text-align: center" @click="button_act">添加<i
+                            class="el-icon-circle-plus"></i>
                     </el-button>
                 </div>
 
@@ -39,8 +40,6 @@
                             :data="user_name"
                             height="250"
                             border
-
-
                     >
                         <el-table-column
                                 align="center"
@@ -48,7 +47,6 @@
                                 label="使用人姓名">
                         </el-table-column>
                     </el-table>
-
                 </template>
             </div>
         </el-col>
@@ -68,9 +66,9 @@
                                         ref="tree"
                                         highlight-current
                                         :default-expanded-keys="[]"
-                                        :default-checked-keys="[]"
+                                        :default-checked-keys="default_checked_keys"
                                         :props="defaultProps"
-                                        @node-click="click_node"
+                                        @check="click_node"
                                 >
                                 </el-tree>
                             </div>

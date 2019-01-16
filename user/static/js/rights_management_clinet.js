@@ -44,12 +44,19 @@ odoo.define('rights_management', function (require) {
 
             var self = this;
 
-            return self._rpc({
+            var info_data = self._rpc({
                 model: 'res.groups',
                 method: 'get_permiss_role',
             }).then(function (data) {
                 self.vue_data.tableData = data
+            });
+
+            var count_info = self._rpc({
+                model: 'res.groups',
+                method: 'calculate_per_couont',
             })
+
+            return $.when(info_data, count_info)
         },
 
         start: function () {
@@ -83,16 +90,19 @@ odoo.define('rights_management', function (require) {
 
                         },
 
+                        click_node_page: function (data) {
+                            var act_info = self._rpc({
+                                model: 'res.groups',
+                                method: 'get_permiss_role',
+                            }).then(function (data) {
+                                self.vue_data.tableData = data
+                            });
+
+                            return $.when(act_info)
+
+                        },
+
                         handleSelectionChange: function (data) {
-//                                   alert('123');
-//                                   self._rpc({
-//                                              model: 'user.employees_get',
-//                                              method:'get_employees',
-//                                            }).then(function(get_data){
-//                                              self.vue_data.tableData=get_data;
-//                                            });
-
-
                         },
 
                         handleSizeChange: function (data) {
@@ -118,38 +128,66 @@ odoo.define('rights_management', function (require) {
                         },
 
                         handleEdit: function (index, row) {
+                            var this_vue = this
                             self.do_action({
                                 name: '權限管理編輯',
                                 type: 'ir.actions.client',
+                                res_id: row.id,
                                 tag: 'edit_role',
                                 target: 'new',
-                                context: {role_name: row.name, per: row.permission_illustrate,}
-
+                                context: {
+                                    role_name: row.name,
+                                    per: row.permission_illust,
+                                    groups_id: row.id
+                                },
+                            }, {
+                                on_close: function () {
+                                    this_vue.click_node_page(this_vue)
+                                }
                             });
-
-
                         },
 
                         handleReset: function (data) {
                             alert('handleReset')
                         },
 
-                        handleDisable: function (index,row) {
+                        handleDisable: function (index, row) {
+                            var self_date = this;
                             self._rpc({
                                 model: 'res.groups',
                                 method: 'get_disable_info_act',
                                 kwargs: {'name': row.name}
                             }).then(function (get_data) {
+                                self_date.click_node_page(self_date)
                             });
                         },
 
-                        handleDelete: function(index, row){
-                            alert('删除')
+                        handleDelete: function (index, row) {
+                            this.$confirm('是否刪除本條記錄', '提示', {
+                                confirmButtonText: '确定',
+                                cancelButtonText: '取消',
+                                type: 'warning'
+                            }).then(() => {
+                                var delete_date = this;
+                                self._rpc({
+                                    model: 'res.groups',
+                                    method: 'delete_record',
+                                    kwargs: {'self_id': row.id}
+                                }).then(function (get_data) {
+                                    delete_date.click_node_page(delete_date)
+                                });
+                            }).catch(() => {
+                                this.$message({
+                                    type: 'info',
+                                    message: '已取消删除'
+                                });
+                            });
+
                         },
 
                         search: function (data) {
                             self._rpc({
-                                model: 'res.users',
+                                model: 'res.groups',
                                 method: 'permissions_search',
                                 kwargs: {'name': self.vue_data.input, 'chose': self.vue_data.value}
                             }).then(function (get_data) {

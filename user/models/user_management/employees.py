@@ -206,7 +206,4 @@ class EmployeesGet(models.Model):
         # smtp.sendmail(sender, [receiver], msg.as_string())
         # smtp.quit()  # 退出
 
-    # 搜索权限页面的数据
-    @api.model
-    def permissions_search(self, **kw):
-        print(kw)
+
