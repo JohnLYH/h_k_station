@@ -25,6 +25,8 @@ ROW_1_LIST = ['EQUIPMENT No.', 'TEAM NO.', 'RESULT \nREFERENCE', 'EQUIPMENT',
 
 class OtherEquipment(models.Model):
     _name = 'other_equipment.other_equipment'
+    _description = '工器具'
+    # _name = 'maintenance_plan.other_equipment'
 
     departments = fields.Many2one('user.department', string='所屬班組', required=True)
     # team_num
@@ -268,6 +270,7 @@ class OtherEquipment(models.Model):
 class OtherEquipmentRecords(models.Model):
     _name = 'other_equipment.other_equipment_records'
     _description = '工器具操作記錄'
+    # _name = 'maintenance_plan.other_equipment_records'
 
     other_equipment_id = fields.Many2one('other_equipment.other_equipment', '工器具', ondelete='cascade')
     user_id = fields.Many2one('res.users', '操作人')

@@ -11,7 +11,7 @@
                 <menuitem id="job_approval" name="工單審批"  parent="approval_management" action="act_order_approval"/>
                 <menuitem id="reference_examination_approval" name="參考資料審批" parent="approval_management"/>
         
-        <menuitem id="equipment_type_management" name="設備類型管理" sequence="5" action="act_maintenance_plan_equipment_type"/>
+        <!--<menuitem id="equipment_type_management" name="設備類型管理" sequence="5" action="act_maintenance_plan_equipment_type"/>-->
 
         <menuitem id="equipment_model" name="參考資料管理" sequence="6" action="act_equipment_model"/>
 

@@ -25,18 +25,18 @@
             <field name="view_mode">tree,form</field>
         </record>
 
-        <!--上傳資料的form-->
-        <record id="reference_materials_manage_upload_form" model="ir.ui.view">
-            <field name="name">上傳文件</field>
-            <field name="model">maintenance_plan.reference_materials_manage</field>
-            <field name="arch" type="xml">
-                <form>
-                    <field name="field_type"/>
-                    <field name="select_file"/>
-                    <field name="edition"/>
-                    <field name="numbering"/>
-                </form>
-            </field>
-        </record>
+        <!--&lt;!&ndash;上傳資料的form&ndash;&gt;-->
+        <!--<record id="reference_materials_manage_upload_form" model="ir.ui.view">-->
+            <!--<field name="name">上傳文件</field>-->
+            <!--<field name="model">maintenance_plan.reference_materials_manage</field>-->
+            <!--<field name="arch" type="xml">-->
+                <!--<form>-->
+                    <!--<field name="field_type"/>-->
+                    <!--<field name="select_file"/>-->
+                    <!--<field name="edition"/>-->
+                    <!--<field name="numbering"/>-->
+                <!--</form>-->
+            <!--</field>-->
+        <!--</record>-->
     </data>
 </odoo>

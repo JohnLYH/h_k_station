@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 # Author: Artorias
 import base64
+import datetime
+import json
 import os
 
 import qrcode
@@ -17,27 +19,101 @@ class EquipmentModel(models.Model):
 
     equipment_model = fields.Char('設備型號')
     description = fields.Char('設備名稱')
-    wi_ids = fields.One2many('maintenance_plan.reference_materials_manage', 'equipment_id', string='WI')
+    reference_materials_manage_ids = fields.One2many('maintenance_plan.reference_materials_manage', 'equipment_id',
+                                                     string='设备参考资料')
     wi = fields.Char(string='WI', compute='_get_value', store=True)
-    edoc_ids = fields.One2many('maintenance_plan.reference_materials_manage', 'equipment_id', string='EDOC')
     edoc = fields.Char(string='EDOC', compute='_get_value', store=True)
-    m_tube_ids = fields.One2many('maintenance_plan.reference_materials_manage', 'equipment_id', string='M-tube')
     m_tube = fields.Char(string='M-tube', compute='_get_value', store=True)
-    fault_finding_ids = fields.One2many('maintenance_plan.reference_materials_manage', 'equipment_id',
-                                        string='Fault finding')
     fault_finding = fields.Char(string='Fault finding', compute='_get_value', store=True)
-    recovery_procedur_ids = fields.One2many('maintenance_plan.reference_materials_manage', 'equipment_id',
-                                            string='Recovery procedur')
     recovery_procedur = fields.Char(string='Recovery procedur', compute='_get_value', store=True)
     reference_materials_manage_records = fields.One2many('maintenance_plan.reference_materials_manage_record',
                                                          'reference_materials_manage_id',string='操作記錄')
 
-    @api.depends('wi_ids', 'edoc_ids', 'm_tube_ids', 'm_tube_ids', 'fault_finding_ids', 'recovery_procedur_ids')
+    @api.one
+    @api.depends('reference_materials_manage_ids')
     def _get_value(self):
-        for re in self:
-            print(re)
-            re.wi = '已上傳' if re.wi_ids else '未上傳'
-            re.edoc = '已上傳' if re.edoc_ids else '未上傳'
-            re.m_tube = '已上傳' if re.m_tube_ids else '未上傳'
-            re.fault_finding = '已上傳' if re.fault_finding_ids else '未上傳'
-            re.recovery_procedur = '已上傳' if re.recovery_procedur_ids else '未上傳'
+        if self:
+            arr = []
+            for reference_materials_manage_id in self.reference_materials_manage_ids:
+                arr.append(reference_materials_manage_id.field_type)
+            arr = list(set(arr))
+            self.wi = '已上傳' if 'WI' in arr else '未上傳'
+            self.edoc = '已上傳' if 'EDOC' in arr else '未上傳'
+            self.m_tube = '已上傳' if 'M-tube' in arr else '未上傳'
+            self.fault_finding = '已上傳' if 'Fault finding' in arr else '未上傳'
+            self.recovery_procedur = '已上傳' if 'Recovery procedur' in arr else '未上傳'
+
+    @api.model
+    def get_value(self,**kwargs):
+        # reference_materials_manage = self.env['maintenance_plan.reference_materials_manage'].browse(59)
+        # print(reference_materials_manage)
+        if kwargs['id']:
+            maintenance_equipment_model = self.env['maintenance_plan.equipment_model'].browse(kwargs['id'])
+            if maintenance_equipment_model:
+                description = maintenance_equipment_model.description
+                equipment_model = maintenance_equipment_model.equipment_model
+                wi = []
+                edoc = []
+                m_tube = []
+                fault_finding = []
+                recovery_procedur = []
+                reference_materials_manage_ids = maintenance_equipment_model.reference_materials_manage_ids
+                if reference_materials_manage_ids:
+                    for reference_materials_manage_id in reference_materials_manage_ids:
+                        if reference_materials_manage_id.field_type == 'WI':
+                            wi.append(self.get_field_type_value(reference_materials_manage_id))
+                        elif reference_materials_manage_id.field_type == 'EDOC':
+                            edoc.append(self.get_field_type_value(reference_materials_manage_id))
+                        elif reference_materials_manage_id.field_type == 'M-tube':
+                            m_tube.append(self.get_field_type_value(reference_materials_manage_id))
+                        elif reference_materials_manage_id.field_type == 'Fault finding':
+                            fault_finding.append(self.get_field_type_value(reference_materials_manage_id))
+                        else:
+                            recovery_procedur.append(self.get_field_type_value(reference_materials_manage_id))
+                else:
+                    return json.dumps({'error': 1, 'msg': '未知錯誤'})
+            else:
+                return json.dumps({'error': 1, 'msg': '未知錯誤'})
+            return json.dumps({'error': 0, 'description': description, 'equipment_model': equipment_model, 'wi': wi, 'edoc': edoc, 'm_tube': m_tube,
+                               'fault_finding': fault_finding, 'recovery_procedur': recovery_procedur})
+        else:
+            return json.dumps({'error': 1, 'msg': '未知錯誤'})
+
+    @staticmethod
+    def get_field_type_value(manage_id):
+        select_file_name = manage_id.select_file_name
+        edition = manage_id.edition
+        numbering = manage_id.numbering
+        id = manage_id.id
+        # select_file = manage_id.select_file
+        return {'select_file_name': select_file_name,
+                'edition': edition,
+                'numbering': numbering,
+                'id': id,
+                }
+
+    @api.model
+    def remove_reference_materials_manage(self,**kwargs):
+        print(kwargs)
+        reference_materials_manage_id = kwargs['id']
+        model_id = kwargs['res_id']
+        equipment_model = self.env['maintenance_plan.equipment_model'].sudo().browse(model_id)
+        print(equipment_model.reference_materials_manage_ids)
+        # 文檔類型
+        # 文檔編號
+        # 版本
+        # 操作類型
+        # 變更原因
+        try:
+            reasons_change = kwargs['reasons_details']
+        except:
+            reasons_change = ''
+        # 操作人
+        user_id = self._uid
+        # 操作時間
+        operation_time = datetime.datetime.now()
+        # 操作類型
+        operation_type = '删除'
+        equipment_model.write({'reference_materials_manage_ids': [(2, reference_materials_manage_id)]})
+        print(equipment_model.reference_materials_manage_ids)
+        return json.dumps({'error': 0})

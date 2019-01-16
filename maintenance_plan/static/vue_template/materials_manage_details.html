@@ -1,0 +1,185 @@
+<div id="app" style="margin-top: 30px">
+    <el-row>
+        <el-col :span="2" style="font-size: 15px">
+            設備名稱：
+        </el-col>
+        <el-col :span="3" style="font-size: 15px">
+            {{description}}
+        </el-col>
+        <el-col :span="2" style="font-size: 15px">
+            設備型號：
+        </el-col>
+        <el-col :span="3" style="font-size: 15px">
+            {{equipment_model}}
+        </el-col>
+        <el-col :span="6" :offset="8">
+            <el-button @click="come_to_detail" size="small" type="success">變更記錄</el-button>
+            <el-button type="success" @click="save" size="small">上傳</el-button>
+        </el-col>
+    </el-row>
+
+    <hr class="vue_hr">
+
+    <el-row>
+        <el-col style="font-size: 15px">
+            WI:
+        </el-col>
+        <el v-if="wi && wi.length > 0">
+            <el v-for="wi1 in wi">
+                <el-col :span="6">
+                    <el-col>
+                        文件名: {{wi1.select_file_name}}
+                    </el-col>
+                    <div style="margin: 20px 0;"></div>
+                    <el-col>
+                        版本: {{wi1.edition}}
+                    </el-col>
+                    <div style="margin: 20px 0;"></div>
+                    <el-col>
+                        編號: {{wi1.numbering}}
+                    </el-col>
+                    <div style="margin: 20px 0;"></div>
+                    <el-col>
+                        <el-button  @click="change(wi1.id)" size="small">修改</el-button>
+                        <el-button  @click="remove(wi1.id)" size="small">刪除</el-button>
+                    </el-col>
+                </el-col>
+            </el>
+        </el>
+        <el v-else style="font-size: 30px">
+            暫無
+        </el>
+    </el-row>
+
+    <hr class="vue_hr">
+
+    <el-row>
+        <el-col style="font-size: 15px">
+            M-tube:
+        </el-col>
+        <el v-if="m_tube && m_tube.length > 0">
+           <el v-for="m_tube1 in m_tube">
+                <el-col :span="6">
+                    <el-col>
+                        文件名: {{m_tube1.select_file_name}}
+                    </el-col>
+                    <div style="margin: 20px 0;"></div>
+                    <el-col>
+                        版本: {{m_tube1.edition}}
+                    </el-col>
+                    <div style="margin: 20px 0;"></div>
+                    <el-col>
+                        編號: {{m_tube1.numbering}}
+                    </el-col>
+                    <div style="margin: 20px 0;"></div>
+                    <el-col>
+                        <el-button  @click="change(m_tube1.id)" size="small">修改</el-button>
+                        <el-button  @click="remove(m_tube1.id)" size="small">刪除</el-button>
+                    </el-col>
+                </el-col>
+            </el>
+        </el>
+        <el v-else style="font-size: 30px">
+            暫無
+        </el>
+    </el-row>
+
+    <hr class="vue_hr">
+
+    <el-row>
+        <el-col style="font-size: 15px">
+            Fault finding:
+        </el-col>
+        <el v-if="fault_finding && fault_finding.length > 0">
+            <el v-for="fault_finding1 in fault_finding">
+                <el-col :span="6">
+                    <el-col>
+                        文件名: {{fault_finding1.select_file_name}}
+                    </el-col>
+                    <div style="margin: 20px 0;"></div>
+                    <el-col>
+                        版本: {{fault_finding1.edition}}
+                    </el-col>
+                    <div style="margin: 20px 0;"></div>
+                    <el-col>
+                        編號: {{fault_finding1.numbering}}
+                    </el-col>
+                    <div style="margin: 20px 0;"></div>
+                    <el-col>
+                        <el-button  @click="change(fault_finding1.id)" size="small">修改</el-button>
+                        <el-button  @click="remove(fault_finding1.id)" size="small">刪除</el-button>
+                    </el-col>
+                </el-col>
+            </el>
+        </el>
+        <el v-else style="font-size: 30px">
+            暫無
+        </el>
+    </el-row>
+
+    <hr class="vue_hr">
+
+    <el-row>
+        <el-col style="font-size: 15px">
+            Recovery procedur:
+        </el-col>
+        <el v-if="recovery_procedur && recovery_procedur.length > 0">
+            <el v-for="recovery_procedur1 in recovery_procedur">
+                <el-col :span="6">
+                    <el-col>
+                        文件名: {{recovery_procedur1.select_file_name}}
+                    </el-col>
+                    <div style="margin: 20px 0;"></div>
+                    <el-col>
+                        版本: {{recovery_procedur1.edition}}
+                    </el-col>
+                    <div style="margin: 20px 0;"></div>
+                    <el-col>
+                        編號: {{recovery_procedur1.numbering}}
+                    </el-col>
+                    <div style="margin: 20px 0;"></div>
+                    <el-col>
+                        <el-button  @click="change(recovery_procedur1.id)" size="small">修改</el-button>
+                        <el-button  @click="remove(recovery_procedur1.id)" size="small">刪除</el-button>
+                    </el-col>
+                </el-col>
+            </el>
+        </el>
+        <el v-else style="font-size: 30px">
+            暫無
+        </el>
+    </el-row>
+
+    <hr class="vue_hr">
+
+    <el-row>
+        <el-col style="font-size: 15px">
+            EDOC:
+        </el-col>
+        <el v-if="edoc && edoc.length > 0">
+           <el v-for="edoc1 in edoc">
+                <el-col :span="6">
+                    <el-col>
+                        文件名: {{edoc1.select_file_name}}
+                    </el-col>
+                    <div style="margin: 20px 0;"></div>
+                    <el-col>
+                        版本: {{edoc1.edition}}
+                    </el-col>
+                    <div style="margin: 20px 0;"></div>
+                    <el-col>
+                        編號: {{edoc1.numbering}}
+                    </el-col>
+                    <div style="margin: 20px 0;"></div>
+                    <el-col>
+                        <el-button  @click="change(edoc1.id)" size="small">修改</el-button>
+                        <el-button  @click="remove(edoc1.id)" size="small">刪除</el-button>
+                    </el-col>
+                </el-col>
+            </el>
+        </el>
+        <el v-else style="font-size: 30px">
+            暫無
+        </el>
+    </el-row>
+</div>

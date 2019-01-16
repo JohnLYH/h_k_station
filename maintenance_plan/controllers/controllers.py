@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import base64
 import json
 from datetime import datetime as dt
 import os
@@ -132,8 +133,33 @@ class MaintenancePlan(http.Controller):
         # }
         return http.request.render('maintenance_plan.maintenance_plan_approval_management', {})
 
-    @http.route('/maintenance_plan/materials_upload_files', auth='user', csrf=False)
+    @http.route('/maintenance_plan/materials_upload_files', auth='user', csrf=False, methods=['POST'])
     def approval_management(self, **kw):
-        file = kw['file']
-        filename = kw['file'].filename
-        return json.dumps({'error': 0,'file':kw['file']})
+        try:
+            field_type = kw['field_type']
+            edition = kw['edition']
+            reasons_change = kw['reasons_change']
+            reasons_details = kw['reasons_details']
+            file = kw['file']
+            numbering = kw['numbering']
+            select_file_name = file.filename
+            equipment_id = kw['id']
+            file.save(select_file_name)
+            open_file = open(select_file_name, "rb")
+            b64str = base64.b64encode(open_file.read())
+            open_file.close()
+            os.remove(select_file_name)
+            values = {
+                'equipment_id': int(equipment_id),
+                'field_type': field_type,
+                'edition': edition,
+                'numbering': numbering,
+                'select_file': b64str,
+                'select_file_name': select_file_name
+            }
+            equipment_model = request.env['maintenance_plan.equipment_model'].sudo().search([('id', '=', equipment_id)])
+            equipment_model.write({'reference_materials_manage_ids': [(0, 0, values)]})
+            # TODO：生成審批記錄
+        except:
+            return json.dumps({'error': 1,'msg': '上傳失敗'})
+        return json.dumps({'error': 0})
