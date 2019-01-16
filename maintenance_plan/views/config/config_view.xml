@@ -19,6 +19,9 @@
                         <group>
                             <field name="max_delay_days"/>
                         </group>
+                        <group>
+                            <field name="send_email_time" options="{'fmt_type': 'time'}"/>
+                        </group>
                     </group>
                 </form>
             </field>

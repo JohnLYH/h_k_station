@@ -134,6 +134,11 @@ class WorkOrder(http.Controller):
 
     @http.route('/mtr/wo/detail', type='json', auth='user')
     def get_work_order_detail(self, **kwargs):
+        '''
+        工單詳情
+        :param kwargs:
+        :return:
+        '''
         params = request.jsonrequest
         record = request.env['maintenance_plan.maintenance.plan'].browse(int(params['id']))
         auto_status_map = dict([(index, word) for (word, index) in STATUS_MAP.items()])
@@ -144,6 +149,11 @@ class WorkOrder(http.Controller):
             equipmentLocation=record.equipment_id.detailed_location,
             executionTime=record.action_time, group=record.action_dep_id.name,
             standardJob=record.standard_job_id.name, id=record.id, description=record.equipment_id.description,
-            model=record.equipment_id.equipment_model.name, woDescription=record.work_order_description
+            model=record.equipment_id.equipment_model.name, woDescription=record.work_order_description,
+            materialList=[{
+                'description': inventory_management.inventory_description, 'code': inventory_management.inventory_id,
+                'stock': inventory_management.inventory_count
+            } for inventory_management in record.standard_job_id.inventory_management_ids]
         )
+        return to_json({'errcode': 0, 'data': result, 'msg': ''})
 

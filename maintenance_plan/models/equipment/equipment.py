@@ -17,29 +17,6 @@ class Equipment(models.Model):
     _description = '設備'
     _rec_name = 'num'
 
-    @staticmethod
-    def generate_2_code(arr):
-        '''
-            获取二维码二进制
-            :param arr:显示内容
-            :return:
-            '''
-        qr = qrcode.QRCode(
-            version=1,
-            # 设置容错率为最高
-            error_correction=qrcode.ERROR_CORRECT_H,
-            box_size=10,
-            border=4,
-        )
-        qr.make(arr)
-        img = qr.make_image()
-        file_name = str(time.time) + str(random.randint(1000)) + 'simpleqrcode.jpg'
-        img.save(file_name)
-        open_icon = open(file_name, "rb")
-        b64str = base64.b64encode(open_icon.read())
-        os.remove(file_name)
-        return b64str
-
     num = fields.Char('設備編號')  # 設備座位號，一個座位會有多個放過的設備
     parent_equipment_num = fields.Char('父設備編號')
     serial_number = fields.Char('設備序列號')
@@ -60,6 +37,29 @@ class Equipment(models.Model):
     oem_manufacturer = fields.Char('原始設備製造商')
     lead_maintainer = fields.Char('設備維護者')
     qr_code = fields.Text('二維碼')
+
+    @staticmethod
+    def generate_2_code(arr):
+        '''
+        获取二维码二进制
+        :param arr:显示内容
+        :return:
+        '''
+        qr = qrcode.QRCode(
+            version=1,
+            # 设置容错率为最高
+            error_correction=qrcode.ERROR_CORRECT_H,
+            box_size=10,
+            border=4
+        )
+        qr.make(arr)
+        img = qr.make_image()
+        file_name = str(time.time) + str(random.randint(1000)) + 'simpleqrcode.jpg'
+        img.save(file_name)
+        open_icon = open(file_name, "rb")
+        b64str = base64.b64encode(open_icon.read())
+        os.remove(file_name)
+        return b64str
 
     @api.model
     def create(self, vals):
