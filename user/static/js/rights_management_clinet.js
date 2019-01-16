@@ -36,6 +36,7 @@ odoo.define('rights_management', function (require) {
                 ],
                 size_: 10,
                 list_size: [10, 20, 30, 40],
+                view_id: '',
 
             };
         },
@@ -48,7 +49,8 @@ odoo.define('rights_management', function (require) {
                 model: 'res.groups',
                 method: 'get_permiss_role',
             }).then(function (data) {
-                self.vue_data.tableData = data
+                self.vue_data.tableData = data.record;
+                self.vue_data.view_id = data.view_id;
             });
 
             var count_info = self._rpc({
@@ -198,6 +200,16 @@ odoo.define('rights_management', function (require) {
                         reset: function (data) {
                             self.vue_data.input = '';
                             self.vue_data.value = '';
+                        },
+                        create_rec: function () {
+                            self.do_action({
+                                name: '新增',
+                                type: 'ir.actions.act_window',
+                                res_model: 'res.groups',
+                                views: [[self.vue_data.view_id, 'form']],
+                                target: 'new',
+                                flags: {'initial_mode': 'edit'},
+                            });
                         },
                     },
 

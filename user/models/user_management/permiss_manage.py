@@ -22,7 +22,8 @@ class PermissManage(models.Model):
         rocord.write({
             'name': kw.get('modify_name'),
             'permission_illust': kw.get('modify_per'),
-            'implied_ids': [(6, 0, kw.get('per_id'))]
+            'implied_ids': [(6, 0, kw.get('per_id'))],
+            'user_person': len(rocord.users.ids),
         })
 
     @api.model
@@ -31,7 +32,7 @@ class PermissManage(models.Model):
         category_id = self.env.ref('{}.{}'.format(config_dict['module_name'], config_dict['custom_group_id']))
         category_id.ensure_one()
         record = self.search_read([('category_id', '=', category_id.id)])
-        return record
+        return {'record': record, 'view_id': self.env.ref('user.create_new_rec_form').id}
 
     @api.model
     def get_disable_info_act(self, **kwargs):
@@ -53,20 +54,31 @@ class PermissManage(models.Model):
     @api.model
     def permissions_search(self, **kw):
         if kw.get('chose') == 'all':
-            record = self.search_read([('name','=',kw.get('name'))])
+            record = self.search_read([('name', '=', kw.get('name'))])
             return record
         elif kw.get('chose') == 'disable':
-            record = self.search_read([('name','=',kw.get('name')),('state','=','禁用')])
+            record = self.search_read([('name', '=', kw.get('name')), ('state', '=', '禁用')])
             return record
         elif kw.get('chose') == 'normal':
             record = self.search_read([('name', '=', kw.get('name')), ('state', '=', '正常')])
             return record
         else:
-            record =[]
+            record = []
             return record
 
     # 删除数据
     @api.model
     def delete_record(self, **kwargs):
         print(kwargs)
-        self.search([('id','=',kwargs.get('self_id'))]).unlink()
+        self.search([('id', '=', kwargs.get('self_id'))]).unlink()
+
+    def creste_new_record(self):
+        config_dict = self.get_config_info()
+        category_id = self.env.ref('{}.{}'.format(config_dict['module_name'], config_dict['custom_group_id']))
+        category_id.ensure_one()
+        self.create({
+            'name': self.name,
+            'category_id': category_id.id,
+            'users': [(6, 0, self.users.ids)],
+            'permission_illust': self.permission_illust,
+        })
