@@ -3,7 +3,7 @@
 # Author: Artorias
 from odoo import models, fields, api
 
-from .approval_management.order_approval import STATUS as APPROVER_STATUS
+from ..approval_management.order_approval import STATUS as APPROVER_STATUS
 
 STATUS = [
     ('be_executed', '待執行'), ('executing', '執行中'), ('pending_approval', '待審批'), ('closed', '已關閉')
@@ -14,6 +14,10 @@ class MaintenancePlan(models.Model):
     _name = 'maintenance_plan.maintenance.plan'
     _description = '維修計劃'
     _rec_name = 'num'
+
+    @staticmethod
+    def _default_order_forms():
+        return [(0, 0, {'name': '對向波口測試', 'status': 'WRITE'}), (0, 0, {'name': '檢測證書', 'status': 'WRITE'})]
 
     num = fields.Char('工單編號')
     work_order_type = fields.Char('工單類型')
@@ -38,6 +42,8 @@ class MaintenancePlan(models.Model):
     approver_user_id = fields.Many2one('res.users', string='審批人', compute='_com_approval', store=True)
     last_submit_date = fields.Datetime('最後提交時間', compute='_com_approval', store=True)
     last_approver_date = fields.Datetime('最後審批時間', compute='_com_approval', store=True)
+    order_form_ids = fields.One2many('maintenance_plan.order.form', 'order_id', string='工單內審批表單',
+                                     default=_default_order_forms)
 
     @api.one
     @api.depends('order_approval_ids')
