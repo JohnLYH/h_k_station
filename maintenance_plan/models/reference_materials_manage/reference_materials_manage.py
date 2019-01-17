@@ -35,6 +35,18 @@ class ReferenceMaterialsManage(models.Model):
         else:
             return json.dumps({'error': 1})
 
+    @api.model
+    def get_change_value(self, **kwargs):
+        reference_materials_manage = self.env['maintenance_plan.reference_materials_manage'].browse(kwargs['id'])
+        if reference_materials_manage:
+            numbering = reference_materials_manage.numbering
+            edition = reference_materials_manage.edition
+            file_name = reference_materials_manage.select_file_name
+            field_type = reference_materials_manage.field_type
+            return json.dumps({'error': 0, 'numbering': numbering, 'edition': edition, 'file_name': file_name, 'field_type': field_type})
+        else:
+            return json.dumps({'error': 1})
+
 
 class ReferenceMaterialsManageRecord(models.Model):
     _name = 'maintenance_plan.reference_materials_manage_record'
@@ -42,21 +54,34 @@ class ReferenceMaterialsManageRecord(models.Model):
 
     reasons_change = fields.Char(string='變更原因')
     reasons_details = fields.Text(string='變更細節')
-    operation_type = fields.Char(string='操作类型')
+    operation_type = fields.Char(string='操作類型')
     reference_materials_manage_id = fields.Many2one(
-        'maintenance_plan.reference_materials_manage', '對應的參考資料管理的詳細管理')
+        'maintenance_plan.equipment_model', '對應的設備編號')
     user_id = fields.Many2one('res.users', '操作人')
     operation_time = fields.Datetime('操作時間')
-    field_type = fields.Selection(file_type, '文件類型', required=True, compute='_get_value', store=True)
-    select_file_name = fields.Char('文件名稱', compute='_get_value', store=True)
-    edition = fields.Char(string='版本', required=True, compute='_get_value', store=True)
-    numbering = fields.Char(string='編號', required=True, compute='_get_value', store=True)
+    field_type = fields.Selection(file_type, '文檔類型', required=True)
+    select_file_name = fields.Char('文件名稱')
+    edition = fields.Char(string='版本', required=True)
+    numbering = fields.Char(string='文檔編號', required=True)
 
-    @api.depends('reference_materials_manage_id')
-    def _get_value(self):
-        for re in self:
-            if re.reference_materials_manage_id:
-                re.field_type = re.reference_materials_manage_id.field_type
-                re.numbering = re.reference_materials_manage_id.numbering
-                re.select_file_name = re.reference_materials_manage_id.select_file_name
-                re.edition = re.reference_materials_manage_id.edition
+    @api.model
+    def get_details_value(self,**kwargs):
+        id = kwargs['id']
+        details_values = self.env['maintenance_plan.reference_materials_manage_record'].browse(id)
+        if details_values:
+            numbering = details_values.numbering
+            edition = details_values.edition
+            file_name = details_values.select_file_name
+            field_type = details_values.field_type
+            reasons_change = details_values.reasons_change
+            reasons_details = details_values.reasons_details
+            values = {'numbering': numbering, 'edition': edition,
+                               'file_name': file_name, 'field_type': field_type,
+                               'reasons_change': reasons_change, 'reasons_details': reasons_details}
+            print(values)
+            return json.dumps({'error': 0, 'numbering': numbering, 'edition': edition,
+                               'file_name': file_name, 'field_type': field_type,
+                               'reasons_change': reasons_change, 'reasons_details': reasons_details})
+        else:
+            return json.dumps({'error': 1})
+
