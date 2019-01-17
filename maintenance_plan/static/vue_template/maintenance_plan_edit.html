@@ -13,41 +13,41 @@
             設備編號：{{equipment_num}}
         </el-col>
         <el-col :span="12">
-            設備類別：
+            設備類別：{{equipment_type_name}}
         </el-col>
     </el-row>
 
     <el-row>
         <el-col :span="12">
-            設備描述：
+            設備描述：{{equipment_description}}
         </el-col>
         <el-col :span="12">
-            設備類別描述：
+            設備類別描述：{{equipment_type_description}}
         </el-col>
     </el-row>
 
     <el-row>
         <el-col :span="24">
-            標準工作：
+            標準工作：{{standard_job}}
         </el-col>
     </el-row>
 
     <el-row>
         <el-col :span="24">
-            工單描述:
+            工單描述: {{work_order_description}}
         </el-col>
     </el-row>
 
     <el-row>
         <el-col :span="24">
-            計劃執行時間：{{display_plan_time}}
+            工單有效時間：{{display_plan_time}}
         </el-col>
     </el-row>
 
     <el-form :model="form" :rules="rules" ref="ruleForm">
         <el-form-item prop="display_action_time">
             <el-col :span="24">
-                具體執行時間：
+                計劃執行時間：
                 <el-date-picker value-format="yyyy-MM-dd" :picker-options="pickerDate" v-model="form.display_action_time"
                                 type="date"
                                 placeholder="选择日期">
