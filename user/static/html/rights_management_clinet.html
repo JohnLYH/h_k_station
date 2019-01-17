@@ -1,90 +1,99 @@
 <div id="rights_management">
     <el-row :gutter="10">
-            <el-form :inline="true"  class="demo-form-inline" style="margin:0px 5px" >
-                <el-form-item >
-                    <el-input v-model="input" size="small" placeholder="搜索角色名稱"></el-input>
-                </el-form-item>
-                <el-form-item>
-                    <span>狀態</span>
-                  <el-select v-model="value" placeholder="请选择" size="small">
+        <el-form :inline="true" class="demo-form-inline" style="margin:0px 5px">
+            <el-form-item>
+                <el-input v-model="input" size="small" placeholder="搜索角色名稱"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <span>狀態</span>
+                <el-select v-model="value" placeholder="请选择" size="small">
                     <el-option
-                      v-for="item in options"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
+                            v-for="item in options"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
                     </el-option>
-                  </el-select>
-              </el-form-item>
-              <el-form-item>
+                </el-select>
+            </el-form-item>
+            <el-form-item>
                 <el-button type="primary" size="small" @click="search">搜索</el-button>
-              </el-form-item>
-              <el-form-item>
+            </el-form-item>
+            <el-form-item>
                 <el-button type="primary" size="small" @click="reset"> 重置</el-button>
-              </el-form-item>
-            </el-form>
-			<div class="grid-content bg-purple-light">
-				<el-card class="box-card">
-					<div slot="header" class="clearfix">
-					</div>
-					<div class="text item">
-						<template>
-						<el-table
-								size="mini"
-								border
-								tooltip-effect="dark"
-								:data="tableData"
-								style="width: 100%"
-								ref="multipleTable"
-								@selection-change="handleSelectionChange"
-								>
-							<el-table-column type="selection" width="55">
-    						</el-table-column>
-							<el-table-column
-									prop="name"
-									label="角色名稱">
-							</el-table-column>
-							<el-table-column
-									prop="permission_illustrate"
-									label="權限說明">
-							</el-table-column>
-							<el-table-column
-									prop="user_person"
-									label="使用人">
-							</el-table-column>
-							<el-table-column
-									prop="state"
-									label="狀態">
-							</el-table-column>
+            </el-form-item>
+            <el-form-item style="float: right">
+                <el-button type="primary" size="small" @click="create_rec">新增</el-button>
+            </el-form-item>
+        </el-form>
+        <div class="grid-content bg-purple-light">
+            <el-card class="box-card">
+                <div slot="header" class="clearfix">
+                </div>
+                <div class="text item">
+                    <template>
+                        <el-table
+                                size="mini"
+                                border
+                                tooltip-effect="dark"
+                                :data="tableData"
+                                style="width: 100%"
+                                ref="multipleTable"
+                                @selection-change="handleSelectionChange"
+                        >
+                            <el-table-column type="selection" width="55">
+                            </el-table-column>
+                            <el-table-column
+                                    prop="name"
+                                    label="角色名稱">
+                            </el-table-column>
+                            <el-table-column
+                                    prop="permission_illust"
+                                    label="權限說明">
+                            </el-table-column>
+                            <el-table-column
+                                    prop="user_person"
+                                    label="使用人">
+                            </el-table-column>
+                            <el-table-column
+                                    prop="state"
+                                    label="狀態">
+                            </el-table-column>
 
-							  <el-table-column label="操作">
-							  <template slot-scope="scope">
-								<el-button
-								  type="text" size="mini"
-								  @click="handleEdit(scope.$index, scope.row)">編輯</el-button>
-                                  <el-button
-								  type="text" size="mini"
-								  @click="handleDisable(scope.$index, scope.row)">禁用</el-button>
-							  </template>
-							</el-table-column>
+                            <el-table-column label="操作">
+                                <template slot-scope="scope">
+                                    <el-button
+                                            type="text" size="mini"
+                                            @click="handleEdit(scope.$index, scope.row)">編輯
+                                    </el-button>
+                                    <el-button
+                                            type="text" size="mini"
+                                            @click="handleDisable(scope.$index, scope.row)">禁用
+                                    </el-button>
+                                    <el-button
+                                            type="text" size="mini"
+                                            @click="handleDelete(scope.$index, scope.row)">删除
+                                    </el-button>
+                                </template>
+                            </el-table-column>
 
-						</el-table>
+                        </el-table>
 
-						<div class=" block" style="margin:10px 0;">
-						</div>
-						</template>
-					</div>
+                        <div class=" block" style="margin:10px 0;">
+                        </div>
+                    </template>
+                </div>
 
-				</el-card>
-                  <div class="block">
-                    <el-pagination
-                      @size-change="handleSizeChange"
-                      @current-change="handleCurrentChange"
-                      :current-page="currentPage4"
-                      :page-sizes='list_size'
-                      layout="total, sizes, prev, pager, next, jumper"
-                      :total='message'>
-                    </el-pagination>
-                  </div>
-			</div>
-	</el-row>
+            </el-card>
+            <div class="block">
+                <el-pagination
+                        @size-change="handleSizeChange"
+                        @current-change="handleCurrentChange"
+                        :current-page="currentPage4"
+                        :page-sizes='list_size'
+                        layout="total, sizes, prev, pager, next, jumper"
+                        :total='message'>
+                </el-pagination>
+            </div>
+        </div>
+    </el-row>
 </div>
