@@ -6,9 +6,6 @@ odoo.define('person_edit', function (require) {
     var construct_id = 1234;
 
     var person_edit = Widget.extend({
-        app: undefined,
-        group_id: 0,
-        is_update: false,
         dom_id: 'person_edit' + construct_id++,
         init: function (parent, action) {
             alert(action.context.node);

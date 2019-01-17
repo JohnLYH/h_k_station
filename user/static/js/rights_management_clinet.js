@@ -37,7 +37,7 @@ odoo.define('rights_management', function (require) {
                 size_: 10,
                 list_size: [10, 20, 30, 40],
                 view_id: '',
-
+                state: '',
             };
         },
 
@@ -78,26 +78,24 @@ odoo.define('rights_management', function (require) {
                     },
 
                     methods: {
-                        click_node: function (data) {
+                        date_return: function (data) {
 
                             self._rpc({
                                 model: 'res.users',
                                 method: 'get_users',
                                 kwargs: {'department_id': data.id}
                             }).then(function (get_data) {
-                                self.vue_data.tableData = get_data.slice(0, 10);
-                                self.vue_data.message = get_data.length;
                             });
 
 
                         },
 
-                        click_node_page: function (data) {
+                        date_return_act: function (data) {
                             var act_info = self._rpc({
                                 model: 'res.groups',
                                 method: 'get_permiss_role',
                             }).then(function (data) {
-                                self.vue_data.tableData = data
+                                self.vue_data.tableData = data.record
                             });
 
                             return $.when(act_info)
@@ -144,7 +142,7 @@ odoo.define('rights_management', function (require) {
                                 },
                             }, {
                                 on_close: function () {
-                                    this_vue.click_node_page(this_vue)
+                                    this_vue.date_return_act(this_vue)
                                 }
                             });
                         },
@@ -160,7 +158,7 @@ odoo.define('rights_management', function (require) {
                                 method: 'get_disable_info_act',
                                 kwargs: {'name': row.name}
                             }).then(function (get_data) {
-                                self_date.click_node_page(self_date)
+                                self_date.date_return_act(self_date)
                             });
                         },
 
@@ -176,7 +174,7 @@ odoo.define('rights_management', function (require) {
                                     method: 'delete_record',
                                     kwargs: {'self_id': row.id}
                                 }).then(function (get_data) {
-                                    delete_date.click_node_page(delete_date)
+                                    delete_date.date_return_act(delete_date)
                                 });
                             }).catch(() => {
                                 this.$message({
@@ -202,14 +200,28 @@ odoo.define('rights_management', function (require) {
                             self.vue_data.value = '';
                         },
                         create_rec: function () {
+                            var this_vue = this
                             self.do_action({
                                 name: '新增',
-                                type: 'ir.actions.act_window',
-                                res_model: 'res.groups',
-                                views: [[self.vue_data.view_id, 'form']],
+                                type: 'ir.actions.client',
+                                tag: 'permiss_add_button',
                                 target: 'new',
-                                flags: {'initial_mode': 'edit'},
+                            }, {
+                                on_close: function () {
+                                    this_vue.date_return_act(this_vue)
+                                }
                             });
+                        },
+                        handleiStart: function (index, row) {
+                            var start_act = this
+                            self._rpc({
+                                model: 'res.groups',
+                                method: 'start_button_act',
+                                kwargs: {value: row.state, self_id: row.id}
+                            }).then(function (get_data) {
+                                start_act.date_return_act(start_act)
+                            });
+
                         },
                     },
 

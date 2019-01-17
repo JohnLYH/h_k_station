@@ -11,7 +11,8 @@
                         <group>
                             <field name="name"></field>
                             <field name="permission_illust"></field>
-                            <field name="users"></field>
+                            <field name="users" widget="many2many_tags"
+                                   options="{'no_create':True,'no_open':True}"></field>
                         </group>
                         <footer>
                             <button name='creste_new_record'

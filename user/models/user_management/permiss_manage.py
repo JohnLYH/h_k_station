@@ -72,13 +72,40 @@ class PermissManage(models.Model):
         print(kwargs)
         self.search([('id', '=', kwargs.get('self_id'))]).unlink()
 
-    def creste_new_record(self):
+    @api.model
+    def creste_new_record(self, **kwargs):
         config_dict = self.get_config_info()
         category_id = self.env.ref('{}.{}'.format(config_dict['module_name'], config_dict['custom_group_id']))
         category_id.ensure_one()
+        # 獲取名字的ID
+        name_id = []
+        for i in kwargs.get('user_name'):
+            print(i)
+            self_id = self.env['res.users'].search([('name', '=', i)])
+            print(self_id.id)
+            name_id.append(self_id.id)
+
         self.create({
-            'name': self.name,
+            'name': kwargs.get('name'),
             'category_id': category_id.id,
-            'users': [(6, 0, self.users.ids)],
-            'permission_illust': self.permission_illust,
+            'users': [(6, 0, name_id)],
+            'permission_illust': kwargs.get('permiss'),
+            'implied_ids': [(6, 0, kwargs.get('tree_id'))],
         })
+
+    @api.model
+    def start_button_act(self, **kwargs):
+        self.browse(kwargs.get('self_id')).write({'state': '正常'})
+
+    # 新增记录
+    @api.model
+    def get_new_create_data(self):
+        record = self.env['res.users'].search([])
+        lis = []
+        for i in record:
+            dic = {}
+            dic['value'] = i.name
+            dic['table'] = i.id
+            lis.append(dic)
+
+        return lis

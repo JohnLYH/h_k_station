@@ -71,7 +71,6 @@ odoo.define('edit_role', function (require) {
 
                     methods: {
                         click_node: function (data) {
-                            console.log('888', data)
                         },
 
                         onSubmit: function (date) {

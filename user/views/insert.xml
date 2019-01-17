@@ -8,6 +8,7 @@
                 <script type="text/javascript" src="/user/static/js/user_tree_buttons.js"/>
                 <script type="text/javascript" src="/user/static/js/person_edit.js"/>
                 <script type="text/javascript" src="/user/static/js/change_password.js"/>
+                <script type="text/javascript" src="/user/static/js/permiss_add_button.js"/>
             </xpath>
         </template>
     </data>

@@ -206,4 +206,8 @@ class EmployeesGet(models.Model):
         # smtp.sendmail(sender, [receiver], msg.as_string())
         # smtp.quit()  # 退出
 
+    @api.model
+    def enable_button_act(self, **kwargs):
+        self.browse(kwargs.get('self_id')).write({'state': '正常'})
+
 

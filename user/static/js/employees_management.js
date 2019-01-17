@@ -190,6 +190,17 @@ odoo.define('employees_management_action', function (require) {
                                 target: 'new',
                             });
                         },
+
+                        enable: function (index, row) {
+                            var start_act = this
+                            self._rpc({
+                                model: 'res.users',
+                                method: 'enable_button_act',
+                                kwargs: {value: row.state, self_id: row.id}
+                            }).then(function (get_data) {
+                                start_act.click_node_page(start_act.$refs.tree.getCurrentNode())
+                            });
+                        }
                     },
 
                 });
