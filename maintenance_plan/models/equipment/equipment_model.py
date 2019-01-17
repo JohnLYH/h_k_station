@@ -70,8 +70,6 @@ class EquipmentModel(models.Model):
                             fault_finding.append(self.get_field_type_value(reference_materials_manage_id))
                         else:
                             recovery_procedur.append(self.get_field_type_value(reference_materials_manage_id))
-                else:
-                    return json.dumps({'error': 1, 'msg': '未知錯誤'})
             else:
                 return json.dumps({'error': 1, 'msg': '未知錯誤'})
             return json.dumps({'error': 0, 'description': description, 'equipment_model': equipment_model, 'wi': wi, 'edoc': edoc, 'm_tube': m_tube,
@@ -94,26 +92,47 @@ class EquipmentModel(models.Model):
 
     @api.model
     def remove_reference_materials_manage(self,**kwargs):
-        print(kwargs)
-        reference_materials_manage_id = kwargs['id']
+        materials_manage_id = kwargs['id']
         model_id = kwargs['res_id']
+        # 設備編號
         equipment_model = self.env['maintenance_plan.equipment_model'].sudo().browse(model_id)
-        print(equipment_model.reference_materials_manage_ids)
-        # 文檔類型
-        # 文檔編號
-        # 版本
-        # 操作類型
-        # 變更原因
-        try:
-            reasons_change = kwargs['reasons_details']
-        except:
-            reasons_change = ''
-        # 操作人
-        user_id = self._uid
-        # 操作時間
-        operation_time = datetime.datetime.now()
-        # 操作類型
-        operation_type = '删除'
-        equipment_model.write({'reference_materials_manage_ids': [(2, reference_materials_manage_id)]})
-        print(equipment_model.reference_materials_manage_ids)
+        # 資料
+        reference_materials_manage_id = self.env['maintenance_plan.reference_materials_manage'].sudo().browse(
+            materials_manage_id)
+        if equipment_model and reference_materials_manage_id:
+            # 文檔類型
+            field_type = reference_materials_manage_id.field_type
+            # 文檔編號
+            numbering = reference_materials_manage_id.numbering
+            # 版本
+            edition = reference_materials_manage_id.edition
+            # 文件名稱
+            select_file_name = reference_materials_manage_id.select_file_name
+            # 變更原因
+            try:
+                reasons_change = kwargs['reasons_details']
+            except:
+                reasons_change = ''
+            # 操作人
+            user_id = self._uid
+            # 操作時間
+            operation_time = datetime.datetime.now()
+            # 操作類型
+            operation_type = '删除'
+            values = {
+                'reasons_change': reasons_change,
+                'reasons_details': '',
+                'operation_type': operation_type,
+                'user_id': user_id,
+                'operation_time': operation_time,
+                'field_type': field_type,
+                'select_file_name': select_file_name,
+                'edition': edition,
+                'numbering': numbering,
+            }
+            equipment_model.write({'reference_materials_manage_ids': [(2, materials_manage_id)]})
+            equipment_model.write({'reference_materials_manage_records': [(0, 0, values)]})
+            # TODO: 刪除審批
+        else:
+            return json.dumps({'error': 0, 'message': '參考資料或設備編號不存在'})
         return json.dumps({'error': 0})

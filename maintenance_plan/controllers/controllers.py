@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 import base64
+import datetime
 import json
+import random
+import time
 from datetime import datetime as dt
 import os
 import openpyxl
@@ -134,20 +137,31 @@ class MaintenancePlan(http.Controller):
         return http.request.render('maintenance_plan.maintenance_plan_approval_management', {})
 
     @http.route('/maintenance_plan/materials_upload_files', auth='user', csrf=False, methods=['POST'])
-    def approval_management(self, **kw):
+    def materials_upload_files(self, **kw):
         try:
+            # 設備類型
             field_type = kw['field_type']
             edition = kw['edition']
-            reasons_change = kw['reasons_change']
-            reasons_details = kw['reasons_details']
             file = kw['file']
+            # 編號
             numbering = kw['numbering']
             select_file_name = file.filename
+            # 設備型號
             equipment_id = kw['id']
+            # 判斷這個型號下是否有相同的版本號或者編號存在
+            # maintenance_plan.reference_materials_manage
+            materials_manage_count = request.env['maintenance_plan.reference_materials_manage'].search_count([
+                ('equipment_id', '=', equipment_id), ('field_type', '=', field_type), '|',
+                ('numbering', '=', numbering), ('edition', '=', edition)])
+            if materials_manage_count > 0:
+                return json.dumps({'error': 1, 'message': '上傳失敗,已存在相同的編號或者版本'})
+            # TODO:修改並發
             file.save(select_file_name)
-            open_file = open(select_file_name, "rb")
-            b64str = base64.b64encode(open_file.read())
-            open_file.close()
+            # open_file = open(select_file_name, "rb")
+            # b64str = base64.b64encode(open_file.read())
+            # open_file.close()
+            with open(select_file_name, "rb") as e:
+                b64str = base64.b64encode(e.read())
             os.remove(select_file_name)
             values = {
                 'equipment_id': int(equipment_id),
@@ -160,6 +174,108 @@ class MaintenancePlan(http.Controller):
             equipment_model = request.env['maintenance_plan.equipment_model'].sudo().search([('id', '=', equipment_id)])
             equipment_model.write({'reference_materials_manage_ids': [(0, 0, values)]})
             # TODO：生成審批記錄
+            # TODO: 生成記錄
+            try:
+                # 變更原因
+                reasons_change = kw['reasons_change']
+            except:
+                reasons_change = ''
+            try:
+                # 變更細節
+                reasons_details = kw['reasons_details']
+            except:
+                reasons_details = ''
+            operation_type = '新增'
+            user_id = request.uid
+            print(user_id)
+            operation_time = datetime.datetime.now()
+            values = {
+                'reasons_change': reasons_change,
+                'reasons_details': reasons_details,
+                'operation_type': operation_type,
+                'user_id': user_id,
+                'operation_time': operation_time,
+                'field_type': field_type,
+                'select_file_name': select_file_name,
+                'edition': edition,
+                'numbering': numbering,
+            }
+            equipment_model.write({'reference_materials_manage_records': [(0, 0, values)]})
         except:
-            return json.dumps({'error': 1,'msg': '上傳失敗'})
+            return json.dumps({'error': 1,'message': '上傳失敗'})
+        return json.dumps({'error': 0})
+
+    @http.route('/maintenance_plan/materials_change', auth='user', csrf=False, methods=['POST'])
+    def materials_change(self, **kw):
+        try:
+            # 設備類型
+            field_type = kw['field_type']
+            edition = kw['edition']
+            # 編號
+            numbering = kw['numbering']
+            # 設備型號
+            equipment_id = kw['res_id']
+            reference_materials_manage_id = kw['id']
+            # 判斷這個型號下是否有相同的版本號或者編號存在
+            materials_manage_count = request.env['maintenance_plan.reference_materials_manage'].search_count([
+                ('equipment_id', '=', equipment_id), ('field_type', '=', field_type),
+                ('id', '!=', reference_materials_manage_id), '|',
+                ('numbering', '=', numbering), ('edition', '=', edition)])
+            if materials_manage_count > 0:
+                return json.dumps({'error': 1, 'message': '上傳失敗,已存在相同的編號或者版本'})
+            if kw['file'] == 'undefined':
+                values = {
+                    'field_type': field_type,
+                    'edition': edition,
+                    'numbering': numbering,
+                }
+                select_file_name = request.env['maintenance_plan.reference_materials_manage'].sudo().search(
+                    [('id', '=', reference_materials_manage_id)]).select_file_name
+            else:
+                file = kw['file']
+                select_file_name = file.filename
+                file_name = str(int(time.time())) + str(random.randint(1, 1000)) + select_file_name
+                file.save(file_name)
+                with open(file_name, "rb") as e:
+                    b64str = base64.b64encode(e.read())
+                os.remove(file_name)
+                values = {
+                    'equipment_id': int(equipment_id),
+                    'field_type': field_type,
+                    'edition': edition,
+                    'numbering': numbering,
+                    'select_file': b64str,
+                    'select_file_name': select_file_name
+                }
+            equipment_model = request.env['maintenance_plan.equipment_model'].sudo().search([('id', '=', equipment_id)])
+            equipment_model.write({'reference_materials_manage_ids': [(1, reference_materials_manage_id, values)]})
+            # TODO：生成審批記錄
+            # 生成記錄
+            try:
+                # 變更原因
+                reasons_change = kw['reasons_change']
+            except:
+                reasons_change = ''
+            try:
+                # 變更細節
+                reasons_details = kw['reasons_details']
+            except:
+                reasons_details = ''
+            operation_type = '修改'
+            user_id = request.uid
+            operation_time = datetime.datetime.now()
+            values = {
+                'reasons_change': reasons_change,
+                'reasons_details': reasons_details,
+                'operation_type': operation_type,
+                'user_id': user_id,
+                'operation_time': operation_time,
+                'field_type': field_type,
+                'select_file_name': select_file_name,
+                'edition': edition,
+                'numbering': numbering,
+            }
+            equipment_model.write({'reference_materials_manage_records': [(0, 0, values)]})
+        except:
+            return json.dumps({'error': 1, 'message': '上傳失敗'})
         return json.dumps({'error': 0})
