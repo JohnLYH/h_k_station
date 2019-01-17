@@ -17,8 +17,8 @@ class EquipmentModel(models.Model):
     _description = '設備型號'
     # _rec_name = 'equipment_model'
 
-    equipment_model = fields.Char('設備型號')
-    description = fields.Char('設備名稱')
+    equipment_model = fields.Char('型號名稱', required=True)
+    description = fields.Char('設備名稱', required=True)
     reference_materials_manage_ids = fields.One2many('maintenance_plan.reference_materials_manage', 'equipment_id',
                                                      string='设备参考资料')
     wi = fields.Char(string='WI', compute='_get_value', store=True)

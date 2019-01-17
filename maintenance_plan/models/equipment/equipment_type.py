@@ -10,9 +10,10 @@ class EquipmentType(models.Model):
     _rec_name = 'name'
     _parent_store = True
 
-    name = fields.Char('類型名稱')
-    line_id = fields.Many2one('maintenance_plan.line', string='線別')
-    station_id = fields.Many2one('maintenance_plan.station', string='車站')
+    name = fields.Char('類型名稱', required=True)
+    description = fields.Char('設備類別描述')
+    line_id = fields.Many2one('maintenance_plan.line', string='線別', required=True)
+    station_id = fields.Many2one('maintenance_plan.station', string='車站', required=True)
     equipment_ids = fields.One2many('maintenance_plan.equipment', 'equipment_type_id', string='設備')
 
     parent_id = fields.Many2one('maintenance_plan.equipment.type', string='上級', ondelete='cascade')
