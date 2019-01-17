@@ -18,10 +18,128 @@
             </field>
         </record>
 
+        <record id="maintenance_plan_equipment_detail_form" model="ir.ui.view">
+            <field name="name">設備詳情</field>
+            <field name="model">maintenance_plan.equipment</field>
+            <field name="arch" type="xml">
+                <form import="false" edit="1" create="1" delete="1">
+                    <group col="3">
+                        <div class="layui-fluid">
+                            <div class="layui-row">
+                                <div class="layui-col-sm4">
+                                    <group>
+                                        <field name="parent_equipment_num"/>
+                                        <field name="num"/>
+                                        <field name="serial_number"/>
+                                        <field name="equipment_model"/>
+                                        <field name="item_code"/>
+                                        <field name="description"/>
+                                        <field name="last_installation_date"/>
+                                        <field name="service_since"/>
+                                        <field name="expected_asset_life"/>
+                                    </group>
+                                </div>
+
+                                <div class="layui-col-sm4">
+                                    <group>
+                                        <field name="direction"/>
+                                        <field name="start_chainage"/>
+                                        <field name="end_chainage"/>
+                                        <field name="supplier"/>
+                                        <field name="oem_manufacturer"/>
+                                        <field name="warranty"/>
+                                        <field name="lead_maintainer"/>
+                                    </group>
+                                </div>
+
+                                <div class="layui-col-sm4">
+                                    <field name="qr_code" widget="qr_code_to_image"/>
+                                </div>
+                            </div>
+                        </div>
+                    </group>
+                    <widget name="equipment_foot"/>
+                </form>
+            </field>
+        </record>
+
+        <record id="maintenance_plan_equipment_form" model="ir.ui.view">
+            <field name="name">設備詳情</field>
+            <field name="model">maintenance_plan.equipment</field>
+            <field name="arch" type="xml">
+                <form import="false" edit="1" create="1" delete="1">
+                    <group col="2">
+                        <group>
+                            <field name="parent_equipment_num"/>
+                        </group>
+                    </group>
+                    <group col="2">
+                        <group>
+                            <field name="num"/>
+                        </group>
+                        <group>
+                            <field name="equipment_type_id"/>
+                        </group>
+
+                        <group>
+                            <field name="serial_number"/>
+                        </group>
+                        <group>
+                            <field name="equipment_model"/>
+                        </group>
+
+                        <group>
+                            <field name="direction"/>
+                        </group>
+                        <group>
+                            <field name="item_code"/>
+                        </group>
+
+                        <group>
+                            <field name="start_chainage"/>
+                        </group>
+                        <group>
+                            <field name="end_chainage"/>
+                        </group>
+
+                        <group>
+                            <field name="description"/>
+                        </group>
+                        <group>
+                            <field name="supplier"/>
+                        </group>
+
+                        <group>
+                            <field name="last_installation_date"/>
+                        </group>
+                        <group>
+                            <field name="oem_manufacturer"/>
+                        </group>
+
+                        <group>
+                            <field name="service_since"/>
+                        </group>
+                        <group>
+                            <field name="warranty"/>
+                        </group>
+
+                        <group>
+                            <field name="expected_asset_life"/>
+                        </group>
+                        <group>
+                            <field name="lead_maintainer"/>
+                        </group>
+                    </group>
+                </form>
+            </field>
+        </record>
+
         <record id="act_equipment_management" model="ir.actions.act_window">
             <field name="name">設備管理</field>
             <field name="res_model">maintenance_plan.equipment</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_ids" eval="[(5, 0, 0),
+                          (0, 0, {'view_mode': 'tree', 'view_id': ref('maintenance_plan_equipment_tree')}),
+                          (0, 0, {'view_mode': 'form', 'view_id': ref('maintenance_plan_equipment_detail_form')})]"/>
         </record>
     </data>
 </odoo>

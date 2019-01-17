@@ -2,9 +2,8 @@
 # -*- coding: utf-8 -*-
 # Author: Artorias
 import os
-import base64
 
-from odoo import models, fields
+from odoo import models, fields, api
 
 BASE_PATH = os.path.dirname(os.path.dirname(__file__))
 
@@ -34,3 +33,10 @@ class Config(models.TransientModel):
             .sudo().get_param('maintenance_plan_send_email_time', default=None)
         return dict(max_advance_days=int(max_advance_days), max_delay_days=int(max_delay_days),
                     send_email_time=send_email_time)
+
+    @api.model
+    def get_ref_id(self, list_string_name):
+        result = []
+        for name in list_string_name:
+            result.append(self.env.ref(name).id)
+        return result
