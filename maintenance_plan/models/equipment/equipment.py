@@ -11,20 +11,24 @@ from PIL import Image
 
 from odoo import fields, models, api
 
+STATUS = [
+    ('Expired', '失效'), ('Effective', '有效')
+]
+
 
 class Equipment(models.Model):
     _name = 'maintenance_plan.equipment'
     _description = '設備'
     _rec_name = 'num'
 
-    num = fields.Char('設備編號')  # 設備座位號，一個座位會有多個放過的設備
-    parent_equipment_num = fields.Char('父設備編號')
-    serial_number = fields.Char('設備序列號')
-    equipment_type_id = fields.Many2one('maintenance_plan.equipment.type', string='設備類別')
-    equipment_model = fields.Many2one('maintenance_plan.equipment_model', '設備型號')
-    description = fields.Char('設備描述')
-    status = fields.Char('狀態')
-    item_code = fields.Char('庫存編碼')
+    num = fields.Char('設備編號', required=True)  # 設備座位號，一個座位會有多個放過的設備
+    parent_equipment_num = fields.Char('父設備編號', required=True)
+    serial_number = fields.Char('設備序列號', required=True)
+    equipment_type_id = fields.Many2one('maintenance_plan.equipment.type', string='設備類型', required=True)
+    equipment_model = fields.Many2one('maintenance_plan.equipment_model', '設備型號', required=True)
+    description = fields.Char('設備描述', required=True)
+    status = fields.Selection(STATUS, required=True, default='Effective', string='狀態')
+    item_code = fields.Char('庫存編碼', required=True)
     direction = fields.Char('方向')
     start_chainage = fields.Char('起始公里標')
     end_chainage = fields.Char('終點公里標')

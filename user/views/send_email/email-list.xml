@@ -1,6 +1,6 @@
 <odoo>
     <record id="email_list_tree" model="ir.ui.view">
-        <field name="郵件列表"></field>
+        <field name="name">郵件列表</field>
         <field name="model">user.send_email</field>
         <field name="arch" type="xml">
             <tree class="noOpen" create="0">
@@ -13,7 +13,7 @@
     </record>
 
     <record id="email_list_form" model="ir.ui.view">
-        <field name="郵件列表"></field>
+        <field name="name">郵件詳情</field>
         <field name="model">user.send_email</field>
         <field name="arch" type="xml">
             <form>

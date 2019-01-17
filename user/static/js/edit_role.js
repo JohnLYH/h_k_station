@@ -21,10 +21,11 @@ odoo.define('edit_role', function (require) {
                 default_checked_keys: [],
                 defaultProps: {
                     children: 'children',
-                    label: 'label'
+                    label: 'name'
                 },
                 role: action.context.role_name,
                 per: action.context.per,
+                group_id: action.context.groups_id,
 
 
             };
@@ -33,12 +34,23 @@ odoo.define('edit_role', function (require) {
 
             var self = this;
 
-            return self._rpc({
-                model: 'res.users',
-                method: 'get_department_users',
-            }).then(function (data) {
-                self.vue_data.departmentList = data
-            })
+            return $.when(self._rpc({
+                    model: 'res.groups',
+                    method: 'get_group_data',
+                    kwargs: {group_id: self.vue_data.group_id},
+                }).then(function (data) {
+                    self.vue_data.departmentList = data.cats
+                    self.vue_data.default_checked_keys = data.checked_groups_ids
+                }),
+
+                self._rpc({
+                    model: 'res.groups',
+                    method: 'get_user_name_data',
+                    kwargs: {group_id: self.vue_data.group_id},
+                }).then(function (data) {
+                    self.vue_data.user_name = data
+                })
+            )
         },
 
         start: function () {
@@ -59,17 +71,24 @@ odoo.define('edit_role', function (require) {
 
                     methods: {
                         click_node: function (data) {
+                            console.log('888', data)
                         },
 
                         onSubmit: function (date) {
+                            var implied_ids = [];
+                            this.$refs.tree.getCheckedNodes(false, true).map(function (node) {
+                                implied_ids.push(node.id)
+                            });
                             self._rpc({
-                                model: 'user.department',
+                                model: 'res.groups',
                                 method: 'edit_save',
                                 kwargs: {
                                     role_name: self.vue_data.role,
-                                    Permission_illustrate: self.vue_data.per,
+                                    permission_illust: self.vue_data.per,
                                     modify_name: self.vue_data.input,
-                                    modify_per: self.vue_data.textarea
+                                    modify_per: self.vue_data.textarea,
+                                    per_id: implied_ids,
+                                    self_id: self.vue_data.group_id
                                 }
                             })
                             self.do_action({"type": "ir.actions.act_window_close"})
@@ -77,6 +96,16 @@ odoo.define('edit_role', function (require) {
                         cancel: function () {
                             self.do_action({"type": "ir.actions.act_window_close"})
                         },
+                        button_act: function (date) {
+                            self.do_action({
+                                name: '添加人員',
+                                type: 'ir.actions.act_window',
+                                res_model: 'res.groups',
+                                res_id: self.vue_data.group_id,
+                                views: [[false, 'form']],
+                                target: "new"
+                            });
+                        }
                     },
 
                 });

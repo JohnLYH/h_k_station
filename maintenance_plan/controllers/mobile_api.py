@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 # Author: Artorias
 import json
+import datetime as dt
+import os
+from dateutil.relativedelta import relativedelta
 
 from odoo import http
 from odoo.http import request, Root, session_gc
@@ -9,6 +12,8 @@ from addons.web.controllers.main import ensure_db
 
 STATUS_MAP = {
     'TODO': 'be_executed', 'EDITING': 'executing', 'PENDING': 'pending_approval', 'APPROVALED': 'closed'}
+
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
 def e_login_setup_session(self, httprequest):
@@ -48,9 +53,24 @@ def to_json(json_dict):
     return json.dumps(json_dict)
 
 
-class Login(http.Controller):
+def get_last_record(query):
+    '''
+    獲取最後一條記錄
+    :param query:
+    :return:
+    '''
+    if len(query) == 0:
+        return query
+    else:
+        return query[-1]
 
-    @http.route('/mtr/login', type='json', auth="none")
+
+class Public(http.Controller):
+    '''
+    公共接口類
+    '''
+
+    @http.route('/mtr/login', type='json', auth='none')
     def login(self, **kwargs):
         '''
         登錄接口
@@ -68,11 +88,27 @@ class Login(http.Controller):
             session_info = http.request.env['ir.http'].session_info()
             return to_json({'errcode': 1, 'data': {'token': session_info}, 'msg': '登錄成功'})
 
+    @http.route('/mtr/upload/img', type='http', auth='user')
+    def upload_img(self, **kwargs):
+        '''
+        圖片上傳
+        :param kwargs:
+        :return:
+        '''
+        file_list = kwargs['file']
+        result = []
+        for up_file in file_list:
+            file_record = request.env['maintenance_plan.binary.file'].create({
+                'file': up_file.read()
+            })
+            result.append(file_record)
+        return to_json({'errcode': 0, 'msg': '', 'data': result})
+
 
 class WorkOrder(http.Controller):
 
     @http.route('/mtr/wo/list', type='json', auth='user')
-    def work_oder_list(self, **kwargs):
+    def get_work_oder_list(self, **kwargs):
         '''
         工單列表
         :param kwargs:
@@ -85,7 +121,7 @@ class WorkOrder(http.Controller):
         end_date = params['endDate']
         page = params['pageIndex']
         limit = params['pageSize']
-        auto_status_map = dict([(index, word) for (word, index) in STATUS_MAP.items()])
+        output_status_map = dict([(index, word) for (word, index) in STATUS_MAP.items()])
         domain = []
         result = []
         if search_key != '':
@@ -126,7 +162,7 @@ class WorkOrder(http.Controller):
             domain, limit=limit, offset=(page - 1) * limit)
         for record in records:
             result.append(dict(
-                no=record.num, status=auto_status_map[record.status], equipmentNo=record.equipment_num,
+                no=record.num, status=output_status_map[record.status], equipmentNo=record.equipment_num,
                 executionTime=record.action_time, group=record.action_dep_id.name,
                 executor=record.executor_id.name or '', standardJob=record.standard_job_id.name, id=record.id
             ))
@@ -141,9 +177,9 @@ class WorkOrder(http.Controller):
         '''
         params = request.jsonrequest
         record = request.env['maintenance_plan.maintenance.plan'].browse(int(params['id']))
-        auto_status_map = dict([(index, word) for (word, index) in STATUS_MAP.items()])
+        output_status_map = dict([(index, word) for (word, index) in STATUS_MAP.items()])
         result = dict(
-            no=record.num, status='' if record.status is False else auto_status_map[record.status],
+            no=record.num, status='' if record.status is False else output_status_map[record.status],
             equipmentNo=record.equipment_id.name, fatherEquipmentNo=record.equipment_id.parent_equipment_num,
             equipmentSerialNo=record.equipment_id.serial_number,
             equipmentLocation=record.equipment_id.detailed_location,
@@ -157,3 +193,89 @@ class WorkOrder(http.Controller):
         )
         return to_json({'errcode': 0, 'data': result, 'msg': ''})
 
+    @http.route('/mtr/wo/test', type='json', auth='user')
+    def get_work_order_test_form(self, **kwargs):
+        '''
+        獲取對象波口測試表單json數據
+        :param kwargs:
+        :return:
+        '''
+        params = request.jsonrequest
+        order_record = request.env['maintenance_plan.maintenance.plan'].browse(params['id'])
+        test_form = order_record.order_form_ids.filtered(lambda f: f.name == '對向波口測試')
+        last_submit_approval = get_last_record(
+            test_form.approval_ids.filtered(lambda f: f.to_status == 'SUBMIT'))
+        last_check_user_approval = get_last_record(
+            test_form.approval_ids.filtered(lambda f: f.to_status == 'CHECK')
+        )
+        last_complete_user_approval = get_last_record(
+            test_form.approval_ids.filtered(lambda f: f.to_status == 'CHECK')
+        )
+        assert len(test_form) in [0, 1]
+        return to_json({
+            'errcode': 0, 'msg': '', 'data': {
+                'no': order_record.num, 'equipmentNo': order_record.equipment_num,
+                'station': order_record.equipment_id.equipment_type_id.station_id.name,
+                'submitStatus': test_form.status, 'submitData': test_form.content or None,
+                'submitUser': {
+                    'id': last_submit_approval.execute_user_id.id or None,
+                    'name': last_submit_approval.execute_user_id.name or None,
+                    'role': last_submit_approval.execute_user_id.role or None,
+                    'time': last_submit_approval.create_date,
+                    'signature': last_submit_approval.signature_url
+                },
+                'checkUser': {
+                    'id': last_check_user_approval.execute_user_id.id or None,
+                    'name': last_check_user_approval.execute_user_id.name or None,
+                    'role': last_check_user_approval.execute_user_id.role or None,
+                    'time': last_check_user_approval.create_date,
+                    'signature': last_check_user_approval.signature_url
+                },
+                'completeUser': {
+                    'id': last_complete_user_approval.execute_user_id.id or None,
+                    'name': last_complete_user_approval.execute_user_id.name or None,
+                    'role': last_complete_user_approval.execute_user_id.role or None,
+                    'time': last_complete_user_approval.create_date,
+                    'signature': last_complete_user_approval.signature_url
+                }
+            }
+        })
+
+    @http.route('/mtr/wo/tools/list', type='json', auth='user')
+    def get_tools_list(self, **kwargs):
+        '''
+        獲取工器具列表
+        :param kwargs:
+        :return:
+        '''
+        params = request.jsonrequest
+        no = params['key']
+        domain = [('status', '=', '正常')]
+        if no != '':
+            domain.append(('equipment_name', 'ilike', no))
+        tools_records = request.env['maintenance_plan.other_equipment'].search(domain)
+        result = {
+            'errcode': 0, 'data': {
+                'list': [{
+                    'id': tool.id, 'no': tool.equipment_num, 'name': tool.equipment_name,
+                    'modle': tool.model, 'expired': False if tool.status == '正常' else True
+                } for tool in tools_records]
+            },
+            'msg': ''
+        }
+        return to_json(result)
+
+    @http.route('/mtr/wo/test/save', type='json', auth='user')
+    def auto_save_form(self, **kwargs):
+        '''
+        對向波口測試自動保存
+        :param kwargs:
+        :return:
+        '''
+        params = request.jsonrequest
+        order_record = request.env['maintenance_plan.maintenance.plan'].browse(params['id'])
+        test_form = order_record.order_form_ids.filtered(lambda f: f.name == '對向波口測試')
+        test_form.write({
+            'content': params['submitDataBODY']
+        })
+        return to_json({'errcode': 0, 'data': '', 'msg': '保存成功'})

@@ -9,9 +9,10 @@ class ApprovalManagement(models.Model):
     '''工單審批管理'''
     _name = 'maintenance_plan.order.approval'
     _description = '審批流水'
+    _order = 'create_date DESC'
 
     work_order_id = fields.Many2one('maintenance_plan.maintenance.plan', '工單')
-    executer_id = fields.Many2one('res.users', '操作人')
+    execute_user_id = fields.Many2one('res.users', '操作人')
     old_status = fields.Selection(STATUS, string='原始狀態')
     to_status = fields.Selection(STATUS, string='目標狀態')
 

@@ -34,7 +34,8 @@
         'security/add_category.xml',
         'views/category_group.xml',
         'views/catagory_menu.xml',
-        'views/send_email/email-list.xml'
+        'views/send_email/email-list.xml',
+        'views/user_management/create_new_rec.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

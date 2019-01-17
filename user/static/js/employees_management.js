@@ -81,7 +81,6 @@ odoo.define('employees_management_action', function (require) {
                                 self.vue_data.message = get_data.count;
                                 self.vue_data.edit_department_id = get_data.department;
                             });
-                            console.log(data);
                         },
 
                         click_node_page: function (data) {
@@ -92,6 +91,7 @@ odoo.define('employees_management_action', function (require) {
                             }).then(function (get_data) {
                                 self.vue_data.tableData = get_data.users;
                                 self.vue_data.message = get_data.count;
+                                self.vue_data.edit_department_id = get_data.department;
                             });
                         },
 
