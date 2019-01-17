@@ -24,7 +24,12 @@ odoo.define('maintenance_plan_edit', function (require) {
                     children: 'children'
                 },
                 work_order_type: this.record.data.work_order_type,
+                work_order_description: this.record.data.work_order_description,
                 equipment_num: this.record.data.equipment_num,
+                equipment_type_name: '',
+                equipment_description: '',
+                equipment_type_description: '',
+                standard_job: '',
                 display_plan_time: this.record.data.display_plan_time,
                 pickerDate: {
                     disabledDate(time) {
@@ -38,7 +43,7 @@ odoo.define('maintenance_plan_edit', function (require) {
                 },
                 rules: {
                     display_action_time: [
-                        {required: true, message: '請選擇具體執行時間', trigger: 'change'},
+                        {required: true, message: '請選擇計劃執行時間', trigger: 'change'},
                     ],
                     selected_dep: [
                         {required: true, message: '請選擇執行班組', trigger: 'change'},
@@ -52,18 +57,28 @@ odoo.define('maintenance_plan_edit', function (require) {
             var get_config = self._rpc({
                 model: 'maintenance_plan.maintenance.plan',
                 method: 'get_config'
-            }).then(function (config) {
-                self.max_advance_days = self.record.data.plan_start_time.subtract(config.max_advance_days, 'days');
-                self.max_delay_days = self.record.data.plan_end_time.add(config.max_delay_days, 'days');
             });
             // 獲取班組tree圖
             var get_deps = self._rpc({
                 model: 'maintenance_plan.maintenance.plan',
                 method: 'get_departs'
-            }).then(function (deps) {
-                self.vue_data.deps = deps
             });
-            return $.when(get_config, get_deps)
+            // 獲取設備信息
+            var get_equipment_info = self._rpc({
+                model: 'maintenance_plan.maintenance.plan',
+                method: 'get_equipment_and_type_info',
+                kwargs: {id: self.record.res_id}
+            });
+            return $.when(get_config, get_deps, get_equipment_info).then(function (config, deps, info) {
+                self.max_advance_days = self.record.data.plan_start_time.subtract(config.max_advance_days, 'days');
+                self.max_delay_days = self.record.data.plan_end_time.add(config.max_delay_days, 'days');
+                self.vue_data.deps = deps;
+                self.vue_data.equipment_type_name = info.equipment_type_name || '';
+                self.vue_data.equipment_description = info.equipment_description || '';
+                self.vue_data.equipment_type_description = info.equipment_type_description || '';
+                self.vue_data.standard_job = info.standard_job || '';
+
+            })
         },
         start: function () {
             var self = this;

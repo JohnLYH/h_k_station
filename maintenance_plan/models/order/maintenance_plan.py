@@ -15,21 +15,20 @@ class MaintenancePlan(models.Model):
     _description = '維修計劃'
     _rec_name = 'num'
 
-    @staticmethod
-    def _default_order_forms():
+    def _default_order_forms(self):
         return [(0, 0, {'name': '對向波口測試', 'status': 'WRITE'}), (0, 0, {'name': '檢測證書', 'status': 'WRITE'})]
 
-    num = fields.Char('工單編號')
-    work_order_type = fields.Char('工單類型')
-    work_order_description = fields.Text('工單描述')
-    standard_job_id = fields.Many2one('maintenance_plan.standard.job', string='標準工作')
-    equipment_id = fields.Many2one('maintenance_plan.equipment', string='設備')
+    num = fields.Char('工單編號', required=True)
+    work_order_type = fields.Char('工單類型', required=True)
+    work_order_description = fields.Text('工單描述', required=True)
+    standard_job_id = fields.Many2one('maintenance_plan.standard.job', string='標準工作', required=True)
+    equipment_id = fields.Many2one('maintenance_plan.equipment', string='設備', required=True)
     equipment_num = fields.Char('設備編號', compute='_com_equipment', store=True)
-    plan_start_time = fields.Date('計劃執行時間(開始)')
-    plan_end_time = fields.Date('計劃執行時間(結束)')
-    display_plan_time = fields.Char('計劃執行時間', compute='_com_plan_time', store=True)
-    action_time = fields.Date('具體執行時間')
-    display_action_time = fields.Char('具體執行時間', compute='_com_action_time', store=True)
+    plan_start_time = fields.Date('工單有效時間(開始)', required=True)
+    plan_end_time = fields.Date('工單有效時間(結束)', required=True)
+    display_plan_time = fields.Char('工單有效時間', compute='_com_plan_time', store=True)
+    action_time = fields.Date('計劃執行時間')
+    display_action_time = fields.Char('計劃執行時間', compute='_com_action_time', store=True)
     action_dep_id = fields.Many2one('user.department', string='執行班組')
     actual_start_time = fields.Datetime('實際開始時間')
     actual_end_time = fields.Datetime('實際結束時間')
@@ -110,6 +109,17 @@ class MaintenancePlan(models.Model):
         ], fields=['name', 'child_ids', 'parent_left', 'parent_right'])
         self.recursion_tree_data(deps)
         return deps
+
+    @api.model
+    def get_equipment_and_type_info(self, id):
+        record = self.browse(id)
+        equipment = record.equipment_id
+        equipment_type_name = equipment.equipment_type_id.name
+        equipment_description = equipment.description
+        equipment_type_description = equipment.equipment_type_id.description
+        standard_job = record.standard_job_id.name
+        return {'equipment_type_name': equipment_type_name, 'equipment_description': equipment_description,
+                'equipment_type_description': equipment_type_description, 'standard_job': standard_job}
 
     @api.model
     def assign_work_order(self, order_id, action_time, dep):
