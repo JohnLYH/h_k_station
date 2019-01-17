@@ -15,7 +15,7 @@ from odoo import fields, models, api
 class EquipmentModel(models.Model):
     _name = 'maintenance_plan.equipment_model'
     _description = '設備型號'
-    # _rec_name = 'equipment_model'
+    _rec_name = 'equipment_model'
 
     equipment_model = fields.Char('型號名稱', required=True)
     description = fields.Char('設備名稱', required=True)
