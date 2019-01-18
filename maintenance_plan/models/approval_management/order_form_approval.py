@@ -14,4 +14,4 @@ class OrderFormApproval(models.Model):
     # 表單狀態：對向波口測試 WRITE、SUBMIT、CHECK、COMPLETE
     old_status = fields.Char('原始狀態')
     to_status = fields.Char('目標狀態')
-    signature_ids = fields.One2many('maintenance_plan.binary.file', 'order_form_approval_id', string='簽名')
+    signature = fields.Char('簽名')  # 圖片url

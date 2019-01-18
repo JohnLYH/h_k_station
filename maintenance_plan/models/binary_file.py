@@ -9,4 +9,4 @@ class BinaryFile(models.Model):
     _description = '附件'
 
     file = fields.Binary('文件', attachment=True)
-    order_form_approval_id = fields.Many2one('maintenance_plan.order.form.approval', string='表單操作流水')
+    filename = fields.Char('文件名')
