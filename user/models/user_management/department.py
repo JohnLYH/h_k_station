@@ -106,9 +106,17 @@ class Department(models.Model):
                     lis.append(rec)
         return lis
 
-    # 權限管理編輯操作
+    # 获取权限组
     @api.model
-    def edit_save(self, **kw):
-        rocord = self.env['res.users'].search([('role', '=', kw.get('role_name'))])
-        for i in rocord:
-            i.write({'role': kw.get('modify_name')})
+    def get_pers_group(self):
+        config_dict = self.env['res.groups'].get_config_info()
+        category_id = self.env.ref('{}.{}'.format(config_dict['module_name'], config_dict['custom_group_id']))
+        category_id.ensure_one()
+        # 获取父节点
+        # 组装子节点
+        category_record_ids = [self.env.ref('{}.{}'.format(config_dict['module_name'], i)).id
+                               for i in config_dict['category_id_list']]
+        cats = self.env['res.groups'].search_read([('category_id', 'in', category_record_ids), ('parent_id', '=', None)], fields=[
+            'name', 'parent_id', 'child_ids', 'parent_left', 'parent_right', 'category_id'], order='sequence')
+        self.env['res.groups'].recursion_tree_data(cats)
+        return cats

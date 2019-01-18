@@ -30,12 +30,13 @@ odoo.define('rights_management', function (require) {
                 message: 0,
                 value: '',
                 options: [
-                          {value: 'normal', label: '正常'},
-                          {value: 'disable', label: '禁用'},
-                          {value: 'all', label: '全部'}
-                       ],
+                    {value: 'normal', label: '正常'},
+                    {value: 'disable', label: '禁用'},
+                    {value: 'all', label: '全部'}
+                ],
                 size_: 10,
                 list_size: [10, 20, 30, 40],
+                view_id: '',
 
             };
         },
@@ -44,12 +45,20 @@ odoo.define('rights_management', function (require) {
 
             var self = this;
 
-            return self._rpc({
-                model: 'user.department',
-                method: 'get_department_users',
+            var info_data = self._rpc({
+                model: 'res.groups',
+                method: 'get_permiss_role',
             }).then(function (data) {
-                self.vue_data.tableData = data
+                self.vue_data.tableData = data.record;
+                self.vue_data.view_id = data.view_id;
+            });
+
+            var count_info = self._rpc({
+                model: 'res.groups',
+                method: 'calculate_per_couont',
             })
+
+            return $.when(info_data, count_info)
         },
 
         start: function () {
@@ -83,16 +92,19 @@ odoo.define('rights_management', function (require) {
 
                         },
 
+                        click_node_page: function (data) {
+                            var act_info = self._rpc({
+                                model: 'res.groups',
+                                method: 'get_permiss_role',
+                            }).then(function (data) {
+                                self.vue_data.tableData = data
+                            });
+
+                            return $.when(act_info)
+
+                        },
+
                         handleSelectionChange: function (data) {
-//                                   alert('123');
-//                                   self._rpc({
-//                                              model: 'user.employees_get',
-//                                              method:'get_employees',
-//                                            }).then(function(get_data){
-//                                              self.vue_data.tableData=get_data;
-//                                            });
-
-
                         },
 
                         handleSizeChange: function (data) {
@@ -118,50 +130,86 @@ odoo.define('rights_management', function (require) {
                         },
 
                         handleEdit: function (index, row) {
+                            var this_vue = this
                             self.do_action({
-                                name: '\u7de8\u8f2f\u4eba\u54e1\u4fe1\u606f',
+                                name: '權限管理編輯',
                                 type: 'ir.actions.client',
+                                res_id: row.id,
                                 tag: 'edit_role',
                                 target: 'new',
-                                context: {role_name: row.name, per: row.Permission_illustrate,}
-
+                                context: {
+                                    role_name: row.name,
+                                    per: row.permission_illust,
+                                    groups_id: row.id
+                                },
+                            }, {
+                                on_close: function () {
+                                    this_vue.click_node_page(this_vue)
+                                }
                             });
-
-
                         },
 
                         handleReset: function (data) {
                             alert('handleReset')
                         },
 
-                        handleDisable: function (data) {
-                            alert('handleDisable')
-//                                   self._rpc({
-//                                              model: 'cdtct_dingtalk.cdtct_dingtalk_users',
-//                                              method:'get_users',
-//                                              kwargs: {'department_id':data.id}
-//                                            }).then(function(get_data){
-//                                              self.vue_data.tableData=get_data;
-//                                            });
+                        handleDisable: function (index, row) {
+                            var self_date = this;
+                            self._rpc({
+                                model: 'res.groups',
+                                method: 'get_disable_info_act',
+                                kwargs: {'name': row.name}
+                            }).then(function (get_data) {
+                                self_date.click_node_page(self_date)
+                            });
+                        },
 
+                        handleDelete: function (index, row) {
+                            this.$confirm('是否刪除本條記錄', '提示', {
+                                confirmButtonText: '确定',
+                                cancelButtonText: '取消',
+                                type: 'warning'
+                            }).then(() => {
+                                var delete_date = this;
+                                self._rpc({
+                                    model: 'res.groups',
+                                    method: 'delete_record',
+                                    kwargs: {'self_id': row.id}
+                                }).then(function (get_data) {
+                                    delete_date.click_node_page(delete_date)
+                                });
+                            }).catch(() => {
+                                this.$message({
+                                    type: 'info',
+                                    message: '已取消删除'
+                                });
+                            });
 
                         },
 
                         search: function (data) {
                             self._rpc({
-                                model: 'res.users',
+                                model: 'res.groups',
                                 method: 'permissions_search',
                                 kwargs: {'name': self.vue_data.input, 'chose': self.vue_data.value}
                             }).then(function (get_data) {
                                 self.vue_data.tableData = get_data
                             });
-
-
                         },
 
                         reset: function (data) {
                             self.vue_data.input = '';
                             self.vue_data.value = '';
+                        },
+                        create_rec: function () {
+                            self.do_action({
+                                name: '新增',
+                                type: 'ir.actions.act_window',
+                                res_model: 'res.groups',
+                                views: [[self.vue_data.view_id, 'form']],
+                                target: 'new',
+                                flags: {'initial_mode': 'edit'},
+                            });
                         },
                     },
 

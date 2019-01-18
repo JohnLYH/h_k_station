@@ -29,6 +29,7 @@
         'views/config/config_view.xml',
         'views/approval_management/order_approval_view.xml',
         'views/reference_materials_manage/reference_materials_manage_view.xml',
+        'views/reference_materials_manage/reference_materials_manage_record.xml',
         'views/maintenance_plan/maintenance_plan_view.xml',
         'views/maintenance_plan/work_order_view.xml',
         'views/equipment/equipment_view.xml',
