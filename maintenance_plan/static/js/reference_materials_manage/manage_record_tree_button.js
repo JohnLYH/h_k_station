@@ -1,4 +1,4 @@
-odoo.define('materials_tree_button', function (require) {
+odoo.define('manage_record_tree_button', function (require) {
     "use strict";
 
     var Widget = require('web.Widget');
@@ -6,7 +6,7 @@ odoo.define('materials_tree_button', function (require) {
     var core = require('web.core');
     var QWeb = core.qweb;
 
-    var materials_tree_button = Widget.extend({
+    var manage_record_tree_button = Widget.extend({
         events: {
             'click': '_click_tree_buttons'
         },
@@ -14,9 +14,10 @@ odoo.define('materials_tree_button', function (require) {
             this._super(parent, record, node);
             this.id = record.res_id;
             this.record = record;
+
         },
         start: function () {
-            var $el = $(QWeb.render('tem_materials_manage_tree_button', {widget: this}).trim());
+            var $el = $(QWeb.render('tem_manage_record_tree_button', {widget: this}).trim());
             this.replaceElement($el);
             this.vue = new Vue({
                 el: '#app',
@@ -28,20 +29,13 @@ odoo.define('materials_tree_button', function (require) {
         _click_tree_buttons: function (event) {
             var self = this;
             event.stopPropagation();
-            if ($(event.target).hasClass('materials_manage_detail')) {
+            if ($(event.target).hasClass('manage_record_detail')) {
                 self.do_action({
-                    "name": "參考資料詳情",
+                    "name": "詳情",
                     "type": "ir.actions.client",
-                    "tag": "materials_detail_btn",
-                    "params": {record: self.record, id: self.id}
-                })
-            } else {
-                self.do_action({
-                    "name": "上傳文件",
-                    "type": "ir.actions.client",
-                    "tag": "materials_upload_btn",
+                    "tag": "manage_record_details",
                     "target": "new",
-                    "params": {record: self.record, id: self.id}
+                    "params": {res_id: self.id}
                 }, {
                     on_close: function () {
                         self.trigger_up('reload')
@@ -51,7 +45,12 @@ odoo.define('materials_tree_button', function (require) {
             }
         }
     });
-    widget_registry.add('materials_tree_button', materials_tree_button);
-    return {materials_tree_button: materials_tree_button}
+    widget_registry.add('manage_record_tree_button', manage_record_tree_button);
+    return {manage_record_tree_button: manage_record_tree_button}
 
 });
+
+
+
+
+

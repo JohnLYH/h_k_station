@@ -9,17 +9,13 @@ odoo.define('equipment_tree_domain', function (require) {
     var ListRenderer = require("web.ListRenderer");
     var ListController = require("web.ListController");
     var core = require('web.core');
-    var Dialog = require('web.Dialog');
-
-
-    var _t = core._t;
 
     var equipment_tree_domain = ListRenderer.extend({
         app: undefined,
         $tree_list_box: undefined,
 
         events: _.extend({}, ListRenderer.prototype.events, {
-            'click #add_quipment_bt': '_add_quipment',
+            'click #add_quipment_bt': '_add_equipment',
         }),
 
         init: function (parent, state, params) {
@@ -27,16 +23,26 @@ odoo.define('equipment_tree_domain', function (require) {
             this.record = state
         },
 
-        _add_quipment: function () {
+        _add_equipment: function () {
             var self = this;
-            self.do_action({
-                type: "ir.actions.act_window",
-                res_model: "maintenance_plan.equipment",
-                views: [[false, "form"]],
-                target: "new",
-                context: {
-                    "default_equipment_type_id": self.app.current_id
-                },
+            self._rpc({
+                model: 'maintenance_plan.config',
+                method: 'get_ref_id',
+                kwargs: {list_string_name: ['maintenance_plan.maintenance_plan_equipment_form']}
+            }).then(function (result) {
+                self.do_action({
+                    type: "ir.actions.act_window",
+                    res_model: "maintenance_plan.equipment",
+                    views: [[result[0], "form"]],
+                    target: "new",
+                    context: {
+                        "default_equipment_type_id": self.app.current_id
+                    },
+                }, {
+                    on_close: function () {
+                        self.trigger_up('reload')
+                    }
+                })
             })
         },
 

@@ -1,4 +1,4 @@
-<div id="app" style="margin-top: 30px">
+<div id="materials_remove_btn" style="margin-top: 30px">
     <el-row>
         <el-col :span="2">
             文件類型
@@ -21,18 +21,22 @@
             選擇文件
         </el-col>
         <el-col :span="21" :offset="1">
-            <el-upload
-                    class="upload-demo"
-                    ref="upload"
-                    action="/maintenance_plan/materials_upload_files/"
-                    :auto-upload="false"
-                    :limit="1"
-                    :on-change="handleChange"
-                    :before-upload="beforeAvatarUpload"
-                    :before-remove="before_remove"
-                    :file-list="fileList">
-                <el-button slot="trigger" size="small" type="primary">上傳文件</el-button>
-            </el-upload>
+            <el-col :span="12">
+                {{file_name}}
+            </el-col>
+            <el-col :span="12">
+                <el-upload
+                        class="upload-demo"
+                        ref="upload"
+                        action="/maintenance_plan/materials_upload_files/"
+                        :auto-upload="false"
+                        :limit="1"
+                        :on-change="handleChange"
+                        :before-remove="before_remove"
+                        :file-list="fileList">
+                    <el-button slot="trigger" size="small" type="primary">替換</el-button>
+                </el-upload>
+            </el-col>
         </el-col>
 
     </el-row>

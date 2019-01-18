@@ -51,9 +51,22 @@
         <div style="text-align: center">
             <a t-attf-record-id="#{widget.id}" class="materials_manage_detail" href="javascript: void 0">詳情</a>
             <a t-attf-record-id="#{widget.id}" class="upload_materials_manage" href="javascript: void 0">上傳文件</a>
-            <!--<form style="display:none" action="/other_equipment/put_in_excel" method="post" enctype="multipart/form-data">-->
-                <!--<input type="file" name="file" value=""/>-->
-            <!--</form>-->
+        </div>
+    </t>
+
+    <t t-name="tem_manage_record_tree_button">
+        <div style="text-align: center">
+            <a t-attf-record-id="#{widget.id}" class="manage_record_detail" href="javascript: void 0">詳情</a>
+        </div>
+    </t>
+
+    <!--二維碼展示及打印二維碼-->
+    <t t-name="tem_qr_code_to_image">
+        <div style="display: flex;flex-direction: column;align-items: center">
+            <div id="print_content" style="width: 200px;">
+                <img style="width: 100%;" t-attf-src="data:image/png;base64,#{widget.value}"/>
+            </div>
+            <button class="btn btn-primary btn-sm">打印</button>
         </div>
     </t>
 </template>
