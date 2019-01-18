@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 # Author: Artorias
 import json
-import datetime as dt
 import os
 import base64
+from PIL import Image, ImageDraw, ImageFont
+import datetime as dt
 from dateutil.relativedelta import relativedelta
 
 from odoo import http
@@ -16,6 +17,30 @@ STATUS_MAP = {
     'TODO': 'be_executed', 'EDITING': 'executing', 'PENDING': 'pending_approval', 'APPROVALED': 'closed'}
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+
+
+def add_text_to_image(image, left_text, rigth_text):
+    '''
+    圖片添加左下、右下水印
+    :param image: Image.open()的文件內容
+    :param left_text: 左下文字
+    :param rigth_text: 右下文字
+    :return: 帶水印的image
+    '''
+    font = ImageFont.truetype(os.path.join(BASE_DIR, 'static/font/STHeiti-Light.ttc'), size=44, index=0)
+    rgba_image = image.convert('RGBA')
+    text_overlay = Image.new('RGBA', rgba_image.size, (255, 255, 255, 0))
+    image_draw = ImageDraw.Draw(text_overlay)
+    # 设置文本文字位置
+    text_size_x, text_size_y = image_draw.textsize(rigth_text, font=font)
+    text_xy_left = (0, rgba_image.size[1] - text_size_y)  # 底部左
+    text_xy_right = (rgba_image.size[0] - text_size_x, rgba_image.size[1] - text_size_y)  # 底部右
+    # text_xy = ((rgba_image.size[0] - text_size_x) / 2, (rgba_image.size[1] - text_size_y) / 2)  # 中间
+    # 设置文本颜色和透明度
+    image_draw.text(text_xy_left, left_text, font=font, fill=(220, 220, 220, 70))
+    image_draw.text(text_xy_right, rigth_text, font=font, fill=(220, 220, 220, 70))
+    image_with_text = Image.alpha_composite(rgba_image, text_overlay)
+    return image_with_text
 
 
 def e_login_setup_session(self, httprequest):
@@ -99,8 +124,12 @@ class Public(http.Controller):
         '''
         if kwargs.get('file', None) is not None:
             file = kwargs['file']
-            file_content = base64.b64encode(file.read())
             filename = file.filename
+            now_time = dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d')
+            name = request.env.user.name or ''
+            # 添加水印
+            image = add_text_to_image(Image.open(file), now_time, name)
+            file_content = base64.b64encode(image.tobytes())
         else:
             file = json.loads(kwargs['base64'])
             file_content = file['data']
