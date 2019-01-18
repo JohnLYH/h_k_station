@@ -191,7 +191,6 @@ class MaintenancePlan(http.Controller):
                 reasons_details = ''
             operation_type = '新增'
             user_id = request.uid
-            print(user_id)
             operation_time = datetime.datetime.now()
             values = {
                 'reasons_change': reasons_change,

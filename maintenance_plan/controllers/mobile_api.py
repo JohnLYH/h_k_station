@@ -1,10 +1,13 @@
 # !user/bin/env python3
 # -*- coding: utf-8 -*-
 # Author: Artorias
+import datetime
 import json
 import datetime as dt
 import os
 import base64
+import time
+
 from dateutil.relativedelta import relativedelta
 
 from odoo import http
@@ -174,7 +177,10 @@ class WorkOrder(http.Controller):
             result.append(dict(
                 no=record.num, status=output_status_map[record.status], equipmentNo=record.equipment_num,
                 executionTime=record.action_time, group=record.action_dep_id.name,
-                executor=record.executor_id.name or '', standardJob=record.standard_job_id.name, id=record.id
+                executor=record.executor_id.name or '', standardJob=record.standard_job_id.name, id=record.id,
+                deadline=record.plan_end_time, planedTime=record.display_action_time,
+                completionTime=record.actual_start_time, overdue=True if time.strptime(
+                    record.actual_end_time, '%Y-%m-%d %H:%M:S') > datetime.datetime.now() else False
             ))
         return to_json({'errcode': 0, 'data': {'list': result}, 'msg': ''})
 

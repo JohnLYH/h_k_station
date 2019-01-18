@@ -89,7 +89,6 @@ class ReferenceMaterialsManageRecord(models.Model):
             values = {'numbering': numbering, 'edition': edition,
                                'file_name': file_name, 'field_type': field_type,
                                'reasons_change': reasons_change, 'reasons_details': reasons_details}
-            print(values)
             return json.dumps({'error': 0, 'numbering': numbering, 'edition': edition,
                                'file_name': file_name, 'field_type': field_type,
                                'reasons_change': reasons_change, 'reasons_details': reasons_details})
