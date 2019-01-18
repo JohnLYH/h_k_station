@@ -148,6 +148,8 @@ class MaintenancePlan(http.Controller):
             select_file_name = file.filename
             # 設備型號
             equipment_id = kw['id']
+            # 上傳的文件時pdf還是視頻
+            upload_tpye = kw['upload_tpye']
             # 判斷這個型號下是否有相同的版本號或者編號存在
             # maintenance_plan.reference_materials_manage
             materials_manage_count = request.env['maintenance_plan.reference_materials_manage'].search_count([
@@ -155,25 +157,27 @@ class MaintenancePlan(http.Controller):
                 ('numbering', '=', numbering), ('edition', '=', edition)])
             if materials_manage_count > 0:
                 return json.dumps({'error': 1, 'message': '上傳失敗,已存在相同的編號或者版本'})
-            # TODO:修改並發
-            file.save(select_file_name)
-            # open_file = open(select_file_name, "rb")
-            # b64str = base64.b64encode(open_file.read())
-            # open_file.close()
-            with open(select_file_name, "rb") as e:
+            file_name = str(int(time.time())) + str(random.randint(1, 1000)) + select_file_name
+            file.save(file_name)
+            with open(file_name, "rb") as e:
                 b64str = base64.b64encode(e.read())
-            os.remove(select_file_name)
+            os.remove(file_name)
             values = {
                 'equipment_id': int(equipment_id),
                 'field_type': field_type,
                 'edition': edition,
                 'numbering': numbering,
                 'select_file': b64str,
-                'select_file_name': select_file_name
+                'select_file_name': select_file_name,
+                'upload_tpye': upload_tpye
             }
             equipment_model = request.env['maintenance_plan.equipment_model'].sudo().search([('id', '=', equipment_id)])
-            equipment_model.write({'reference_materials_manage_ids': [(0, 0, values)]})
-            # TODO：生成審批記錄
+            if upload_tpye == 'mp4':
+                values['status'] = True
+                equipment_model.write({'reference_materials_manage_ids': [(0, 0, values)]})
+            else:
+                equipment_model.write({'reference_materials_manage_ids': [(0, 0, values)]})
+                # TODO：生成審批記錄
             # TODO: 生成記錄
             try:
                 # 變更原因
@@ -215,6 +219,8 @@ class MaintenancePlan(http.Controller):
             numbering = kw['numbering']
             # 設備型號
             equipment_id = kw['res_id']
+            # 上傳的文件是視頻還是pdf(pdf需要生成審批記錄,視頻不需要)
+            upload_tpye = kw['upload_tpye']
             reference_materials_manage_id = kw['id']
             # 判斷這個型號下是否有相同的版本號或者編號存在
             materials_manage_count = request.env['maintenance_plan.reference_materials_manage'].search_count([
@@ -228,6 +234,7 @@ class MaintenancePlan(http.Controller):
                     'field_type': field_type,
                     'edition': edition,
                     'numbering': numbering,
+                    'upload_tpye': upload_tpye
                 }
                 select_file_name = request.env['maintenance_plan.reference_materials_manage'].sudo().search(
                     [('id', '=', reference_materials_manage_id)]).select_file_name
@@ -245,9 +252,12 @@ class MaintenancePlan(http.Controller):
                     'edition': edition,
                     'numbering': numbering,
                     'select_file': b64str,
-                    'select_file_name': select_file_name
+                    'select_file_name': select_file_name,
+                    'upload_tpye': upload_tpye
                 }
             equipment_model = request.env['maintenance_plan.equipment_model'].sudo().search([('id', '=', equipment_id)])
+            if upload_tpye == 'mp4':
+                values['status'] = True
             equipment_model.write({'reference_materials_manage_ids': [(1, reference_materials_manage_id, values)]})
             # TODO：生成審批記錄
             # 生成記錄

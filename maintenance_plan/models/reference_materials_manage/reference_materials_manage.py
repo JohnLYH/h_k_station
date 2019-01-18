@@ -19,6 +19,15 @@ class ReferenceMaterialsManage(models.Model):
     select_file = fields.Binary(string='文件', attachment=True, required=True)
     edition = fields.Char(string='版本', required=True)
     numbering = fields.Char(string='編號', required=True)
+    url = fields.Char(string='文件url', compute='_get_url', store=True)
+    status = fields.Boolean(string='是否已經通過審批', default=False, required=True)
+    upload_tpye = fields.Char(string='視頻或者pdf')
+
+    @api.one
+    @api.depends('select_file')
+    def _get_url(self):
+        self.url = '/web/content?model=maintenance_plan.reference_materials_manage&id={}' \
+                   '&field=select_file&filename={}'.format(self.id, self.select_file_name)
 
     @api.model
     def create(self, vals):
@@ -43,7 +52,9 @@ class ReferenceMaterialsManage(models.Model):
             edition = reference_materials_manage.edition
             file_name = reference_materials_manage.select_file_name
             field_type = reference_materials_manage.field_type
-            return json.dumps({'error': 0, 'numbering': numbering, 'edition': edition, 'file_name': file_name, 'field_type': field_type})
+            upload_tpye = reference_materials_manage.upload_tpye
+            return json.dumps({'error': 0, 'numbering': numbering, 'edition': edition, 'file_name': file_name,
+                               'field_type': field_type, 'upload_tpye': upload_tpye})
         else:
             return json.dumps({'error': 1})
 

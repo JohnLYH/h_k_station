@@ -24,31 +24,36 @@
         <el-col style="font-size: 15px">
             WI:
         </el-col>
-        <el v-if="wi && wi.length > 0">
-            <el v-for="wi1 in wi">
-                <el-col :span="6">
-                    <el-col>
+        <el-col v-if="wi && wi.length > 0">
+            <el-col v-for="wi1 in wi" :span="8" style="margin-top: 20px;">
+                <el-col :span="7" style="height: 80px">
+                    <el v-if="wi1.upload_tpye == 'pdf'">
+                        <a :href="wi1.url"><img src="/maintenance_plan/static/img/pdf.jpeg" style="height: 80px"></a>
+                    </el>
+                    <el v-else>
+                        <a :href="wi1.url"><img src="/maintenance_plan/static/img/MP4.jpg" style="height: 80px"></a>
+                    </el>
+                </el-col>
+                <el-col :span="17" style="height: 80px">
+                    <el-col style="line-height: 20px">
                         文件名: {{wi1.select_file_name}}
                     </el-col>
-                    <div style="margin: 20px 0;"></div>
-                    <el-col>
+                    <el-col tyle="line-height: 20px">
                         版本: {{wi1.edition}}
                     </el-col>
-                    <div style="margin: 20px 0;"></div>
-                    <el-col>
+                    <el-col tyle="line-height: 20px">
                         編號: {{wi1.numbering}}
                     </el-col>
-                    <div style="margin: 20px 0;"></div>
-                    <el-col>
-                        <el-button  @click="change(wi1.id)" size="small">修改</el-button>
-                        <el-button  @click="remove(wi1.id)" size="small">刪除</el-button>
+                    <el-col tyle="line-height: 20px">
+                        <el-button @click="change(wi1.id)" size="small">修改</el-button>
+                        <el-button @click="remove(wi1.id)" size="small">刪除</el-button>
                     </el-col>
                 </el-col>
-            </el>
-        </el>
-        <el v-else style="font-size: 30px">
+            </el-col>
+        </el-col>
+        <el-col v-else style="font-size: 30px">
             暫無
-        </el>
+        </el-col>
     </el-row>
 
     <hr class="vue_hr">
@@ -58,26 +63,31 @@
             M-tube:
         </el-col>
         <el v-if="m_tube && m_tube.length > 0">
-           <el v-for="m_tube1 in m_tube">
-                <el-col :span="6">
-                    <el-col>
+            <el-col v-for="m_tube1 in m_tube" :span="8" style="margin-top: 20px;">
+                <el-col :span="7" style="height: 80px">
+                    <el v-if="m_tube1.upload_tpye == 'pdf'">
+                        <a :href="m_tube1.url"><img src="/maintenance_plan/static/img/pdf.jpeg" style="height: 80px"></a>
+                    </el>
+                    <el v-else>
+                        <a :href="m_tube1.url"><img src="/maintenance_plan/static/img/MP4.jpg" style="height: 80px"></a>
+                    </el>
+                </el-col>
+                <el-col :span="17" style="height: 80px">
+                    <el-col style="line-height: 20px">
                         文件名: {{m_tube1.select_file_name}}
                     </el-col>
-                    <div style="margin: 20px 0;"></div>
-                    <el-col>
+                    <el-col tyle="line-height: 20px">
                         版本: {{m_tube1.edition}}
                     </el-col>
-                    <div style="margin: 20px 0;"></div>
-                    <el-col>
+                    <el-col tyle="line-height: 20px">
                         編號: {{m_tube1.numbering}}
                     </el-col>
-                    <div style="margin: 20px 0;"></div>
-                    <el-col>
-                        <el-button  @click="change(m_tube1.id)" size="small">修改</el-button>
-                        <el-button  @click="remove(m_tube1.id)" size="small">刪除</el-button>
+                    <el-col tyle="line-height: 20px">
+                        <el-button @click="change(m_tube1.id)" size="small">修改</el-button>
+                        <el-button @click="remove(m_tube1.id)" size="small">刪除</el-button>
                     </el-col>
                 </el-col>
-            </el>
+            </el-col>
         </el>
         <el v-else style="font-size: 30px">
             暫無
@@ -92,22 +102,27 @@
         </el-col>
         <el v-if="fault_finding && fault_finding.length > 0">
             <el v-for="fault_finding1 in fault_finding">
-                <el-col :span="6">
-                    <el-col>
+                <el-col :span="7" style="height: 80px">
+                    <el v-if="fault_finding1.upload_tpye == 'pdf'">
+                        <a :href="fault_finding1.url"><img src="/maintenance_plan/static/img/pdf.jpeg" style="height: 80px"></a>
+                    </el>
+                    <el v-else>
+                        <a :href="fault_finding1.url"><img src="/maintenance_plan/static/img/MP4.jpg" style="height: 80px"></a>
+                    </el>
+                </el-col>
+                <el-col :span="17" style="height: 80px">
+                    <el-col style="line-height: 20px">
                         文件名: {{fault_finding1.select_file_name}}
                     </el-col>
-                    <div style="margin: 20px 0;"></div>
-                    <el-col>
+                    <el-col tyle="line-height: 20px">
                         版本: {{fault_finding1.edition}}
                     </el-col>
-                    <div style="margin: 20px 0;"></div>
-                    <el-col>
+                    <el-col tyle="line-height: 20px">
                         編號: {{fault_finding1.numbering}}
                     </el-col>
-                    <div style="margin: 20px 0;"></div>
-                    <el-col>
-                        <el-button  @click="change(fault_finding1.id)" size="small">修改</el-button>
-                        <el-button  @click="remove(fault_finding1.id)" size="small">刪除</el-button>
+                    <el-col tyle="line-height: 20px">
+                        <el-button @click="change(fault_finding1.id)" size="small">修改</el-button>
+                        <el-button @click="remove(fault_finding1.id)" size="small">刪除</el-button>
                     </el-col>
                 </el-col>
             </el>
@@ -125,22 +140,27 @@
         </el-col>
         <el v-if="recovery_procedur && recovery_procedur.length > 0">
             <el v-for="recovery_procedur1 in recovery_procedur">
-                <el-col :span="6">
-                    <el-col>
+                <el-col :span="7" style="height: 80px">
+                    <el v-if="recovery_procedur1.upload_tpye == 'pdf'">
+                        <a :href="recovery_procedur1.url"><img src="/maintenance_plan/static/img/pdf.jpeg" style="height: 80px"></a>
+                    </el>
+                    <el v-else>
+                        <a :href="recovery_procedur1.url"><img src="/maintenance_plan/static/img/MP4.jpg" style="height: 80px"></a>
+                    </el>
+                </el-col>
+                <el-col :span="17" style="height: 80px">
+                    <el-col style="line-height: 20px">
                         文件名: {{recovery_procedur1.select_file_name}}
                     </el-col>
-                    <div style="margin: 20px 0;"></div>
-                    <el-col>
+                    <el-col tyle="line-height: 20px">
                         版本: {{recovery_procedur1.edition}}
                     </el-col>
-                    <div style="margin: 20px 0;"></div>
-                    <el-col>
+                    <el-col tyle="line-height: 20px">
                         編號: {{recovery_procedur1.numbering}}
                     </el-col>
-                    <div style="margin: 20px 0;"></div>
-                    <el-col>
-                        <el-button  @click="change(recovery_procedur1.id)" size="small">修改</el-button>
-                        <el-button  @click="remove(recovery_procedur1.id)" size="small">刪除</el-button>
+                    <el-col tyle="line-height: 20px">
+                        <el-button @click="change(recovery_procedur1.id)" size="small">修改</el-button>
+                        <el-button @click="remove(recovery_procedur1.id)" size="small">刪除</el-button>
                     </el-col>
                 </el-col>
             </el>
@@ -157,23 +177,28 @@
             EDOC:
         </el-col>
         <el v-if="edoc && edoc.length > 0">
-           <el v-for="edoc1 in edoc">
-                <el-col :span="6">
-                    <el-col>
+            <el v-for="edoc1 in edoc">
+                <el-col :span="7" style="height: 80px">
+                    <el v-if="edoc1.upload_tpye == 'pdf'">
+                        <a :href="edoc1.url"><img src="/maintenance_plan/static/img/pdf.jpeg" style="height: 80px"></a>
+                    </el>
+                    <el v-else>
+                        <a :href="edoc1.url"><img src="/maintenance_plan/static/img/MP4.jpg" style="height: 80px"></a>
+                    </el>
+                </el-col>
+                <el-col :span="17" style="height: 80px">
+                    <el-col style="line-height: 20px">
                         文件名: {{edoc1.select_file_name}}
                     </el-col>
-                    <div style="margin: 20px 0;"></div>
-                    <el-col>
+                    <el-col tyle="line-height: 20px">
                         版本: {{edoc1.edition}}
                     </el-col>
-                    <div style="margin: 20px 0;"></div>
-                    <el-col>
+                    <el-col tyle="line-height: 20px">
                         編號: {{edoc1.numbering}}
                     </el-col>
-                    <div style="margin: 20px 0;"></div>
-                    <el-col>
-                        <el-button  @click="change(edoc1.id)" size="small">修改</el-button>
-                        <el-button  @click="remove(edoc1.id)" size="small">刪除</el-button>
+                    <el-col tyle="line-height: 20px">
+                        <el-button @click="change(edoc1.id)" size="small">修改</el-button>
+                        <el-button @click="remove(edoc1.id)" size="small">刪除</el-button>
                     </el-col>
                 </el-col>
             </el>
