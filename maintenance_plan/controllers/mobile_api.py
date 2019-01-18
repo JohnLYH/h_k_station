@@ -4,12 +4,14 @@
 import json
 import datetime as dt
 import os
+import base64
 from dateutil.relativedelta import relativedelta
 
 from odoo import http
 from odoo.http import request, Root, session_gc
 from addons.web.controllers.main import ensure_db
 
+# 前後端審批狀態映射
 STATUS_MAP = {
     'TODO': 'be_executed', 'EDITING': 'executing', 'PENDING': 'pending_approval', 'APPROVALED': 'closed'}
 
@@ -88,21 +90,29 @@ class Public(http.Controller):
             session_info = http.request.env['ir.http'].session_info()
             return to_json({'errcode': 1, 'data': {'token': session_info}, 'msg': '登錄成功'})
 
-    @http.route('/mtr/upload/img', type='http', auth='user')
+    @http.route('/mtr/upload/img', type='http', auth='none', csrf=False, cors='*')
     def upload_img(self, **kwargs):
         '''
         圖片上傳
-        :param kwargs:
+        :param kwargs: file或者base64為key，有file時傳的文件類型，base64時傳的文件的base64數據
         :return:
         '''
-        file_list = kwargs['file']
-        result = []
-        for up_file in file_list:
-            file_record = request.env['maintenance_plan.binary.file'].create({
-                'file': up_file.read()
-            })
-            result.append(file_record)
-        return to_json({'errcode': 0, 'msg': '', 'data': result})
+        if kwargs.get('file', None) is not None:
+            file = kwargs['file']
+            file_content = base64.b64encode(file.read())
+            filename = file.filename
+        else:
+            file = json.loads(kwargs['base64'])
+            file_content = file['data']
+            filename = file['name']
+        file_record = request.env['maintenance_plan.binary.file'].sudo().create({
+            'file': file_content,
+            'filename': filename
+        })
+        url = '/web/content?model={}&id={}&field={}&filename_field={}'.format(
+            'maintenance_plan.binary.file', file_record.id, 'file', 'filename'
+        )
+        return to_json({'errcode': 0, 'msg': '', 'data': {'url': url}})
 
 
 class WorkOrder(http.Controller):

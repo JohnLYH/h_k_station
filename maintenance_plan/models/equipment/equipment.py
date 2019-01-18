@@ -26,21 +26,21 @@ class Equipment(models.Model):
     serial_number = fields.Char('設備序列號', required=True)
     equipment_type_id = fields.Many2one('maintenance_plan.equipment.type', string='設備類型', required=True)
     equipment_model = fields.Many2one('maintenance_plan.equipment_model', '設備型號', required=True)
-    description = fields.Char('設備描述', required=True)
+    description = fields.Text('設備描述', required=True)
     status = fields.Selection(STATUS, required=True, default='Effective', string='狀態')
-    item_code = fields.Char('庫存編碼', required=True)
+    item_code = fields.Char('庫存編號', required=True)
     direction = fields.Char('方向')
     start_chainage = fields.Char('起始公里標')
-    end_chainage = fields.Char('終點公里標')
+    end_chainage = fields.Char('結束公里標')
     detailed_location = fields.Char('設備詳細位置')
-    last_installation_date = fields.Date('最近安裝時間')
+    last_installation_date = fields.Date('安裝時間')
     service_since = fields.Date('啟用時間')
-    expected_asset_life = fields.Integer('使用壽命')
-    warranty = fields.Integer('保修期')
+    expected_asset_life = fields.Date('預期壽命')
+    warranty = fields.Char('保修期')
     supplier = fields.Char('供應商')
-    oem_manufacturer = fields.Char('原始設備製造商')
+    oem_manufacturer = fields.Char('原始製造商')
     lead_maintainer = fields.Char('設備維護者')
-    qr_code = fields.Text('二維碼')
+    qr_code = fields.Text('二維碼', readonly=True)
 
     @staticmethod
     def generate_2_code(arr):
@@ -70,3 +70,4 @@ class Equipment(models.Model):
         equipment = super(Equipment, self).create(vals)
         equipment.qr_code = self.generate_2_code(equipment.id)
         return equipment
+
