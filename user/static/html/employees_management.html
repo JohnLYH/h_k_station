@@ -1,137 +1,143 @@
 <div id="employees_html">
     <el-row :gutter="10">
-            <el-form :inline="true"  class="demo-form-inline" style="margin:0px 5px" >
-                <el-form-item >
-                    <el-input v-model="input" size="small" placeholder="请输入内容姓名或者工号"></el-input>
-                </el-form-item>
-                <el-form-item>
-                    <span>狀態</span>
-                  <el-select v-model="value" placeholder="请选择" size="small">
+        <el-form :inline="true" class="demo-form-inline" style="margin:0px 5px">
+            <el-form-item>
+                <el-input v-model="input" size="small" placeholder="请输入内容姓名或者工号"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <span>狀態</span>
+                <el-select v-model="value" placeholder="请选择" size="small">
                     <el-option
 
-                      v-for="item in options"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value"
-					  size="small">
+                            v-for="item in options"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value"
+                            size="small">
                     </el-option>
-                  </el-select>
-              </el-form-item>
-              <el-form-item>
+                </el-select>
+            </el-form-item>
+            <el-form-item>
                 <el-button type="primary" size="small" @click="search">搜索</el-button>
-              </el-form-item>
-              <el-form-item>
+            </el-form-item>
+            <el-form-item>
                 <el-button type="primary" size="small" @click="reset"> 重置</el-button>
-              </el-form-item>
-                <el-form-item style="float:right">
+            </el-form-item>
+            <el-form-item style="float:right">
+                <el-button type="primary" size="small" @click="crete_new_record">新增</el-button>
+            </el-form-item>
+            <el-form-item style="float:right">
                 <el-button type="primary" size="small" @click="loaddown"> 導入</el-button>
-              </el-form-item>
-            </el-form>
-		<el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
-			<div class="grid-content bg-purple">
-				<el-card class="box-card">
-					<div slot="header" class="clearfix">
-					</div>
-					<div class="text item">
-						<el-tree
-								:data="departmentList"
-								node-key="id"
-								ref="tree"
-								highlight-current
-								:default-expanded-keys="[]"
-								:default-checked-keys="[]"
-								:props="defaultProps"
-								@node-click="click_node"
-						>
-						</el-tree>
-					</div>
-				</el-card>
-			</div>
-		</el-col>
-		<el-col :xs="24" :sm="24" :md="18" :lg="18" :xl="18">
-			<div class="grid-content bg-purple-light">
-				<el-card class="box-card">
-					<div slot="header" class="clearfix">
-					</div>
-					<!--<el-form :inline="true"  class="demo-form-inline">-->
-					<!--</el-form>-->
-					<div class="text item">
-						<template>
-						<el-table
-								size="mini"
-								border
-								tooltip-effect="dark"
-								:data="tableData"
-								style="width: 100%"
-								ref="multipleTable"
-								@selection-change="handleSelectionChange"
-								>
-							<el-table-column type="selection" width="55">
-    						</el-table-column>
-							<el-table-column
-									prop="name"
-									label="姓名">
-							</el-table-column>
-							<el-table-column
-									prop="login"
-									label="賬號">
-							</el-table-column>
-							<el-table-column
-									prop="post"
-									label="崗位">
-							</el-table-column>
-							<el-table-column
-									prop="role"
-									label="角色">
-							</el-table-column>
-							<el-table-column
-									prop="email"
-									label="郵箱">
-							</el-table-column>
-							<el-table-column
-									prop="state"
-									label="狀態">
-							</el-table-column>
+            </el-form-item>
+        </el-form>
+        <el-col :xs="24" :sm="24" :md="6" :lg="6" :xl="6">
+            <div class="grid-content bg-purple">
+                <el-card class="box-card">
+                    <div slot="header" class="clearfix">
+                    </div>
+                    <div class="text item">
+                        <el-tree
+                                :data="departmentList"
+                                node-key="id"
+                                ref="tree"
+                                highlight-current
+                                :default-expanded-keys="[]"
+                                :default-checked-keys="[]"
+                                :props="defaultProps"
+                                @node-click="click_node"
+                        >
+                        </el-tree>
+                    </div>
+                </el-card>
+            </div>
+        </el-col>
+        <el-col :xs="24" :sm="24" :md="18" :lg="18" :xl="18">
+            <div class="grid-content bg-purple-light">
+                <el-card class="box-card">
+                    <div slot="header" class="clearfix">
+                    </div>
+                    <!--<el-form :inline="true"  class="demo-form-inline">-->
+                    <!--</el-form>-->
+                    <div class="text item">
+                        <template>
+                            <el-table
+                                    size="mini"
+                                    border
+                                    tooltip-effect="dark"
+                                    :data="tableData"
+                                    style="width: 100%"
+                                    ref="multipleTable"
+                                    @selection-change="handleSelectionChange"
+                            >
+                                <el-table-column type="selection" width="55">
+                                </el-table-column>
+                                <el-table-column
+                                        prop="name"
+                                        label="姓名">
+                                </el-table-column>
+                                <el-table-column
+                                        prop="login"
+                                        label="賬號">
+                                </el-table-column>
+                                <el-table-column
+                                        prop="post"
+                                        label="崗位">
+                                </el-table-column>
+                                <el-table-column
+                                        prop="role"
+                                        label="角色">
+                                </el-table-column>
+                                <el-table-column
+                                        prop="email"
+                                        label="郵箱">
+                                </el-table-column>
+                                <el-table-column
+                                        prop="state"
+                                        label="狀態">
+                                </el-table-column>
 
-							  <el-table-column label="操作">
-							  <template slot-scope="scope">
-								<el-button
-								  type="text" size="mini"
-								  @click="handleEdit(scope.$index, scope.row)">編輯</el-button>
-                                  <el-button
-								  type="text" size="mini"
-								  @click="handleReset(scope.$index, scope.row)">重置密碼</el-button>
-                                  <el-button
-                                  v-if="scope.row.state==='正常'"
-								  type="text" size="mini"
-								  @click="handleDisable(scope.$index, scope.row)">禁用</el-button>
-                                  <el-button
-                                          v-if="scope.row.state==='禁用'"
-                                          type="text" size="mini"
-                                          @click="enable(scope.$index, scope.row)">啟用
-                                  </el-button>
-							  </template>
-							</el-table-column>
+                                <el-table-column label="操作">
+                                    <template slot-scope="scope">
+                                        <el-button
+                                                type="text" size="mini"
+                                                @click="handleEdit(scope.$index, scope.row)">編輯
+                                        </el-button>
+                                        <el-button
+                                                type="text" size="mini"
+                                                @click="handleReset(scope.$index, scope.row)">重置密碼
+                                        </el-button>
+                                        <el-button
+                                                v-if="scope.row.state==='正常'"
+                                                type="text" size="mini"
+                                                @click="handleDisable(scope.$index, scope.row)">禁用
+                                        </el-button>
+                                        <el-button
+                                                v-if="scope.row.state==='禁用'"
+                                                type="text" size="mini"
+                                                @click="enable(scope.$index, scope.row)">啟用
+                                        </el-button>
+                                    </template>
+                                </el-table-column>
 
-						</el-table>
+                            </el-table>
 
-						<div class=" block" style="margin:10px 0;">
-						</div>
-						</template>
-					</div>
+                            <div class=" block" style="margin:10px 0;">
+                            </div>
+                        </template>
+                    </div>
 
-				</el-card>
-                  <div class="block">
+                </el-card>
+                <div class="block">
                     <el-pagination
-                      @size-change="handleSizeChange"
-                      @current-change="handleCurrentChange"
-                      :current-page="currentPage4"
-                      :page-sizes='list_size'
-                      layout="total, sizes, prev, pager, next, jumper"
-                      :total='message'>
+                            @size-change="handleSizeChange"
+                            @current-change="handleCurrentChange"
+                            :current-page="currentPage4"
+                            :page-size="30"
+                            layout="total, prev, pager, next, jumper"
+                            :total='message'>
                     </el-pagination>
-                  </div>
-			</div>
-		</el-col>
-	</el-row>
+                </div>
+            </div>
+        </el-col>
+    </el-row>
 </div>

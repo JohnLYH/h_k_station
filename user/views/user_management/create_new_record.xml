@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<odoo>
+    <data>
+
+        <record id="create_new_ifo" model="ir.ui.view">
+            <field name="name">新增</field>
+            <field name="model">res.users</field>
+            <field name="arch" type="xml">
+                <form creata="0" edit="0" class="noOpen">
+                    <sheet>
+                        <group>
+                            <field name="name" string="姓名"></field>
+                            <field name="login" string="賬號"></field>
+                            <field name="post" string="崗位"></field>
+                            <field name="role" string="角色"></field>
+                            <field name="email" string="郵箱"></field>
+                        </group>
+                        <footer>
+                            <button name='create_new_send_email'
+                                    string='確認'
+                                    class='btn-primary'
+                                    type='object'/>
+                            <button string='取消'
+                                    class='btn-default'
+                                    special='cancel'/>
+                        </footer>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

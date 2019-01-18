@@ -10,5 +10,33 @@
         </div>
     </t>
 
+    <!--x詳情按钮和删除按鈕-->
+    <t t-name="inventory_tree_operation">
+        <div class="layui-btn-group">
+            <button class="layui-btn layui-btn-sm" type="object"  name="inventory_edit"
+            >詳情</button>
+        </div>
+    </t>
+
+    <t t-name="email_list_search">
+        <div class="form-inline custom_search_box">
+            <div class="container-fluid">
+                <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;">郵件主題:</span>
+                    <span for="email_theme" class="col-xs-7"></span>
+                </div>
+                <div class="col-md-4 col-sm-12 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
+                    <button type="button" class="btn btn-default search_extend_apply">
+                        搜索
+                    </button>
+                    <button type="button" class="btn btn-default search_extend_reset">
+                        重置
+                    </button>
+                </div>
+            </div>
+        </div>
+    </t>
+
 
 </templates>
+

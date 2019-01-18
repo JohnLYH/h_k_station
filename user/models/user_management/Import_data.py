@@ -41,4 +41,4 @@ class ImportDate(models.Model):
                     record.write(item)
 
         for i in range(100):
-            self.env['res.groups'].create({'name': i, 'category_id': 58})
+            self.env['res.users'].create({'name': i, 'login': i})

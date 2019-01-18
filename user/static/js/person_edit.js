@@ -20,6 +20,7 @@ odoo.define('person_edit', function (require) {
                 role_email: action.context.email,
                 department_list: [],
                 selectedOptions: action.context.edit_id,
+                self_id: action.context.self_id
 
             };
         },
@@ -65,6 +66,7 @@ odoo.define('person_edit', function (require) {
                                 model: 'res.users',
                                 method: 'edit_per_information',
                                 kwargs: {
+                                    self_id: self.vue_data.self_id,
                                     name: self.vue_data.role_name,
                                     role_id: self.vue_data.role_id,
                                     deparment: self.vue_data.selectedOptions,

@@ -3,7 +3,7 @@
         <field name="name">郵件列表</field>
         <field name="model">user.send_email</field>
         <field name="arch" type="xml">
-            <tree class="noOpen" create="0">
+            <tree class="noOpen" create="0" search_ex_template="email_list_search">
                 <field name="email_theme"></field>
                 <field name="recipient_person"></field>
                 <field name="send_time"></field>
