@@ -8,7 +8,6 @@ odoo.define('person_edit', function (require) {
     var person_edit = Widget.extend({
         dom_id: 'person_edit' + construct_id++,
         init: function (parent, action) {
-            alert(action.context.node);
             var self = this;
             this._super.apply(this, arguments);
             this.vue_data = {

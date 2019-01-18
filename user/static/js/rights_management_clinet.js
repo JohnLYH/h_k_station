@@ -34,8 +34,8 @@ odoo.define('rights_management', function (require) {
                     {value: 'disable', label: '禁用'},
                     {value: 'all', label: '全部'}
                 ],
-                size_: 10,
-                list_size: [10, 20, 30, 40],
+                size_: 30,
+                // list_size: [10, 20, 30, 40],
                 view_id: '',
                 state: '',
             };
@@ -51,6 +51,7 @@ odoo.define('rights_management', function (require) {
             }).then(function (data) {
                 self.vue_data.tableData = data.record;
                 self.vue_data.view_id = data.view_id;
+                self.vue_data.message = data.cont_data;
             });
 
             var count_info = self._rpc({
@@ -102,6 +103,23 @@ odoo.define('rights_management', function (require) {
 
                         },
 
+                        current_page_data: function () {
+                            self._rpc({
+                                model: 'res.groups',
+                                method: 'current_page_data',
+                                kwargs: {
+                                    'record': page,
+                                    'page': self.vue_data.tableData.length,
+                                    'name': self.vue_data.input,
+                                    'chose': self.vue_data.value,
+                                    'message': self.vue_data.message,
+                                }
+                            }).then(function (get_data) {
+                                self.vue_data.tableData = get_data;
+                            });
+
+                        },
+
                         handleSelectionChange: function (data) {
                         },
 
@@ -118,17 +136,24 @@ odoo.define('rights_management', function (require) {
                         },
 
                         handleCurrentChange: function (page) {
+                            self.vue_data.currentPage4 = page;
                             self._rpc({
                                 model: 'res.users',
                                 method: 'current_change',
-                                kwargs: {'record': page, 'page': self.vue_data.tableData.length}
+                                kwargs: {
+                                    'record': page,
+                                    'page': self.vue_data.tableData.length,
+                                    'name': self.vue_data.input,
+                                    'chose': self.vue_data.value,
+                                    'message': self.vue_data.message,
+                                }
                             }).then(function (get_data) {
                                 self.vue_data.tableData = get_data;
                             });
                         },
 
                         handleEdit: function (index, row) {
-                            var this_vue = this
+                            var self_act = this;
                             self.do_action({
                                 name: '權限管理編輯',
                                 type: 'ir.actions.client',
@@ -142,13 +167,12 @@ odoo.define('rights_management', function (require) {
                                 },
                             }, {
                                 on_close: function () {
-                                    this_vue.date_return_act(this_vue)
+                                    self_act.handleCurrentChange(self.vue_data.currentPage4)
                                 }
                             });
                         },
 
                         handleReset: function (data) {
-                            alert('handleReset')
                         },
 
                         handleDisable: function (index, row) {
@@ -191,7 +215,8 @@ odoo.define('rights_management', function (require) {
                                 method: 'permissions_search',
                                 kwargs: {'name': self.vue_data.input, 'chose': self.vue_data.value}
                             }).then(function (get_data) {
-                                self.vue_data.tableData = get_data
+                                self.vue_data.tableData = get_data.record
+                                self.vue_data.message = get_data.count
                             });
                         },
 

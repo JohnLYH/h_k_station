@@ -54,8 +54,18 @@ class EmployeesGet(models.Model):
 
     @api.model
     def current_change(self, **kw):
-        users = self.env['res.users'].search_read([])
-        return users[(kw['record'] - 1) * kw['page']: kw['record'] * kw['page']]
+        config_dict = self.env['res.groups'].get_config_info()
+        category_id = self.env.ref('{}.{}'.format(config_dict['module_name'], config_dict['custom_group_id']))
+        category_id.ensure_one()
+
+        users = self.env['res.groups'].search_read([('category_id', '=', category_id.id)],
+                                                   limit=kw.get('record') * 30)[-30:]
+        page_count = kw.get('message') // 30
+        remainder = kw.get('message') % 30  # 余数来判断最后一页的数据
+        if kw.get('record') == page_count + 1:
+            users = self.env['res.groups'].search_read([('category_id', '=', category_id.id)],
+                                                       limit=kw.get('record') * 30)[-remainder:]
+        return users
 
     @api.model
     def get_department_users(self):
@@ -209,5 +219,3 @@ class EmployeesGet(models.Model):
     @api.model
     def enable_button_act(self, **kwargs):
         self.browse(kwargs.get('self_id')).write({'state': '正常'})
-
-
