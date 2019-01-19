@@ -6,13 +6,13 @@ import random
 import time
 from datetime import datetime as dt
 import os
-import openpyxl
-from openpyxl.styles import PatternFill
-from openpyxl.writer.excel import save_virtual_workbook
-
 
 from odoo import http
 from odoo.http import request
+
+import openpyxl
+from openpyxl.styles import PatternFill
+from openpyxl.writer.excel import save_virtual_workbook
 
 ROW_1_LIST = ['Work Order No', 'Work Nature Level 1', 'Work Nature Level 2', 'Equipment No',
               'Equipment Description', 'Equipment Class', 'Equipment Class Description', 'Work Group',
@@ -202,7 +202,7 @@ class MaintenancePlan(http.Controller):
             }
             equipment_model.write({'reference_materials_manage_records': [(0, 0, values)]})
         except:
-            return json.dumps({'error': 1,'message': '上傳失敗'})
+            return json.dumps({'error': 1, 'message': '上傳失敗'})
         return json.dumps({'error': 0})
 
     @http.route('/maintenance_plan/materials_change', auth='user', csrf=False, methods=['POST'])

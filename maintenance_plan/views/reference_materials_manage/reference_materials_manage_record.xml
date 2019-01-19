@@ -5,7 +5,7 @@
             <field name="name">變更記錄</field>
             <field name="model">maintenance_plan.reference_materials_manage_record</field>
             <field name="arch" type="xml">
-                <tree edit="0" create="0" delete="0" class="noOpen">
+                <tree edit="0" create="0" delete="0" class="noOpen" js_class="manage_record_tree">
                     <field name="field_type"/>
                     <field name="numbering"/>
                     <field name="edition"/>

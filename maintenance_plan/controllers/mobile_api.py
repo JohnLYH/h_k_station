@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 # Author: Artorias
 import json
-import datetime as dt
 import os
 import base64
+from PIL import Image, ImageDraw, ImageFont
+import datetime as dt
 from dateutil.relativedelta import relativedelta
 
 from odoo import http
@@ -16,6 +17,42 @@ STATUS_MAP = {
     'TODO': 'be_executed', 'EDITING': 'executing', 'PENDING': 'pending_approval', 'APPROVALED': 'closed'}
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+
+
+def add_text_to_image(image, left_text, center_text, rigth_text):
+    '''
+    圖片添加水印，思路是連原圖總共分為3層圖片，第二層與原圖尺寸相同，將水印圖片塊粘貼到第二層后，再將第一層、第二層復合為一個新的image
+    :param image: Image.open()的文件內容
+    :param left_text: 左下文字
+    :param center_text: 中下文字
+    :param rigth_text: 右下文字
+    :return: 帶水印的image
+    '''
+    white_font = (255, 255, 255, 180)
+    black_bg = (0, 0, 0, 30)
+    font = ImageFont.truetype(os.path.join(BASE_DIR, 'static/font/STHeiti-Light.ttc'), size=44, index=0)
+    # 將原圖轉換為rgba模式
+    rgba_image = image.convert('RGBA')
+    # 創建水印層
+    text_overlay = Image.new('RGBA', (rgba_image.size[0], 50), black_bg)
+    # 創建復合背景層
+    layer = Image.new('RGBA', rgba_image.size, (255, 255, 255, 0))
+    # 水印層添加文字
+    image_draw = ImageDraw.Draw(text_overlay)
+    # 设置文本文字位置
+    text_size_x, text_size_y = image_draw.textsize(rigth_text, font=font)
+    text_xy_left = (0, (text_overlay.size[1] - text_size_y) / 2)  # 底部左
+    text_xy_center = ((text_overlay.size[0] - text_size_x) / 2, (text_overlay.size[1] - text_size_y) / 2)  # 底部中
+    text_xy_right = (text_overlay.size[0] - text_size_x, (text_overlay.size[1] - text_size_y) / 2)  # 底部右
+    # 设置文本颜色和透明度
+    image_draw.text(text_xy_left, left_text, font=font, fill=white_font)
+    image_draw.text(text_xy_center, center_text, font=font, fill=white_font)
+    image_draw.text(text_xy_right, rigth_text, font=font, fill=white_font)
+    # 粘貼水印層到復合背景層
+    layer.paste(text_overlay, (0, layer.size[1] - text_overlay.size[1]))
+    # 復合圖片
+    image_with_text = Image.alpha_composite(rgba_image, layer)
+    return image_with_text
 
 
 def e_login_setup_session(self, httprequest):
@@ -99,8 +136,13 @@ class Public(http.Controller):
         '''
         if kwargs.get('file', None) is not None:
             file = kwargs['file']
-            file_content = base64.b64encode(file.read())
             filename = file.filename
+            now_date = dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d')
+            now_time = dt.datetime.strftime(dt.datetime.now(), '%H:%M:%S')
+            name = request.env.user.name or ''
+            # 添加水印
+            image = add_text_to_image(Image.open(file), now_date, now_time, name)
+            file_content = base64.b64encode(image.tobytes())
         else:
             file = json.loads(kwargs['base64'])
             file_content = file['data']
