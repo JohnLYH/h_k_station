@@ -202,7 +202,7 @@ class MaintenancePlan(http.Controller):
             }
             equipment_model.write({'reference_materials_manage_records': [(0, 0, values)]})
         except:
-            return json.dumps({'error': 1,'message': '上傳失敗'})
+            return json.dumps({'error': 1, 'message': '上傳失敗'})
         return json.dumps({'error': 0})
 
     @http.route('/maintenance_plan/materials_change', auth='user', csrf=False, methods=['POST'])
