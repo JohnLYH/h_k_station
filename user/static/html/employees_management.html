@@ -36,17 +36,33 @@
                     <div slot="header" class="clearfix">
                     </div>
                     <div class="text item">
-                        <el-tree
-                                :data="departmentList"
-                                node-key="id"
-                                ref="tree"
-                                highlight-current
-                                :default-expanded-keys="[]"
-                                :default-checked-keys="[]"
-                                :props="defaultProps"
-                                @node-click="click_node"
-                        >
-                        </el-tree>
+                        <div class="block">
+                            <p>使用 scoped slot</p>
+                            <el-tree
+                                    :data="data5"
+                                    show-checkbox
+                                    node-key="id"
+                                    default-expand-all
+                                    :expand-on-click-node="false">
+                                      <span class="custom-tree-node" slot-scope="{ node, data }">
+                                        <span>{{ node.label }}</span>
+                                        <span>
+                                          <el-button
+                                                  type="text"
+                                                  size="mini"
+                                                  @click="() => append(data)">
+                                            添加
+                                          </el-button>
+                                          <el-button
+                                                  type="text"
+                                                  size="mini"
+                                                  @click="() => remove(node, data)">
+                                            刪除
+                                          </el-button>
+                                        </span>
+                                      </span>
+                            </el-tree>
+                        </div>
                     </div>
                 </el-card>
             </div>
@@ -140,4 +156,16 @@
             </div>
         </el-col>
     </el-row>
+    <el-dialog
+                title="提示"
+                :visible.sync="tree_input"
+                width="30%"
+                append-to-body
+                >
+            <el-input v-model="tree_date" placeholder="请输入内容"></el-input>
+            <span slot="footer" class="dialog-footer">
+        <el-button @click="cancel_tree">取 消</el-button>
+        <el-button type="primary" @click="sure_tree">确 定</el-button>
+      </span>
+    </el-dialog>
 </div>

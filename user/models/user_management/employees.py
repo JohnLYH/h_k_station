@@ -279,3 +279,14 @@ class EmployeesGet(models.Model):
         self.env['user.send_email'].create(
             {'email_theme': subject, 'recipient_person': self.name,
              'send_time': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')})
+
+    # 添加tree数据
+    @api.model
+    def add_tree_button(self, **kwargs):
+        print(kwargs)
+
+
+    # 删除tree数据
+    @api.model
+    def delete_tree_button(self,**kwargs):
+        print(kwargs)

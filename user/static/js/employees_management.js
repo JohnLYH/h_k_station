@@ -38,6 +38,10 @@ odoo.define('employees_management_action', function (require) {
                 node_record: '',
                 edit_department_id: '',
                 act_id: '',
+                data5: '',
+                tree_input: false,
+                tree_date: '',
+                tree_data5: '',
             };
         },
 
@@ -50,7 +54,7 @@ odoo.define('employees_management_action', function (require) {
                 method: 'get_department_users',
             }).then(function (data) {
                 console.log('777', data)
-                self.vue_data.departmentList = data.department_tree
+                self.vue_data.data5 = data.department_tree
                 self.vue_data.act_id = data.act_id
             })
         },
@@ -223,6 +227,53 @@ odoo.define('employees_management_action', function (require) {
                                     this_vue.handleCurrentChange(self.vue_data.currentPage4)
                                 }
                             });
+                        },
+
+                        append(data) {
+                            self.vue_data.tree_data5 = data.id;
+                            var data_chose = this;
+                            $.when(self.vue_data.tree_input = true,
+                                data_chose.before_data(data_chose)
+                            )
+                            var id = 5;
+                            const newChild = {id: id++, label: self.vue_data.tree_date, children: []};
+                            if (!data.children) {
+                                this.$set(data, 'children', []);
+                            }
+                            data.children.push(newChild);
+                        },
+
+                        remove(node, data) {
+                            self._rpc({
+                                model: 'res.users',
+                                method: 'delete_tree_button',
+                                kwargs: {value:data.id}
+                            })
+                            const parent = node.parent;
+                            const children = parent.data.children || parent.data;
+                            const index = children.findIndex(d => d.id === data.id);
+                            children.splice(index, 1);
+                        },
+
+                        sure_tree: function () {
+                            self._rpc({
+                                model: 'res.users',
+                                method: 'add_tree_button',
+                                kwargs: {value: self.vue_data.tree_data5}
+                            }).then(function (get_data) {
+                                alert('123')
+                            });
+                            $.when(this.tree_input = false)
+
+                        },
+
+                        before_data: function () {
+                            self.vue_data.data5
+                        },
+
+                        cancel_tree: function () {
+                            alert('123')
+                            this.tree_input = false
                         }
                     },
 
