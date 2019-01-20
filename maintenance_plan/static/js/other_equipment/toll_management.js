@@ -31,7 +31,7 @@ odoo.define('tool_management', function (require) {
             if ($(event.target).hasClass('tool_detail')) {
                 self.do_action({
                     type: 'ir.actions.act_window',
-                    res_model: 'other_equipment.other_equipment',
+                    res_model: 'maintenance_plan.other_equipment',
                     res_id: self.id,
                     views: [[false, "form"]],
                 })
@@ -94,7 +94,7 @@ odoo.define('tool_management_inspection', function (require) {
                 model: 'vue_template_manager.template_manage',
                 method: 'get_template_content',
                 kwargs: {
-                    module_name: 'other_equipment',
+                    module_name: 'maintenance_plan',
                     template_name: 'tool_management_inspection'
                 }
             }).then(function (el) {
@@ -112,7 +112,7 @@ odoo.define('tool_management_inspection', function (require) {
                         get_tool_information: function () {
                             var this_vue = this;
                             var get_info = self._rpc({
-                                model: 'other_equipment.other_equipment',
+                                model: 'maintenance_plan.other_equipment',
                                 method: 'search_read',
                                 domain: [['id', '=', this_vue.id]] || None,
                             });
@@ -120,7 +120,13 @@ odoo.define('tool_management_inspection', function (require) {
                                 this_vue.equipment_name = tool_info[0].equipment_name;
                                 this_vue.equipment_num = tool_info[0].equipment_num;
                                 this_vue.model = tool_info[0].model;
+                                if (this_vue.model === false) {
+                                    this_vue.model = '無'
+                                }
                                 this_vue.freq_of_cal = tool_info[0].freq_of_cal;
+                                if (this_vue.freq_of_cal === false) {
+                                    this_vue.freq_of_cal = '無'
+                                }
                                 this_vue.last_maintenance_date = tool_info[0].last_maintenance_date;
                                 this_vue.maintenance_due_data = tool_info[0].maintenance_due_data;
 
@@ -128,20 +134,32 @@ odoo.define('tool_management_inspection', function (require) {
                         },
                         save: function () {
                             var this_vue = this;
+                            if (!this_vue.last_maintenance_date) {
+                                self.vue.$message({
+                                    message: '檢驗日期未填寫',
+                                    type: 'warning'
+                                });
+                                return
+                            }
+                            if (!this_vue.maintenance_due_data) {
+                                self.vue.$message({
+                                    message: '有效期未填寫',
+                                    type: 'warning'
+                                });
+                                return
+                            }
                             this_vue.$confirm('是否確認保存校驗信息？', '提示', {
                                 confirmButtonText: '确定',
                                 cancelButtonText: '取消',
                                 type: 'warning'
                             }).then(() => {
                                 self._rpc({
-                                    model: 'other_equipment.other_equipment',
+                                    model: 'maintenance_plan.other_equipment',
                                     method: 'save_tool_management_inspection',
                                     kwargs: {
                                         'id': this_vue.id,
                                         'equipment_name': this_vue.equipment_name,
                                         'equipment_num': this_vue.equipment_num,
-                                        'model': this_vue.model,
-                                        'freq_of_cal': this_vue.freq_of_cal,
                                         'last_maintenance_date': this_vue.last_maintenance_date,
                                         'maintenance_due_data': this_vue.maintenance_due_data,
                                         'remark': this_vue.remark
@@ -163,9 +181,11 @@ odoo.define('tool_management_inspection', function (require) {
                         },
                         reverse_maintenance_due_data: function () {
                             var this_vue = this;
-                            console.log(moment(this_vue.last_maintenance_date).format('l'));
                             var freq_of_cal = this_vue.freq_of_cal;
                             if (freq_of_cal === 'ON CONDITION') {
+                                return
+                            }
+                            if (freq_of_cal === '無') {
                                 return
                             } else {
                                 // l是 YYYY-MM-DD格式
@@ -211,7 +231,7 @@ odoo.define('tool_management_scrap', function (require) {
                 model: 'vue_template_manager.template_manage',
                 method: 'get_template_content',
                 kwargs: {
-                    module_name: 'other_equipment',
+                    module_name: 'maintenance_plan',
                     template_name: 'tool_management_scrap'
                 }
             }).then(function (el) {
@@ -229,7 +249,7 @@ odoo.define('tool_management_scrap', function (require) {
                         get_tool_information: function () {
                             var this_vue = this;
                             var get_info = self._rpc({
-                                model: 'other_equipment.other_equipment',
+                                model: 'maintenance_plan.other_equipment',
                                 method: 'search_read',
                                 domain: [['id', '=', this_vue.id]] || None,
                             });
@@ -238,6 +258,12 @@ odoo.define('tool_management_scrap', function (require) {
                                 this_vue.equipment_num = tool_info[0].equipment_num;
                                 this_vue.model = tool_info[0].model;
                                 this_vue.brand = tool_info[0].brand;
+                                if (this_vue.model === false) {
+                                    this_vue.model = '無'
+                                }
+                                if (this_vue.brand === false) {
+                                    this_vue.brand = '無'
+                                }
                             });
                         },
                         save: function () {
@@ -248,7 +274,7 @@ odoo.define('tool_management_scrap', function (require) {
                                 type: 'warning'
                             }).then(() => {
                                 self._rpc({
-                                    model: 'other_equipment.other_equipment',
+                                    model: 'maintenance_plan.other_equipment',
                                     method: 'save_tool_management_scrap',
                                     kwargs: {
                                         'id': this_vue.id,
@@ -261,9 +287,6 @@ odoo.define('tool_management_scrap', function (require) {
                                 }).then(function (e) {
                                     if (e) {
                                         self.do_action(false);
-                                        // self.getParent().destroy();
-                                        // window.location.reload();
-                                        // return this.parent.load(['invitations']);
                                     } else {
                                         self.vue.$message({
                                             message: '未找到這條記錄',

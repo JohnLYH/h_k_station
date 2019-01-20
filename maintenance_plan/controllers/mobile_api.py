@@ -295,3 +295,20 @@ class WorkOrder(http.Controller):
             'content': params['submitDataBODY']
         })
         return to_json({'errcode': 0, 'data': '', 'msg': '保存成功'})
+
+    @http.route('/mtr/wo/start', type='json', auth='user')
+    def auto_save_form(self, **kwargs):
+        '''
+        對向波口測試自動保存
+        :param kwargs:
+        :return:
+        '''
+        params = request.jsonrequest
+        order_record = request.env['maintenance_plan.maintenance.plan'].browse(params['id'])
+        userid = int(params['userid'])
+        # 获取执行班组
+        action_dep_id = order_record.action_dep_id
+        # 判断这个人是否是这个班组的
+        if request.env['maintenance_plan.maintenance.plan'].search_count([('users', 'in', userid)]) > 0:
+            return to_json({'errcode': 0, 'data': '', 'msg': '保存成功'})
+        return to_json({'errcode': 1, 'data': '', 'msg': '保存失敗,此組沒有這個人'})

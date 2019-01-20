@@ -99,8 +99,14 @@ odoo.define("tool_search", function (require) {
                     domains.push([domain])
                 }
             });
+            // his._rpc({
+            //     route: '/other_equipment/get_in_excel',
+            //     params: {
+            //         domains: domains
+            //     }
+            // })
             this._rpc({
-                model: 'other_equipment.other_equipment',
+                model: 'maintenance_plan.other_equipment',
                 method: 'get_in_excel',
                 kwargs: {domains: domains},
             })
@@ -137,7 +143,7 @@ odoo.define("tool_search", function (require) {
                     if (fileName != "xlsx") {
                         self.vue.$notify({
                             title: '錯誤',
-                            message: '请选择xls格式文件上传！',
+                            message: '请选择xlsx格式文件上传！',
                             type: 'error'
                         });
                         $(this).val("");
@@ -155,7 +161,7 @@ odoo.define("tool_search", function (require) {
             var self = this;
             self.do_action({
                 type: 'ir.actions.act_window',
-                res_model: 'other_equipment.other_equipment',
+                res_model: 'maintenance_plan.other_equipment',
                 views: [[false, "form"]],
             })
         }

@@ -9,3 +9,4 @@ from . import inventory_management
 from . import reference_materials_manage
 from . import binary_file
 from . import order
+from . import other_equiment
