@@ -137,8 +137,9 @@ class Public(http.Controller):
         if kwargs.get('file', None) is not None:
             file = kwargs['file']
             filename = file.filename
-            now_date = dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d')
-            now_time = dt.datetime.strftime(dt.datetime.now(), '%H:%M:%S')
+            now_datetime = dt.datetime.now() + relativedelta(hours=8)
+            now_date = dt.datetime.strftime(now_datetime, '%Y-%m-%d')
+            now_time = dt.datetime.strftime(now_datetime, '%H:%M:%S')
             name = request.env.user.name or ''
             # 添加水印
             image = add_text_to_image(Image.open(file), now_date, now_time, name)
