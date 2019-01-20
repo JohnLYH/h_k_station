@@ -22,6 +22,7 @@
                 <script type="text/javascript" src="/maintenance_plan/static/js/other_equipment/search.js"/>
                 <script type="text/javascript" src="/maintenance_plan/static/js/other_equipment/toll_management.js"/>
                 <script type="text/javascript" src="/maintenance_plan/static/js/other_equipment/freq_of_cal.js"/>
+                <script type="text/javascript" src="/maintenance_plan/static/js/reference_materials_manage/manage_record_tree.js"/>
                 <script type="text/javascript" src="/maintenance_plan/static/js/equipment/equipment_tree_domain.js"/>
                 <script type="text/javascript" src="/maintenance_plan/static/js/equipment/qr_code_to_image.js"/>
                 <script type="text/javascript" src="/maintenance_plan/static/js/equipment/equipment_tree_button.js"/>
