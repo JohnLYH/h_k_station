@@ -19,6 +19,8 @@ odoo.define('materials_detail_btn', function (require) {
                     m_tube: [],
                     fault_finding: [],
                     edoc: [],
+                    url: '',
+                    upload_tpye: '',
                 };
             },
             start: function () {
@@ -76,6 +78,8 @@ odoo.define('materials_detail_btn', function (require) {
                                     self_vue.m_tube = data.m_tube;
                                     self_vue.fault_finding = data.fault_finding;
                                     self_vue.edoc = data.edoc;
+                                    self_vue.url = data.url;
+                                    self_vue.upload_tpye = data.upload_tpye;
                                 })
                             },
                             come_to_detail: function () {
@@ -88,9 +92,6 @@ odoo.define('materials_detail_btn', function (require) {
                                     views: [[false, 'list']],
                                     target: 'current',
                                     domain: [['reference_materials_manage_id', '=', this_detail.id]],
-                                    context: {description: this_detail.description, equipment_model: this_detail.equipment_model}
-                                }, {
-                                    replace_last_action: true
                                 });
                                 // TODO: 刷新了之後顯示不出來
                             },
@@ -123,7 +124,10 @@ odoo.define('materials_detail_btn', function (require) {
                                     },
                                     size: 'medium',
                                 })
-                            }
+                            },
+                            // go_to_pdf: function(id) {
+                            //     alert(id)
+                            // }
                         }
                     })
                 })

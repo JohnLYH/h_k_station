@@ -5,3 +5,5 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 "access_maintenance_plan_equipment_type","maintenance_plan_equipment_type","model_maintenance_plan_equipment_type",,1,1,1,1
 "access_maintenance_plan_equipment_model","maintenance_plan_equipment_model","model_maintenance_plan_equipment_model",,1,1,1,1
 "access_maintenance_plan_reference_materials_manage","maintenance_plan_reference_materials_manage","model_maintenance_plan_reference_materials_manage",,1,1,1,1
+access_maintenance_plan_other_equipment,maintenance_plan.other_equipment,model_maintenance_plan_other_equipment,,1,1,1,1
+access_maintenance_plan_other_equipment_records,maintenance_plan.other_equipment_records,model_maintenance_plan_other_equipment_records,,1,1,1,1

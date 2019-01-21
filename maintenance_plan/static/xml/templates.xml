@@ -69,4 +69,55 @@
             <button class="btn btn-primary btn-sm">打印</button>
         </div>
     </t>
+
+    <!-- 工器具管理按鈕 -->
+    <t t-name="tem_tool_management_tree_button">
+        <div style="text-align: center">
+            <a t-attf-record-id="#{widget.id}" class="tool_detail" href="javascript: void 0">詳情</a>
+            <a t-attf-record-id="#{widget.id}" class="tool_inspection" href="javascript: void 0">檢驗</a>
+            <a t-attf-record-id="#{widget.id}" class="tool_scrap" href="javascript: void 0">報廢</a>
+        </div>
+    </t>
+
+    <t t-name="freq_of_cal_radio_btn">
+        <t t-if="widget.mode === 'readonly'">
+            <span class="o_field_char o_field_widget" name="model">
+                <t t-esc="widget.value"/>
+            </span>
+        </t>
+        <t t-else="">
+            <t t-if="widget.value == 'ON CONDITION'">
+                <label>
+                    <input name="freq_of_cal" type="radio" value=""/>
+                    <input type="text" id="freq_of_cal_id" />個月
+                </label>
+
+                <label>
+                    <input name="freq_of_cal" type="radio" checked="checked" value="ON\nCONDITION"/>ON CONDITION
+                </label>
+            </t>
+
+            <t t-if="widget.value == false">
+                <label>
+                    <input name="freq_of_cal" type="radio" value=""/>
+                    <input type="text" id="freq_of_cal_id" />個月
+                </label>
+
+                <label>
+                    <input name="freq_of_cal" type="radio" value="ON\nCONDITION"/>ON CONDITION
+                </label>
+            </t>
+
+            <t t-else="">
+                <label>
+                    <input name="freq_of_cal" checked="checked" type="radio" value=""/>
+                    <input type="text" id="freq_of_cal_id" t-attf-value="#{widget.value}"/>個月
+                </label>
+
+                <label>
+                    <input name="freq_of_cal" type="radio" value="ON\nCONDITION"/>ON CONDITION
+                </label>
+            </t>
+        </t>
+    </t>
 </template>

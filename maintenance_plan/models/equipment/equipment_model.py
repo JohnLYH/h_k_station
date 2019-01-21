@@ -83,11 +83,14 @@ class EquipmentModel(models.Model):
         edition = manage_id.edition
         numbering = manage_id.numbering
         id = manage_id.id
-        # select_file = manage_id.select_file
+        url = manage_id.url
+        upload_tpye = manage_id.upload_tpye
         return {'select_file_name': select_file_name,
                 'edition': edition,
                 'numbering': numbering,
                 'id': id,
+                'url': url,
+                'upload_tpye':upload_tpye,
                 }
 
     @api.model
