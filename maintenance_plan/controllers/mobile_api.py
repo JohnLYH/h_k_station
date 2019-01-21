@@ -1,9 +1,12 @@
 # !user/bin/env python3
 # -*- coding: utf-8 -*-
 # Author: Artorias
+import datetime
 import json
 import os
 import base64
+import time
+
 from PIL import Image, ImageDraw, ImageFont
 import datetime as dt
 from dateutil.relativedelta import relativedelta
@@ -217,7 +220,10 @@ class WorkOrder(http.Controller):
             result.append(dict(
                 no=record.num, status=output_status_map[record.status], equipmentNo=record.equipment_num,
                 executionTime=record.action_time, group=record.action_dep_id.name,
-                executor=record.executor_id.name or '', standardJob=record.standard_job_id.name, id=record.id
+                executor=record.executor_id.name or '', standardJob=record.standard_job_id.name, id=record.id,
+                deadline=record.plan_end_time, planedTime=record.display_action_time,
+                completionTime=record.actual_start_time, overdue=True if time.strptime(
+                    record.actual_end_time, '%Y-%m-%d %H:%M:S') > datetime.datetime.now() else False
             ))
         return to_json({'errcode': 0, 'data': {'list': result}, 'msg': ''})
 
@@ -332,3 +338,20 @@ class WorkOrder(http.Controller):
             'content': params['submitDataBODY']
         })
         return to_json({'errcode': 0, 'data': '', 'msg': '保存成功'})
+
+    @http.route('/mtr/wo/start', type='json', auth='user')
+    def auto_save_form(self, **kwargs):
+        '''
+        對向波口測試自動保存
+        :param kwargs:
+        :return:
+        '''
+        params = request.jsonrequest
+        order_record = request.env['maintenance_plan.maintenance.plan'].browse(params['id'])
+        userid = int(params['userid'])
+        # 获取执行班组
+        action_dep_id = order_record.action_dep_id
+        # 判断这个人是否是这个班组的
+        if request.env['maintenance_plan.maintenance.plan'].search_count([('users', 'in', userid)]) > 0:
+            return to_json({'errcode': 0, 'data': '', 'msg': '保存成功'})
+        return to_json({'errcode': 1, 'data': '', 'msg': '保存失敗,此組沒有這個人'})

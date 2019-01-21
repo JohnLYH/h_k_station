@@ -34,7 +34,8 @@ odoo.define('materials_change_btn', function (require) {
                 reasons_details: '',
                 fileList: [],
                 files: '',
-                file_name: ''
+                file_name: '',
+                upload_tpye: '',
             };
         },
         start: function () {
@@ -71,6 +72,7 @@ odoo.define('materials_change_btn', function (require) {
                                 this_vue.edition = data.edition;
                                 this_vue.file_name = data.file_name;
                                 this_vue.field_type = data.field_type;
+                                this_vue.upload_tpye = data.upload_tpye;
                             })
                         },
                         save: function () {
@@ -130,8 +132,7 @@ odoo.define('materials_change_btn', function (require) {
                                     type: 'error'
                                 });
                                 return
-                            }
-                            else {
+                            } else {
                                 self_vue.$confirm('確認上傳文件后將提交審核，是否繼續？', '提示', {
                                     confirmButtonText: '确定',
                                     cancelButtonText: '取消',
@@ -146,6 +147,7 @@ odoo.define('materials_change_btn', function (require) {
                                     formData.append('reasons_details', self_vue.reasons_details);
                                     formData.append('id', self_vue.id);
                                     formData.append('res_id', self_vue.res_id);
+                                    formData.append('upload_tpye', self_vue.upload_tpye);
                                     $.ajax({
                                         url: '/maintenance_plan/materials_change',
                                         type: 'POST',
@@ -175,15 +177,70 @@ odoo.define('materials_change_btn', function (require) {
                             }
                         },
                         handleChange: function (file, fileList) {
-                            this.files = file;
+                            var self_vue = this;
+                            self_vue.files = file;
+                            var file_type = self_vue.files.raw.type;
+                            if (file_type === 'video/mp4' || file_type === 'application/pdf') {
+                                if (file_type === 'application/pdf') {
+                                    if (self_vue.files.raw.size > 1024 * 1024 * 100) {
+                                        self_vue.$notify({
+                                            title: '錯誤',
+                                            message: 'pdf大小不能超过100M,请重新上传',
+                                            type: 'error'
+                                        });
+                                        self_vue.files = '';
+                                        self_vue.$refs['upload'].clearFiles();
+                                        return
+                                    }
+                                    self_vue.upload_tpye = 'pdf'
+                                } else {
+                                    self_vue.upload_tpye = 'mp4'
+                                    // var url = URL.createObjectURL(self_vue.files.raw);
+                                    // var audioElement = new Audio(url);
+                                    // var duration;
+                                    // var ratio;
+                                    // audioElement.addEventListener("loadedmetadata", function (_event) {
+                                    //     // 播放时长
+                                    //     duration = audioElement.duration;
+                                    //     ratio = audioElement.ratio;
+                                    //     if (duration > 900) {
+                                    //         self_vue.$notify({
+                                    //             title: '錯誤',
+                                    //             message: '視頻時長應該小於15分鐘',
+                                    //             type: 'error'
+                                    //         });
+                                    //         self_vue.files = '';
+                                    //         self_vue.$refs['upload'].clearFiles();
+                                    //         return
+                                    //     }
+                                    // });
+                                }
+                            } else {
+                                self_vue.$notify({
+                                    title: '錯誤',
+                                    message: '只能上传MP4格式的视频或者pdf',
+                                    type: 'error'
+                                });
+                                self_vue.files = '';
+                                self_vue.$refs['upload'].clearFiles();
+                                return
+                            }
                         },
                         beforeAvatarUpload: function (file) {
                         },
                         cancel: function () {
                             self.getParent().destroy()
                         },
-                        before_remove: function(file, fileList){
+                        before_remove: function (file, fileList) {
                             this.files = ''
+                        },
+                        on_exceed: function (file, fileList) {
+                            var self_vue = this;
+                            self_vue.$notify({
+                                title: '錯誤',
+                                message: '請先刪除已上傳了的，再點擊替換',
+                                type: 'error'
+                            });
                         },
                     }
                 })

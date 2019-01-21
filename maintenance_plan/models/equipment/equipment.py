@@ -64,8 +64,8 @@ class Equipment(models.Model):
         img = qr.make_image()
         file_name = str(int(time.time())) + str(random.randint(1,1000)) + 'simpleqrcode.jpg'
         img.save(file_name)
-        open_icon = open(file_name, "rb")
-        b64str = base64.b64encode(open_icon.read())
+        with open(file_name, 'rb') as open_icon:
+            b64str = base64.b64encode(open_icon.read())
         os.remove(file_name)
         return b64str
 

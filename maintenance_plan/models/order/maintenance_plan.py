@@ -18,7 +18,7 @@ class MaintenancePlan(models.Model):
     def _default_order_forms(self):
         return [(0, 0, {'name': '對向波口測試', 'status': 'WRITE'}), (0, 0, {'name': '檢測證書', 'status': 'WRITE'})]
 
-    num = fields.Char('工單編號', required=True)
+    num = fields.Char('工單編號')
     work_order_type = fields.Char('工單類型', required=True)
     work_order_description = fields.Text('工單描述', required=True)
     standard_job_id = fields.Many2one('maintenance_plan.standard.job', string='標準工作', required=True)
