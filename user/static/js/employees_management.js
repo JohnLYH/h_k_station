@@ -222,10 +222,6 @@ odoo.define('employees_management_action', function (require) {
                                 res_model: 'res.users',
                                 views: [[self.vue_data.act_id, 'form']],
                                 target: 'new',
-                            }, {
-                                on_close: function () {
-                                    this_vue.handleCurrentChange(self.vue_data.currentPage4)
-                                }
                             });
                         },
 

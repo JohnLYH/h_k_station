@@ -16,7 +16,7 @@ class Department(models.Model):
     name = fields.Char('部门名称', readonly=True)
     department_order = fields.Integer('部门编号', readonly=True)
     parent_order = fields.Integer('父部门编号', readonly=True)
-    department_hierarchy = fields.Integer(string='部门层级') # 用于计算
+    department_hierarchy = fields.Integer(string='部门层级')  # 用于计算
     parent_id = fields.Many2one('user.department', string='父部门', ondelete='cascade')
     child_ids = fields.One2many('user.department', 'parent_id', string='子部门')
     parent_left = fields.Integer(index=True)
@@ -28,7 +28,6 @@ class Department(models.Model):
         'user_id',
         'udepartment_id', readonly=True)
 
-    # TODO： 导入人员信息后面修改
     @api.model
     def department_information(self):
         '''
@@ -40,22 +39,6 @@ class Department(models.Model):
         rows = sheet_data.nrows  # 获取有多好行
         cols = sheet_data.ncols
         keys = ('name',)  # 用来作为父部门 和 子部门装载器
-        one_sheet_content = []
-        # for i in range(1, rows):
-        #     row_content = []
-        #     k = 4
-        #     for j in range(2):
-        #         cell = sheet_data.cell_value(i, k)
-        #         row_content.append(cell)
-        #         one_dict = dict(zip(keys, row_content))
-        #
-        #     one_sheet_content.append(one_dict)
-        # for i, item in enumerate(one_sheet_content):
-        #     dic = {}
-        #     record = self.search([('name', '=', item['name'])])
-        #     if not record:
-        #         dic['name'] = item['name']
-        #         self.create(dic)
         for i in range(1, rows):
             for j in range(cols):
                 cell = sheet_data.cell_value(i, j)
@@ -116,7 +99,29 @@ class Department(models.Model):
         # 组装子节点
         category_record_ids = [self.env.ref('{}.{}'.format(config_dict['module_name'], i)).id
                                for i in config_dict['category_id_list']]
-        cats = self.env['res.groups'].search_read([('category_id', 'in', category_record_ids), ('parent_id', '=', None)], fields=[
-            'name', 'parent_id', 'child_ids', 'parent_left', 'parent_right', 'category_id'], order='sequence')
+        cats = self.env['res.groups'].search_read(
+            [('category_id', 'in', category_record_ids), ('parent_id', '=', None)], fields=[
+                'name', 'parent_id', 'child_ids', 'parent_left', 'parent_right', 'category_id'], order='sequence')
         self.env['res.groups'].recursion_tree_data(cats)
         return cats
+
+    # 层级选择
+    @api.model
+    def get_equipment_class(self, id=False):
+        '''
+        获取分组
+        :return:
+        '''
+        rst = []
+        class_a = self.env['user.department'].search_read([('parent_id', '=', id)],
+                                                          fields=['child_ids', 'name'])
+        for record in class_a:
+            vals = {
+                'value': record['id'],
+                'label': record['name'],
+            }
+            children = self.get_equipment_class(record['id'])
+            if children:
+                vals['children'] = children
+            rst.append(vals)
+        return rst

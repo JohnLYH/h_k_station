@@ -14,6 +14,7 @@
                             <field name="login" string="賬號"></field>
                             <field name="post" string="崗位"></field>
                             <field name="role" string="角色"></field>
+                            <field name="department_list" string="員工部門" widget="cascader_widget"></field>
                             <field name="email" string="郵箱"></field>
                         </group>
                         <footer>

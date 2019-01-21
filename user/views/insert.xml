@@ -9,6 +9,7 @@
                 <script type="text/javascript" src="/user/static/js/person_edit.js"/>
                 <script type="text/javascript" src="/user/static/js/change_password.js"/>
                 <script type="text/javascript" src="/user/static/js/permiss_add_button.js"/>
+                <script type="text/javascript" src="/user/static/js/caseder_class.js"/>
             </xpath>
         </template>
     </data>

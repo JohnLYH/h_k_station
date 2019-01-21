@@ -15,6 +15,7 @@ class EmployeesGet(models.Model):
     role = fields.Char(string='角色')
     state = fields.Selection([('正常', '正常'), ('禁用', '禁用')], default='正常')
     branch = fields.Char(string='員工部門')
+    department_list = fields.Char(string='部門')
 
     @api.model
     def get_users_info(self, **kw):
@@ -39,7 +40,6 @@ class EmployeesGet(models.Model):
                 if two_id[0].get('parent_id'):
                     lis.append(two_id[0].get('parent_id')[0])
         return {'users': users, 'count': count, 'department': lis[::-1]}
-
 
     @api.model
     def page_size(self, **kw):
@@ -67,7 +67,7 @@ class EmployeesGet(models.Model):
         return users
 
     @api.model
-    def get_department_users(self,id=False):
+    def get_department_users(self, id=False):
         '''
         获取部门信息
         :return:
@@ -250,6 +250,10 @@ class EmployeesGet(models.Model):
         smtp.login(username, password)
         smtp.sendmail(sender, [receiver], msg.as_string())
         smtp.quit()  # 退出
+        rec = self.env['user.department'].search([('id', '=', self.department_list)])  # 獲取部門的記錄
+        lis_rec = rec.users.ids  # 獲取當前部門下面的人員id
+        lis_rec.append(self.id)
+        rec.write({'users': [(6, 0, lis_rec)]})
         self.write({'password': 123456})
         self.env['user.send_email'].create(
             {'email_theme': subject, 'recipient_person': self.name,
@@ -259,7 +263,7 @@ class EmployeesGet(models.Model):
     @api.model
     def add_tree_button(self, **kwargs):
         date_int = max(self.env['user.department'].search([]).ids)
-        self.env['user.department'].create({'name':kwargs.get('value'),'parent_id':kwargs.get('parent_id')})
+        self.env['user.department'].create({'name': kwargs.get('value'), 'parent_id': kwargs.get('parent_id')})
         return date_int + 1
 
     # 删除tree数据
