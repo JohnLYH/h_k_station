@@ -7,6 +7,7 @@ from odoo import models, fields
 class MigrateRecords(models.Model):
     _name = 'maintenance_plan.migrate.records'
     _description = '設備遷移歷史'
+    _order = 'create_date DESC'
 
     equipment_id = fields.Many2one('maintenance_plan.equipment', string='設備')
     info = fields.Char('遷移信息')

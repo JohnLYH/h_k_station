@@ -7,6 +7,7 @@ from odoo import models, fields, api
 class MaintenanceRecords(models.Model):
     _name = 'maintenance_plan.maintenance.records'
     _description = '設備維修記錄'
+    _order = 'create_date DESC'
 
     equipment_id = fields.Many2one('maintenance_plan.equipment', compute='_com_work_order', store=True)
     work_order_id = fields.Many2one('maintenance_plan.maintenance.plan', '工單', required=True)

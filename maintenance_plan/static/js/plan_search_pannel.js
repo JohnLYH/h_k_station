@@ -14,10 +14,13 @@ odoo.define("plan_search_pannel", function (require) {
 
         start: function () {
             var self = this;
+            self.domains = [];
             this.vue = new Vue({
                 el: '#app',
                 data() {
-                    return {}
+                    return {
+                        fullscreenLoading: false
+                    }
                 }
             });
             return self._super()
@@ -54,10 +57,19 @@ odoo.define("plan_search_pannel", function (require) {
                 url: '/maintenance_plan/put_in_excel/',
                 type: 'POST',
                 data: formData,
-                processData: false,  //tell jQuery not to process the data
-                contentType: false,  //tell jQuery not to set contentType
+                processData: false, //tell jQuery not to process the data
+                contentType: false, //tell jQuery not to set contentType
                 //这儿的三个参数其实就是XMLHttpRequest里面带的信息。
+                beforeSend: function (xhr) {
+                    self.loading = self.vue.$loading({
+                        lock: true
+                    })
+                },
+                error: function (textStatus) {
+                    self.loading.close();
+                },
                 success: function (response) {
+                    self.loading.close();
                     response = JSON.parse(response);
                     if (response.error === false) {
                         self.vue.$notify({
@@ -92,10 +104,40 @@ odoo.define("plan_search_pannel", function (require) {
 
         export_excel: function (event) {
             // TODO: 導出excel
-            console.log(event)
+            var self = this;
+            var limit = self.getParent().getParent().pager.state.limit;
+            var offset = self.getParent().getParent().pager.state.current_min;
+            var oReq = new XMLHttpRequest();
+            oReq.open("POST", '/maintenance_plan/export_work_order', true);
+            oReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            //指定返回类型
+            oReq.responseType = "arraybuffer";
+            oReq.onload = function (oEvent) {
+
+                if (oReq.readyState == 4 && oReq.status == 200) {
+                    console.log(oReq.getResponseHeader("File-name"))
+                    var blob = new Blob([oReq.response], {
+                        type: "application/vnd.ms-excel"
+                    });
+
+                    // 转换Blob完成，创建一个a标签用于下载
+                    var a = document.createElement('a');
+                    //点击事件
+                    var evt = document.createEvent("HTMLEvents");
+                    evt.initEvent("click", false, false);
+                    // 设置文件名
+                    a.download = '导出工单.xlsx';
+                    // 利用URL.createObjectURL()方法为a元素生成blob URL
+                    a.href = URL.createObjectURL(blob);
+                    a.click();
+                }
+            };
+            // 发送待参数的请求
+            oReq.send("domain=" + JSON.stringify(self.domains) + "&limit=" + limit + "&offset=" + offset);
         },
         commit_search: function () {
             var domains = []
+            var self = this;
             _.each(this.propositions, function (proposition) {
                 var domain = proposition.get_domain()
                 if (!domain) {
@@ -138,9 +180,15 @@ odoo.define("plan_search_pannel", function (require) {
                     domains.push([domain])
                 }
             })
+            self.domains = domains;
             this.trigger_up('search', {
                 domains: domains
             });
+        },
+        reset_search: function () {
+            var self = this;
+            self._super();
+            self.domains = [];
         }
     });
 
