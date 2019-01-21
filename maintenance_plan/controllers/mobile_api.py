@@ -339,7 +339,7 @@ class WorkOrder(http.Controller):
         return to_json({'errcode': 0, 'data': '', 'msg': '保存成功'})
 
     @http.route('/mtr/wo/start', type='json', auth='user')
-    def auto_save_form(self, **kwargs):
+    def auto_star_form(self, **kwargs):
         '''
         對向波口測試自動保存
         :param kwargs:
@@ -354,3 +354,26 @@ class WorkOrder(http.Controller):
         if request.env['maintenance_plan.maintenance.plan'].search_count([('users', 'in', userid)]) > 0:
             return to_json({'errcode': 0, 'data': '', 'msg': '保存成功'})
         return to_json({'errcode': 1, 'data': '', 'msg': '保存失敗,此組沒有這個人'})
+
+    @http.route('/mtr/wo/test/submit', type='json', auth='user')
+    def auto_submit_form(self, **kwargs):
+        '''
+        對向波口測試提交、簽署
+        :param kwargs:
+        :return:
+        '''
+        params = request.jsonrequest
+        submitData = params['submitData']
+        submitStatus = params['submitStatus']
+        approver = params['approver']
+        signature = params['signature']
+        # 工單id
+        id = params['id']
+        # 獲取工單
+        order_record = request.env['maintenance_plan.maintenance.plan'].browse(id)
+        test_form = order_record.order_form_ids.filtered(lambda f: f.name == '對向波口測試')
+        test_form.write({
+            'content': params['submitDataBODY']
+        })
+        return to_json({'errcode': 0, 'data': '', 'msg': '保存成功'})
+

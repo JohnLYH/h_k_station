@@ -8,6 +8,7 @@ from datetime import datetime as dt
 import os
 import openpyxl
 import xlwt
+from dateutil.relativedelta import relativedelta
 from openpyxl import load_workbook, Workbook
 from openpyxl.styles import PatternFill
 from openpyxl.writer.excel import save_virtual_workbook
@@ -71,7 +72,7 @@ class MaintenancePlan(http.Controller):
         '''
         file = kwargs['file']
         filename = kwargs['file'].filename
-        workbook = openpyxl.load_workbook(file)
+        workbook = openpyxl.load_workbook(file, data_only=True)
         sheet = workbook.active
         # 设置单元格背景色紅色
         red_style = PatternFill(fill_type='solid', fgColor="FF3030")
@@ -344,6 +345,7 @@ class OtherEquipment(http.Controller):
             if new_sheet.cell(num, col).value is None:
                 pass
             else:
+                print(new_sheet.cell(num, col).value)
                 try:
                     dt.strptime(new_sheet.cell(num, col).value, '%Y/%m/%d')
                 except Exception as e:
@@ -361,12 +363,6 @@ class OtherEquipment(http.Controller):
             if new_sheet.cell(num, col).value is None:
                 new_sheet.cell(num, col).fill = style
                 row_error = True
-            if col == 14:
-                if new_sheet.cell(num, col).value in ['OK', 'Expired', 'Scraped']:
-                    pass
-                else:
-                    new_sheet.cell(num, col).fill = style
-                    row_error = True
             if col == 1:
                 equipment_num = new_sheet.cell(num, col).value
                 if new_sheet.cell(num, 7).value:
@@ -382,6 +378,11 @@ class OtherEquipment(http.Controller):
                             [('equipment_num', '=', equipment_num)]) > 0:
                         new_sheet.cell(num, col).fill = style
                         row_error = True
+            if col == 14:
+                status = new_sheet.cell(num, col).value
+                if status not in ['OK', 'Expired', 'Scraped']:
+                    new_sheet.cell(num, col).fill = style
+                    row_error = True
         return row_error
 
     @staticmethod
@@ -408,7 +409,7 @@ class OtherEquipment(http.Controller):
         try:
             file = kwargs['file']
             filename = kwargs['file'].filename
-            workbook = load_workbook(file)
+            workbook = load_workbook(file, data_only=True)
             sheet = workbook.active
             # 设置单元格背景色紅色
             red_style = PatternFill(fill_type='solid', fgColor="FF3030")
@@ -422,14 +423,13 @@ class OtherEquipment(http.Controller):
                     if [i.value for i in row] != OTHER_ROW_1_LIST:
                         return json.dumps({'message': '表格不符', 'error': True})
                 else:
-                    print([i.value for i in row])
                     # 這裡是檢測日期格式是否正確
-                    row_error = self.check_date(sheet, n_row, [12, 13], red_style)
+                    row_error = self.check_date(sheet, n_row, [12,13], red_style)
                     # 檢驗三個必填字段是否為空
-                    row_error2 = self.check_none(sheet, n_row, [1, 2, 14], red_style)
+                    row_error2 = self.check_none(sheet, n_row, [1, 2], red_style)
                     # 這裡檢查參數是否合格
                     row_error3 = self.excel_validate(request, sheet, n_row,
-                                                     [7, 9], red_style)
+                                                     [7, 9, 14], red_style)
                     if row_error or row_error2 or row_error3:
                         error = True
                     else:
@@ -450,7 +450,7 @@ class OtherEquipment(http.Controller):
                         # 設備位置
                         location_of_equipment = sheet.cell(n_row, 8).value
                         # 檢驗週期
-                        freq_of_cal = sheet.cell(n_row,9).value
+                        freq_of_cal = sheet.cell(n_row, 9).value
                         # 檢驗主體
                         calibration_body = sheet.cell(n_row, 10).value
                         # 檢驗要求
@@ -458,7 +458,15 @@ class OtherEquipment(http.Controller):
                         # 最後維護日期
                         last_maintenance_date = sheet.cell(n_row, 12).value
                         # 應用到期時間
-                        maintenance_due_data = sheet.cell(n_row, 13).value
+                        try:
+                            mymonth = int(freq_of_cal)
+                        except:
+                            mymonth = False
+                        if mymonth:
+                            maintenance_due_data = dt.strptime(last_maintenance_date, '%Y/%m/%d') + relativedelta(
+                                months=mymonth)
+                        else:
+                            maintenance_due_data = sheet.cell(n_row, 13).value
                         # 狀態
                         status = sheet.cell(n_row, 14).value
                         # 備註
