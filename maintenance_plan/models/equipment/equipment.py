@@ -41,6 +41,10 @@ class Equipment(models.Model):
     oem_manufacturer = fields.Char('原始製造商')
     lead_maintainer = fields.Char('設備維護者')
     qr_code = fields.Text('二維碼', readonly=True)
+    # 維修記錄
+    maintenance_records_ids = fields.One2many('maintenance_plan.maintenance.records', 'equipment_id', string='維修記錄')
+    # 遷移記錄
+    migrate_records_ids = fields.One2many('maintenance_plan.migrate.records', 'equipment_id', string='遷移歷史')
 
     @staticmethod
     def generate_2_code(arr):
