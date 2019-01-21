@@ -22,26 +22,24 @@ class EmployeesGet(models.Model):
         部门下的人员
         :return:
         '''
-        count = self.env['res.users'].search_count([])
         role_ids = self.env['user.department'].search([('id', '=', kw.get('department_id'))])
-
-        # todo: 后面使用
-        # users = self.env['res.users'].search_read(
-        #     [('id', 'in', role_ids.users.ids)],
-        #     fields=['name', 'login', 'post', 'role', 'state', 'branch', 'email'
-        #             ])
-
-        users = self.search_read([], limit=30)
+        count = self.env['res.users'].search_count([('id', 'in', role_ids.users.ids)])
+        users = self.env['res.users'].search_read(
+            [('id', 'in', role_ids.users.ids)],
+            fields=['name', 'login', 'post', 'role', 'state', 'branch', 'email'
+                    ], limit=30)
         lis = []  # 用来存放部门
         lis.append(kw.get('department_id'))
         dep_id = self.env['user.department'].search_read([('id', '=', kw.get('department_id'))], ['parent_id'])
-        if dep_id[0].get('parent_id'):
-            lis.append(dep_id[0].get('parent_id')[0])
-            two_id = self.env['user.department'].search_read([('id', '=', dep_id[0].get('parent_id')[0])],
-                                                             ['parent_id'])
-            if two_id[0].get('parent_id'):
-                lis.append(two_id[0].get('parent_id')[0])
+        if dep_id:
+            if dep_id[0].get('parent_id'):
+                lis.append(dep_id[0].get('parent_id')[0])
+                two_id = self.env['user.department'].search_read([('id', '=', dep_id[0].get('parent_id')[0])],
+                                                                 ['parent_id'])
+                if two_id[0].get('parent_id'):
+                    lis.append(two_id[0].get('parent_id')[0])
         return {'users': users, 'count': count, 'department': lis[::-1]}
+
 
     @api.model
     def page_size(self, **kw):
@@ -69,48 +67,25 @@ class EmployeesGet(models.Model):
         return users
 
     @api.model
-    def get_department_users(self):
+    def get_department_users(self,id=False):
         '''
         获取部门信息
         :return:
-        '''
-
-        department_tree = []
-
-        # 一级部门
-        one_department_ids = self.env['user.department'].sudo(1).search(
-            [('department_hierarchy', '=', 1)])
-        for parent_department_id in one_department_ids:
-            parent_department = {'label': parent_department_id.name}
-            parent_department['id'] = parent_department_id.id
-
-            # 二级部门
-            two_department_ids = self.env['user.department'].sudo(1).search_read(
-                [('parent_order', '=', parent_department_id.department_order)],
-                ['parent_order', 'name', 'id', 'department_order'])
-            child_departments = []
-            for two_department_id in two_department_ids:
-                department_map = {}
-                department_map['label'] = two_department_id.get('name')
-                department_map['id'] = two_department_id.get('id')
-                two_department_department_id = two_department_id.get('department_order')
-
-                # 三级部门
-                three_department_ids = self.env['user.department'].sudo(1).search_read(
-                    [('parent_order', '=', two_department_department_id)],
-                    ['parent_order', 'name', 'id', 'department_order'])
-                three_department_list = []
-                for three_department_id in three_department_ids:
-                    three_department_map = {}
-                    three_department_map['label'] = three_department_id.get('name')
-                    three_department_map['id'] = three_department_id.get('id')
-                    three_department_list.append(three_department_map)
-                department_map['children'] = three_department_list
-                child_departments.append(department_map)
-            parent_department['children'] = child_departments
-            department_tree.append(parent_department)
+         '''
+        rst = []
+        class_a = self.env['user.department'].search_read([('parent_id', '=', id)],
+                                                          fields=['child_ids', 'name'])
+        for record in class_a:
+            vals = {
+                'value': record['id'],
+                'label': record['name'],
+            }
+            children = self.get_department_edit(record['id'])
+            if children:
+                vals['children'] = children
+            rst.append(vals)
         act_id = self.env.ref('user.create_new_ifo').id
-        return {'department_tree': department_tree, 'act_id': act_id}
+        return {'department_tree': rst, 'act_id': act_id}
 
     @api.model
     def get_department_edit(self, id=False):
@@ -283,10 +258,11 @@ class EmployeesGet(models.Model):
     # 添加tree数据
     @api.model
     def add_tree_button(self, **kwargs):
-        print(kwargs)
-
+        date_int = max(self.env['user.department'].search([]).ids)
+        self.env['user.department'].create({'name':kwargs.get('value'),'parent_id':kwargs.get('parent_id')})
+        return date_int + 1
 
     # 删除tree数据
     @api.model
-    def delete_tree_button(self,**kwargs):
-        print(kwargs)
+    def delete_tree_button(self, **kwargs):
+        self.env['user.department'].search([('id', '=', kwargs.get('value'))]).unlink()

@@ -35,10 +35,10 @@ class ImportDate(models.Model):
             for i, item in enumerate(one_sheet_content):
                 record = self.env['res.users'].search([('login', '=', item.get('login'))])
                 if not record.id:
-                    self.env['res.users'].create(item)
+                    re_id = self.env['res.users'].create(item)
+                    post=self.env['user.department'].search([('name','=',item.get('post'))])
+                    if post:
+                        self.env['user.department'].write({'users':[(6,0,[re_id.id])]})
                 else:
                     del item['login']
                     record.write(item)
-
-        for i in range(100):
-            self.env['res.users'].create({'name': i, 'login': i})

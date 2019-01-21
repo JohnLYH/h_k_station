@@ -42,6 +42,7 @@ odoo.define('employees_management_action', function (require) {
                 tree_input: false,
                 tree_date: '',
                 tree_data5: '',
+                data5_data: '',
             };
         },
 
@@ -53,7 +54,6 @@ odoo.define('employees_management_action', function (require) {
                 model: 'res.users',
                 method: 'get_department_users',
             }).then(function (data) {
-                console.log('777', data)
                 self.vue_data.data5 = data.department_tree
                 self.vue_data.act_id = data.act_id
             })
@@ -76,12 +76,12 @@ odoo.define('employees_management_action', function (require) {
 
                     methods: {
                         click_node: function (data) {
-                            self.vue_data.node_record = data.id;
+                            self.vue_data.node_record = data.value;
                             self.vue_data.currentPage4 = 1;
                             self._rpc({
                                 model: 'res.users',
                                 method: 'get_users_info',
-                                kwargs: {'department_id': data.id, 'page': 1, 'limit': 30}
+                                kwargs: {'department_id': data.value, 'page': 1, 'limit': 30}
                             }).then(function (get_data) {
                                 self.vue_data.tableData = get_data.users;
                                 self.vue_data.message = get_data.count;
@@ -93,7 +93,7 @@ odoo.define('employees_management_action', function (require) {
                             self._rpc({
                                 model: 'res.users',
                                 method: 'get_users_info',
-                                kwargs: {'department_id': data.id, 'page': self.vue_data.currentPage4, 'limit': 30}
+                                kwargs: {'department_id': data.value, 'page': self.vue_data.currentPage4, 'limit': 30}
                             }).then(function (get_data) {
                                 self.vue_data.tableData = get_data.users;
                                 self.vue_data.message = get_data.count;
@@ -230,49 +230,49 @@ odoo.define('employees_management_action', function (require) {
                         },
 
                         append(data) {
-                            self.vue_data.tree_data5 = data.id;
+                            console.log('567', data.value)
+                            self.vue_data.data5_data = data
+                            self.vue_data.tree_data5 = data.value;
                             var data_chose = this;
                             $.when(self.vue_data.tree_input = true,
-                                data_chose.before_data(data_chose)
                             )
-                            var id = 5;
-                            const newChild = {id: id++, label: self.vue_data.tree_date, children: []};
-                            if (!data.children) {
-                                this.$set(data, 'children', []);
-                            }
-                            data.children.push(newChild);
                         },
 
                         remove(node, data) {
                             self._rpc({
                                 model: 'res.users',
                                 method: 'delete_tree_button',
-                                kwargs: {value:data.id}
+                                kwargs: {value: data.value}
                             })
                             const parent = node.parent;
                             const children = parent.data.children || parent.data;
-                            const index = children.findIndex(d => d.id === data.id);
+                            const index = children.findIndex(d => d.id === data.value);
                             children.splice(index, 1);
                         },
 
                         sure_tree: function () {
+                            alert(self.vue_data.tree_data5)
                             self._rpc({
                                 model: 'res.users',
                                 method: 'add_tree_button',
-                                kwargs: {value: self.vue_data.tree_data5}
+                                kwargs: {parent_id: self.vue_data.tree_data5, value: self.vue_data.tree_date}
                             }).then(function (get_data) {
-                                alert('123')
+                                var id = get_data;
+                                const newChild = {id: id++, label: self.vue_data.tree_date, children: []};
+                                if (!self.vue_data.data5_data.children) {
+                                    this.$set(self.vue_data.data5_data, 'children', []);
+                                }
+                                self.vue_data.data5_data.children.push(newChild);
                             });
                             $.when(this.tree_input = false)
 
                         },
 
                         before_data: function () {
-                            self.vue_data.data5
+                            return self.vue_data.data5;
                         },
 
                         cancel_tree: function () {
-                            alert('123')
                             this.tree_input = false
                         }
                     },
