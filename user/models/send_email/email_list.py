@@ -26,7 +26,7 @@ class Email_List(models.Model):
         smtpserver = ''  # 邮箱的server
         username = ''  # 发送人的邮箱
         password = ''  # 发送人的授权码,不是密码
-        content = kwargs.get('content')
+        content = kwargs.get('content') #邮件的内容
 
         msg = MIMEText(content, 'plain', 'utf-8')  # 中文需参数‘utf-8'，单字节字符不需要
         msg['Subject'] = Header(subject, 'utf-8')  # 标题
@@ -42,4 +42,14 @@ class Email_List(models.Model):
         self.unlink()
 
     def email_edit(self):
-        pass
+        return {
+            'name': '邮件详情',
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'user.send_email',
+            'context': {'edit': False},
+            'res_id': self.id,
+            'flags': {'initial_mode': 'readonly'},
+            'target': 'new',
+        }
