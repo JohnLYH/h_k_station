@@ -58,7 +58,29 @@
                             </div>
                         </div>
                     </group>
-                    <widget name="equipment_foot"/>
+
+                    <notebook>
+                        <page string="維修記錄">
+                            <field name="maintenance_records_ids">
+                                <tree class="noOpen" create="0" edit="0" delete="0">
+                                    <field name="work_order_id" string="工單編號"/>
+                                    <field name="equipment_serial_number"/>
+                                    <field name="actual_start_time"/>
+                                    <field name="actual_end_time"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="遷移歷史">
+                            <field name="migrate_records_ids">
+                                <tree class="noOpen" create="0" edit="0" delete="0">
+                                    <field name="info"/>
+                                    <field name="remark" string="遷移原因"/>
+                                    <field name="executor_user_id"/>
+                                    <field name="create_date" string="操作時間"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
                 </form>
             </field>
         </record>

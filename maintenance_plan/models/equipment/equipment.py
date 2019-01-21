@@ -41,6 +41,11 @@ class Equipment(models.Model):
     oem_manufacturer = fields.Char('原始製造商')
     lead_maintainer = fields.Char('設備維護者')
     qr_code = fields.Text('二維碼', readonly=True)
+    # 維修記錄
+    maintenance_records_ids = fields.One2many('maintenance_plan.maintenance.records', 'equipment_id', string='維修記錄')
+    # 遷移記錄, 与序列号绑定
+    migrate_records_ids = fields.Many2many('maintenance_plan.migrate.records', 'equipment_migrate', 'equipment_id',
+                                           'migrate_id', string='遷移歷史', compute='_com_migrate', store=True)
 
     @staticmethod
     def generate_2_code(arr):
@@ -64,6 +69,14 @@ class Equipment(models.Model):
             b64str = base64.b64encode(open_icon.read())
         os.remove(file_name)
         return b64str
+
+    @api.one
+    @api.depends('serial_number')
+    def _com_migrate(self):
+        migrate_records = self.env['maintenance_plan.migrate.records'].search([
+            ('equipment_serial_number', '=', self.serial_number)
+        ])
+        self.migrate_records_ids = [[6, 0, migrate_records.ids]]
 
     @api.model
     def create(self, vals):

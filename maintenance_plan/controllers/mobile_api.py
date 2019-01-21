@@ -5,6 +5,7 @@ import datetime
 import json
 import os
 import base64
+import random
 import time
 
 from PIL import Image, ImageDraw, ImageFont
@@ -140,8 +141,9 @@ class Public(http.Controller):
         if kwargs.get('file', None) is not None:
             file = kwargs['file']
             filename = file.filename
-            now_date = dt.datetime.strftime(dt.datetime.now(), '%Y-%m-%d')
-            now_time = dt.datetime.strftime(dt.datetime.now(), '%H:%M:%S')
+            now_datetime = dt.datetime.now() + relativedelta(hours=8)
+            now_date = dt.datetime.strftime(now_datetime, '%Y-%m-%d')
+            now_time = dt.datetime.strftime(now_datetime, '%H:%M:%S')
             name = request.env.user.name or ''
             # 添加水印
             image = add_text_to_image(Image.open(file), now_date, now_time, name)
@@ -364,8 +366,11 @@ class WorkOrder(http.Controller):
         '''
         params = request.jsonrequest
         submitData = params['submitData']
+        # 提交狀態
         submitStatus = params['submitStatus']
+        # 下級審批人
         approver = params['approver']
+        # 圖片地址
         signature = params['signature']
         # 工單id
         id = params['id']
@@ -373,7 +378,182 @@ class WorkOrder(http.Controller):
         order_record = request.env['maintenance_plan.maintenance.plan'].browse(id)
         test_form = order_record.order_form_ids.filtered(lambda f: f.name == '對向波口測試')
         test_form.write({
-            'content': params['submitDataBODY']
+            'content': params['submitDataBODY'],
+            'status': submitStatus
         })
-        return to_json({'errcode': 0, 'data': '', 'msg': '保存成功'})
+        # 表單id
+        order_form_id = test_form.id
+        # 當前操作人
+        execute_user_id = request.uid
+        if submitStatus == 'SUBMIT':
+            old_status = 'WRITE'
+        else:
+            # 找到之前的最後條記錄
+            order_form_approval = request.env['maintenance_plan.order.form.approval'].search([
+                ('next_execute_user_id', '=', execute_user_id), ('order_form_id', '=', order_form_id)], limit=1)
+            old_status = order_form_approval.to_status if order_form_approval else 'WRITE'
+        to_status = submitStatus
+        request.env['maintenance_plan.order.form.approval'].create({
+            'order_form_id': order_form_id,
+            'execute_user_id': execute_user_id,
+            'next_execute_user_id': approver,
+            'old_status': old_status,
+            'to_status': to_status,
+            'signature': signature,
+        })
+        # TODO: 判断是否要修改工单状态到审批
+        return to_json({'errcode': 0, 'data': '', 'msg': '提交成功'})
+
+    @http.route('/mtr/wo/test/reject', type='json', auth='user')
+    def auto_reject_form(self, **kwargs):
+        '''
+        對向波口測試拒絕
+        :param kwargs:
+        :return:
+        '''
+        params = request.jsonrequest
+        # 工單id
+        id = params['id']
+        # 拒绝原因
+        reason = params['reason']
+        # 拒絕的狀態
+        rejectStatus = params['rejectStatus']
+        # 签名
+        signature = params['signature']
+        # 當前操作人
+        execute_user_id = request.uid
+        # 獲取工單
+        order_record = request.env['maintenance_plan.maintenance.plan'].browse(id)
+        # 修改状态为前一步
+        test_form = order_record.order_form_ids.filtered(lambda f: f.name == '對向波口測試')
+        test_form.write({
+            'status': rejectStatus
+        })
+        # 表單id
+        order_form_id = test_form.id
+        # 找到之前的最後條記錄
+        order_form_approval = request.env['maintenance_plan.order.form.approval'].search([
+            ('next_execute_user_id', '=', execute_user_id), ('order_form_id', '=', order_form_id)], limit=1)
+        old_status = order_form_approval.to_status if order_form_approval else 'SUBMIT'
+        next_execute_user_id = order_form_approval.execute_user_id.id
+        request.env['maintenance_plan.order.form.approval'].create({
+            'order_form_id': order_form_id,
+            'execute_user_id': execute_user_id,
+            'next_execute_user_id': next_execute_user_id,
+            'old_status': old_status,
+            'to_status': rejectStatus,
+            'signature': signature,
+        })
+        return to_json({'errcode': 0, 'data': '', 'msg': '拒絕成功'})
+
+    @http.route('/mtr/wo/equipment/exchange', type='json', auth='user')
+    def auto_exchange_form(self, **kwargs):
+        '''
+        設備更換
+        :param kwargs:
+        :return:
+        '''
+        params = request.jsonrequest
+        # 工單id
+        id = params['id']
+        # 更換原因
+        reason = params['reason']
+        # 新設備序列號
+        serialNo = params['serialNo']
+        # 签名
+        signature = params['signature']
+        # 當前操作人
+        execute_user_id = request.uid
+        # 獲取工單
+        order_record = request.env['maintenance_plan.maintenance.plan'].browse(id)
+        # 獲取設備編號
+        equipment_id = order_record.equipment_id
+        if not equipment_id:
+            return to_json({'errcode': 1, 'data': '', 'msg': '找不到該設備'})
+        # 原有設備的設備序列號
+        old_serialNo = equipment_id.serial_number
+        equipment = equipment_id.description
+        station = equipment_id.detailed_location
+        equipmentNo = equipment_id.num
+        # 中間過度用的序列號
+        serialNo_str = str(int(time.time()) + random.randint(1, 1000000))
+        # 去找到新設備序列號的原來那台設備并更改設備序列號為過度序列號
+        to_old_equipment = request.env['maintenance_plan.equipment'].search([{
+            ('serial_number', '=', serialNo), ('num', '=', None)
+        }])
+        if not to_old_equipment:
+            to_old_equipment = request.env['maintenance_plan.equipment'].search([{
+                ('serial_number', '=', serialNo)
+            }])
+            if to_old_equipment:
+                return to_json({'errcode': 1, 'data': '', 'msg': '設備序列號已安裝在编号：{}設備編號下，請確認是否輸入正確'.format(
+                    to_old_equipment.num)})
+            else:
+                return to_json({'errcode': 1, 'data': '', 'msg': '未找到該序列號'})
+        # 新序列號的拆卸記錄
+        request.env['maintenance_plan.migrate.records'].write({
+            'info': '從設備No.：{}上拆卸'.format(to_old_equipment.num),
+            'equipment_serial_number': serialNo,
+            'remark': reason,
+            'executor_user_id': execute_user_id,
+            'signature': signature
+        })
+        # 老序列號的拆卸記錄
+        request.env['maintenance_plan.migrate.records'].write({
+            'info': '從設備No.：{}上拆卸'.format(equipment_id.num),
+            'equipment_serial_number': old_serialNo,
+            'remark': reason,
+            'executor_user_id': execute_user_id,
+            'signature': signature
+        })
+        to_old_equipment = to_old_equipment.write({
+            'serial_number': serialNo_str
+        })
+        # 新序列號的安裝記錄
+        request.env['maintenance_plan.migrate.records'].write({
+            'info': '安裝到設備No.：{}'.format(equipment_id.num),
+            'equipment_serial_number': serialNo,
+            'remark': reason,
+            'executor_user_id': execute_user_id,
+            'signature': signature
+        })
+        # 更改序列號
+        equipment_id.write({
+            'serial_number': serialNo
+        })
+        # 丟棄老設備
+        to_old_equipment = to_old_equipment.write({
+            'serial_number': old_serialNo,
+            'num': None,
+        })
+        user = request.env['res.users'].browse(execute_user_id)
+        # 操作人的信息
+        exchangeUser = {
+           'signature': signature,
+           'time': datetime.datetime.now(),
+           'id': execute_user_id,
+           'name': user.name,
+           'role': user.role,
+        }
+        #新設備
+        newEquipment = {
+            'serialNo': serialNo,
+            'description': equipment_id.description,
+            'remarks': reason
+        }
+        return to_json({'errcode': 0, 'data': {'equipment': equipment, 'equipmentNo': equipmentNo,
+                                               'serialNo': old_serialNo, 'station': station,
+                                               'newEquipment': newEquipment, 'exchangeUser': exchangeUser},
+                        'msg': '拒絕成功'})
+
+    @http.route('/mtr/wo/equipment/exchange', type='json', auth='user')
+    def auto_exchange_form(self, **kwargs):
+        '''
+        獲取檢測證書數據
+        :param kwargs:
+        :return:
+        '''
+        params = request.jsonrequest
+
+
 

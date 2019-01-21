@@ -190,7 +190,6 @@ class MaintenancePlan(http.Controller):
             else:
                 equipment_model.write({'reference_materials_manage_ids': [(0, 0, values)]})
                 # TODO：生成審批記錄
-            # TODO: 生成記錄
             try:
                 # 變更原因
                 reasons_change = kw['reasons_change']
