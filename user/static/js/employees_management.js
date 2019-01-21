@@ -247,7 +247,7 @@ odoo.define('employees_management_action', function (require) {
                         },
 
                         sure_tree: function () {
-                            alert(self.vue_data.tree_data5)
+                            var button = this;
                             self._rpc({
                                 model: 'res.users',
                                 method: 'add_tree_button',
@@ -256,7 +256,7 @@ odoo.define('employees_management_action', function (require) {
                                 var id = get_data;
                                 const newChild = {id: id++, label: self.vue_data.tree_date, children: []};
                                 if (!self.vue_data.data5_data.children) {
-                                    this.$set(self.vue_data.data5_data, 'children', []);
+                                    button.$set(self.vue_data.data5_data, 'children', []);
                                 }
                                 self.vue_data.data5_data.children.push(newChild);
                             });

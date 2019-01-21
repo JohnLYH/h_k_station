@@ -84,6 +84,14 @@ class EmployeesGet(models.Model):
             if children:
                 vals['children'] = children
             rst.append(vals)
+        if not rst:
+            rst = []
+            rec = self.env['user.department'].create({'name': '部門分組'})
+            vals = {
+                'value': rec['id'],
+                'label': rec['name'],
+            }
+            rst.append(vals)
         act_id = self.env.ref('user.create_new_ifo').id
         return {'department_tree': rst, 'act_id': act_id}
 
