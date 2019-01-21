@@ -54,8 +54,8 @@ odoo.define("plan_search_pannel", function (require) {
                 url: '/maintenance_plan/put_in_excel/',
                 type: 'POST',
                 data: formData,
-                processData: false,  //tell jQuery not to process the data
-                contentType: false,  //tell jQuery not to set contentType
+                processData: false, //tell jQuery not to process the data
+                contentType: false, //tell jQuery not to set contentType
                 //这儿的三个参数其实就是XMLHttpRequest里面带的信息。
                 success: function (response) {
                     response = JSON.parse(response);

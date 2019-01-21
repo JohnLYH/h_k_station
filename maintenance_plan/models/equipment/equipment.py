@@ -23,7 +23,7 @@ class Equipment(models.Model):
 
     num = fields.Char('設備編號', required=True)  # 設備座位號，一個座位會有多個放過的設備
     parent_equipment_num = fields.Char('父設備編號', required=True)
-    serial_number = fields.Char('設備序列號', required=True)
+    serial_number = fields.Char('設備序列號', required=True)  # 唯一
     equipment_type_id = fields.Many2one('maintenance_plan.equipment.type', string='設備類型', required=True)
     equipment_model = fields.Many2one('maintenance_plan.equipment_model', '設備型號', required=True)
     description = fields.Text('設備描述', required=True)

@@ -14,18 +14,23 @@ import openpyxl
 from openpyxl.styles import PatternFill
 from openpyxl.writer.excel import save_virtual_workbook
 
-ROW_1_LIST = ['Work Order No', 'Work Nature Level 1', 'Work Nature Level 2', 'Equipment No',
-              'Equipment Description', 'Equipment Class', 'Equipment Class Description', 'Work Group',
-              'Work Group Name', 'Standard Job Code', 'Standard Job Description', 'Standard Job ParamSet Name',
-              'Person In Charge', 'Priority', 'Quantity', 'Work Order Description', 'Planned Start Date',
-              'Planned Completion Date', 'Actual Start Date', 'Actual Complete Date', 'Status',
-              'Service Break Down', 'Start Work Date', 'Finish Work Date', 'Line Code', 'Direction Code',
-              'Location From Code', 'Detail IDs', 'Hash X', 'Hash Y']
-
 APP_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
 class MaintenancePlan(http.Controller):
+
+    @staticmethod
+    def get_row1_list_colnum(row1_list, value):
+        '''
+        獲取list中某詞的index并+1，若沒有則返回None
+        :param row1_list:
+        :param value:
+        :return:
+        '''
+        try:
+            return {'col'}
+        except ValueError as e:
+            return None
 
     @staticmethod
     def excel_validate(sheet, num, cols_list, style, has_date_col=True):
@@ -71,37 +76,31 @@ class MaintenancePlan(http.Controller):
         for row in sheet.rows:
             n_row += 1
             if n_row == 1:
-                if [i.value for i in row] != ROW_1_LIST:
-                    return json.dumps({'message': '表格不符', 'error': True})
+                title_list = [i.value for i in row]
             else:
-                row_error = self.excel_validate(sheet, n_row, [1, 2, 4, 16, 17, 18], red_style)
-                work_order_count = request.env['maintenance_plan.maintenance.plan'].search_count([
-                    ('num', '=', sheet.cell(n_row, 1).value)
-                ])
-                equipment_record = request.env['maintenance_plan.equipment'].search([
-                    ('num', '=', sheet.cell(n_row, 4).value)
-                ])
-                if work_order_count != 0 and sheet.cell(n_row, 1).value is not None:
-                    sheet.cell(n_row, 1).fill = green_style
-                if len(equipment_record) == 0:
-                    sheet.cell(n_row, 4).fill = red_style
-                if work_order_count == 0 and len(equipment_record) != 0:
-                    request.env['maintenance_plan.maintenance.plan'].create({
-                        'num': sheet.cell(n_row, 1).value, 'work_order_type': sheet.cell(n_row, 2).value,
-                        'work_order_description': sheet.cell(n_row, 16).value, 'equipment_id': equipment_record.id,
-                        'plan_start_time': sheet.cell(n_row, 17).value.split(' ')[0],
-                        'plan_end_time': sheet.cell(n_row, 18).value.split(' ')[0],
-                    })
-                if row_error is True:
-                    error = True
-        if error is True:
-            new_file = request.env['maintenance_plan.trans.excel'].create({
-                'name': filename.split('.')[0],
-                'file': save_virtual_workbook(workbook)
-            })
-            return json.dumps({'error': error, 'message': '文件有部分錯誤信息，請修改后再次傳入', 'file_id': new_file.id})
-        else:
-            return json.dumps({'error': error, 'message': '上傳成功'})
+                work_num = self.get_row1_list_colnum(title_list, 'Work Order No')  # 工單編號
+                work_order_type = self.get_row1_list_colnum(title_list, 'Work Nature Level 1')  # 工單類型
+                equipment_num = self.get_row1_list_colnum(title_list, 'Equipment No')  # 設備編號
+                standard_job = self.get_row1_list_colnum(title_list, 'Standard Job Code')  # 標準工作
+                work_order_description = self.get_row1_list_colnum(title_list, 'Work Order Description')  # 工單描述
+                plan_start_time = self.get_row1_list_colnum(title_list, 'Planned Start Date')  # 建議開始時間
+                plan_end_time = self.get_row1_list_colnum(title_list, 'Planned Completion Date')  # 建議結束時間
+                # 檢查是否有colnum未存在的列
+                none_col_list = []
+                for check_col in [work_num, work_order_type, equipment_num, standard_job, work_order_description,
+                                  plan_start_time, plan_end_time]:
+                    if check_col is None:
+                        none_col_list.append()
+
+
+        # if error is True:
+        #     new_file = request.env['maintenance_plan.trans.excel'].create({
+        #         'name': filename.split('.')[0],
+        #         'file': save_virtual_workbook(workbook)
+        #     })
+        #     return json.dumps({'error': error, 'message': '文件有部分錯誤信息，請修改后再次傳入', 'file_id': new_file.id})
+        # else:
+        return json.dumps({'error': error, 'message': '上傳成功'})
 
     @http.route('/maintenance_plan/down_wrong_file', type='http', auth="user", methods=['GET'])
     def down_wrong_file(self, **kwargs):
