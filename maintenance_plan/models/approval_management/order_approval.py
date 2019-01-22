@@ -13,6 +13,7 @@ class ApprovalManagement(models.Model):
 
     work_order_id = fields.Many2one('maintenance_plan.maintenance.plan', '工單')
     execute_user_id = fields.Many2one('res.users', '操作人')
+    approver_user_id = fields.Many2one('res.users', '下級審批人')
     old_status = fields.Selection(STATUS, string='原始狀態')
     to_status = fields.Selection(STATUS, string='目標狀態')
 

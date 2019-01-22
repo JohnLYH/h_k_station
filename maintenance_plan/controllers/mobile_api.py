@@ -343,7 +343,7 @@ class WorkOrder(http.Controller):
     @http.route('/mtr/wo/start', type='json', auth='user')
     def auto_star_form(self, **kwargs):
         '''
-        對向波口測試自動保存
+        開始測試
         :param kwargs:
         :return:
         '''
@@ -353,7 +353,12 @@ class WorkOrder(http.Controller):
         # 获取执行班组
         action_dep_id = order_record.action_dep_id
         # 判断这个人是否是这个班组的
-        if request.env['maintenance_plan.maintenance.plan'].search_count([('users', 'in', userid)]) > 0:
+        if action_dep_id.search_count([('users', 'in', userid)]) > 0:
+            order_record.write({
+                'action_dep_id': userid,
+                'status': 'executing',
+                # 'actual_start_time': datetime.datetime.now()
+            })
             return to_json({'errcode': 0, 'data': '', 'msg': '保存成功'})
         return to_json({'errcode': 1, 'data': '', 'msg': '保存失敗,此組沒有這個人'})
 
@@ -377,10 +382,18 @@ class WorkOrder(http.Controller):
         # 獲取工單
         order_record = request.env['maintenance_plan.maintenance.plan'].browse(id)
         test_form = order_record.order_form_ids.filtered(lambda f: f.name == '對向波口測試')
-        test_form.write({
-            'content': params['submitDataBODY'],
-            'status': submitStatus
-        })
+        if submitStatus == 'SUBMIT':
+            test_form.write({
+                'content': params['submitData'],
+                'status': submitStatus
+            })
+            # order_record.write({
+            #     'actual_end_time': datetime.datetime.now()
+            # })
+        else:
+            test_form.write({
+                'status': submitStatus
+            })
         # 表單id
         order_form_id = test_form.id
         # 當前操作人
@@ -529,13 +542,13 @@ class WorkOrder(http.Controller):
         user = request.env['res.users'].browse(execute_user_id)
         # 操作人的信息
         exchangeUser = {
-           'signature': signature,
-           'time': datetime.datetime.now(),
-           'id': execute_user_id,
-           'name': user.name,
-           'role': user.role,
+            'signature': signature,
+            'time': datetime.datetime.now(),
+            'id': execute_user_id,
+            'name': user.name,
+            'role': user.role,
         }
-        #新設備
+        # 新設備
         newEquipment = {
             'serialNo': serialNo,
             'description': equipment_id.description,
@@ -546,14 +559,132 @@ class WorkOrder(http.Controller):
                                                'newEquipment': newEquipment, 'exchangeUser': exchangeUser},
                         'msg': '拒絕成功'})
 
-    @http.route('/mtr/wo/equipment/exchange', type='json', auth='user')
-    def auto_exchange_form(self, **kwargs):
+    @http.route('/mtr/wo/certificate', type='json', auth='user')
+    def auto_certificate_form(self, **kwargs):
         '''
         獲取檢測證書數據
         :param kwargs:
         :return:
         '''
         params = request.jsonrequest
+        # 工單id
+        id = int(params['id'])
+        # 獲取工單
+        order_record = request.env['maintenance_plan.maintenance.plan'].browse(id)
+        # 當前操作人
+        execute_user_id = request.uid
+        test_form = order_record.order_form_ids.filtered(lambda f: f.name == '對向波口測試')
+        # 數據
+        content = json.loads(test_form.content)
+        no = content['no']
+        name = content['name']
+        date = content['date']
+        test_form2 = order_record.order_form_ids.filtered(lambda f: f.name == '檢測證書')
+        # 找到對應的審批記錄
+        order_form_approval = request.env['maintenance_plan.order.form.approval'].search([(
+            'order_form_id', '=', test_form2.id)])
+        if order_form_approval:
+            status = 'SIGNATURED'
+            execute_user_id = order_form_approval.execute_user_id
+            signatureUser = {
+                'id': execute_user_id.id,
+                'role': execute_user_id.role,
+                'time': datetime.datetime.now(),
+                'signature': order_form_approval.signature
+            }
+            return to_json({'errcode': 0, 'data': {'no': no, 'date': date, 'name': name, 'status': status,
+                                                   'signatureUser': signatureUser}, 'msg': '成功'})
+        else:
+            status = 'UNSIGNATURE'
+            return to_json(
+                {'errcode': 0, 'data': {'no': no, 'date': date, 'name': name, 'status': status}, 'msg': '成功'})
 
+    @http.route('/mtr/wo/certificate', type='json', auth='user')
+    def auto_certificate_form(self, **kwargs):
+        '''
+        獲取檢測證書數據
+        :param kwargs:
+        :return:
+        '''
+        params = request.jsonrequest
+        if request.httprequest.method == 'GET':
+            # 工單id
+            id = int(params['id'])
+            # 獲取工單
+            order_record = request.env['maintenance_plan.maintenance.plan'].browse(id)
+            test_form = order_record.order_form_ids.filtered(lambda f: f.name == '對向波口測試')
+            # 數據
+            content = json.loads(test_form.content)
+            # TODO:數據待定
+            no = content['no']
+            name = content['name']
+            date = content['date']
+            test_form2 = order_record.order_form_ids.filtered(lambda f: f.name == '檢測證書')
+            # 找到對應的審批記錄
+            order_form_approval = request.env['maintenance_plan.order.form.approval'].search([(
+                'order_form_id', '=', test_form2.id)])
+            if order_form_approval:
+                status = 'SIGNATURED'
+                execute_user_id = order_form_approval.execute_user_id
+                signatureUser = {
+                    'id': execute_user_id.id,
+                    'role': execute_user_id.role,
+                    'time': datetime.datetime.now(),
+                    'signature': order_form_approval.signature
+                }
+                return to_json({'errcode': 0, 'data': {'no': no, 'date': date, 'name': name, 'status': status,
+                                                       'signatureUser': signatureUser}, 'msg': '成功'})
+            else:
+                status = 'UNSIGNATURE'
+                return to_json(
+                    {'errcode': 0, 'data': {'no': no, 'date': date, 'name': name, 'status': status}, 'msg': '成功'})
+        else:
+            # 工單id
+            id = int(params['id'])
+            # 下級審批人
+            approvers = int(params['approvers'])
+            signature = params['signature']
+            # 獲取工單
+            order_record = request.env['maintenance_plan.maintenance.plan'].browse(id)
+            test_form2 = order_record.order_form_ids.filtered(lambda f: f.name == '檢測證書')
+            request.env['maintenance_plan.order.form.approval'].create({
+                'order_form_id': test_form2.id,
+                'execute_user_id': request.uid,
+                'next_execute_user_id': approvers,
+                'old_status': 'UNSIGNATURE',
+                'to_status': 'SIGNATURED',
+                'signature': signature,
+            })
+            return to_json({"errcode": "0", "msg": "", "data": {}})
 
-
+    @http.route('/mtr/wo/submit', type='json', auth='user')
+    def auto_submit(self, **kwargs):
+        '''
+        提交工單
+        :param kwargs:
+        :return:
+        '''
+        params = request.jsonrequest
+        # 工單id
+        id = int(params['id'])
+        # 獲取工單
+        order_record = request.env['maintenance_plan.maintenance.plan'].browse(id)
+        # 開始時間
+        begin = params['begin']
+        # 結束時間
+        end = params['end']
+        approver = int(params['approver'])
+        request.env['maintenance_plan.order.approval'].create({
+            'work_order_id': id,
+            'execute_user_id': request.uid,
+            'approver_user_id': approver,
+            'old_status': None,
+            'to_status': 'pending_approval'
+        })
+        order_record.write({
+            'actual_start_time': begin,
+            'actual_end_time': end,
+            'approver_user_id': approver,
+            'status': 'pending_approval'
+        })
+        return to_json({"errcode": "0", "msg": "", "data": {}})
