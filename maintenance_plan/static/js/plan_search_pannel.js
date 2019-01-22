@@ -8,19 +8,31 @@ odoo.define("plan_search_pannel", function (require) {
 
     var plan_search_pannel = search_pannel_default.extend({
         events: _.extend({}, search_pannel_default.prototype.events, {
-            'click .export_excel': 'export_excel',
-            'click .put_in_excel': 'put_in_excel',
+            'click .export_excel': 'export_excel', // 導入工單
+            'click .put_in_excel': 'put_in_excel', // 導出工單
+            'click .equipment_search_apply': 'equipment_search_apply', // 設備頁面的搜索，因為有左側設備類型，單獨提出
+            'click .put_in_equipment': 'put_in_equipment', // 導入設備
+            'click .export_qr_code': 'export_qr_code', // 導出設備二維碼
         }),
 
         start: function () {
             var self = this;
+            self.domains = [];
             this.vue = new Vue({
                 el: '#app',
                 data() {
-                    return {}
+                    return {
+                        fullscreenLoading: false
+                    }
                 }
             });
             return self._super()
+        },
+        put_in_equipment: function (event) {
+            // TODO: 導入設備
+        },
+        export_qr_code: function (event) {
+            // TODO: 導出設備二維碼
         },
         put_in_excel: function (event) {
             var self = this;
@@ -54,10 +66,19 @@ odoo.define("plan_search_pannel", function (require) {
                 url: '/maintenance_plan/put_in_excel/',
                 type: 'POST',
                 data: formData,
-                processData: false,  //tell jQuery not to process the data
-                contentType: false,  //tell jQuery not to set contentType
+                processData: false, //tell jQuery not to process the data
+                contentType: false, //tell jQuery not to set contentType
                 //这儿的三个参数其实就是XMLHttpRequest里面带的信息。
+                beforeSend: function (xhr) {
+                    self.loading = self.vue.$loading({
+                        lock: true
+                    })
+                },
+                error: function (textStatus) {
+                    self.loading.close();
+                },
                 success: function (response) {
+                    self.loading.close();
                     response = JSON.parse(response);
                     if (response.error === false) {
                         self.vue.$notify({
@@ -91,11 +112,38 @@ odoo.define("plan_search_pannel", function (require) {
         },
 
         export_excel: function (event) {
-            // TODO: 導出excel
-            console.log(event)
+            var self = this;
+            var limit = self.getParent().getParent().pager.state.limit;
+            var offset = self.getParent().getParent().pager.state.current_min;
+            var oReq = new XMLHttpRequest();
+            oReq.open("POST", '/maintenance_plan/export_work_order', true);
+            oReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            //指定返回类型
+            oReq.responseType = "arraybuffer";
+            oReq.onload = function (oEvent) {
+                if (oReq.readyState == 4 && oReq.status == 200) {
+                    var blob = new Blob([oReq.response], {
+                        type: "application/vnd.ms-excel"
+                    });
+                    // 转换Blob完成，创建一个a标签用于下载
+                    var a = document.createElement('a');
+                    //点击事件
+                    var evt = document.createEvent("HTMLEvents");
+                    evt.initEvent("click", false, false);
+                    // 设置文件名
+                    a.download = '導出工單.xlsx';
+                    // 利用URL.createObjectURL()方法为a元素生成blob URL
+                    a.href = URL.createObjectURL(blob);
+                    a.click();
+                }
+            };
+            // 发送待参数的请求
+            oReq.send("domain=" + JSON.stringify(self.domains) + "&limit=" + limit + "&offset=" + offset);
         },
-        commit_search: function () {
+        equipment_search_apply: function () {
             var domains = []
+            console.log(this.getParent().getParent().renderer.app.current_id) // 設備類型搜索的id
+            var self = this;
             _.each(this.propositions, function (proposition) {
                 var domain = proposition.get_domain()
                 if (!domain) {
@@ -138,9 +186,66 @@ odoo.define("plan_search_pannel", function (require) {
                     domains.push([domain])
                 }
             })
+            self.domains = domains;
             this.trigger_up('search', {
                 domains: domains
             });
+        },
+
+        commit_search: function () {
+            var domains = []
+            var self = this;
+            _.each(this.propositions, function (proposition) {
+                var domain = proposition.get_domain()
+                if (!domain) {
+                    return
+                }
+                // 添加計劃時間段搜索
+                if (proposition.field.name === 'plan_start_time') {
+                    if (domain.length == 2) {
+                        var d1 = domain[0]
+                        var d2 = domain[1]
+
+                        if (!d1[2] || d1[2] == '' || !d2[2] || d2[2] == '') {
+                            return
+                        } else {
+                            domain[1][0] = 'plan_end_time' // 第二個字段改為結束時間的範圍
+                            domains.push(domain)
+                        }
+                        return
+                    }
+                }
+                // 针对时间做特别处理
+                else if (proposition.field.type == 'date' || proposition.field.type == 'datetime') {
+                    if (domain.length == 2) {
+                        var d1 = domain[0]
+                        var d2 = domain[1]
+
+                        if (!d1[2] || d1[2] == '' || !d2[2] || d2[2] == '') {
+                            return
+                        } else {
+                            domains.push(domain)
+                        }
+                        return
+                    }
+                }
+
+                domain = domain[0]
+                if (domain[2] == '' || domain[2] == undefined) {
+                    return
+                } else {
+                    domains.push([domain])
+                }
+            })
+            self.domains = domains;
+            this.trigger_up('search', {
+                domains: domains
+            });
+        },
+        reset_search: function () {
+            var self = this;
+            self._super();
+            self.domains = [];
         }
     });
 

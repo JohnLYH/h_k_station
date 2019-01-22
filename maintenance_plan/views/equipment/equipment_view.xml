@@ -5,7 +5,9 @@
             <field name="name">設備管理列表</field>
             <field name="model">maintenance_plan.equipment</field>
             <field name="arch" type="xml">
-                <tree import="false" edit="0" create="0" delete="0" js_class="equipment_tree_domain" class="noOpen">
+                <tree import="false" edit="0" create="0" delete="0"
+                      search_ex_template="equipment_search_template" search_pannel_js_class="plan_search_pannel"
+                      js_class="equipment_tree_domain" class="noOpen">
                     <field name="parent_equipment_num"/>
                     <field name="num"/>
                     <field name="description"/>
@@ -42,6 +44,8 @@
 
                                 <div class="layui-col-sm4">
                                     <group>
+                                        <field name="line"/>
+                                        <field name="station"/>
                                         <field name="direction"/>
                                         <field name="start_chainage"/>
                                         <field name="end_chainage"/>

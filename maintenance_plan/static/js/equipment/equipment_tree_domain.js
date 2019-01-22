@@ -172,7 +172,7 @@ odoo.define('equipment_tree_domain', function (require) {
                                 });
                             },
 
-                            add_equipment(event, node) {
+                            add_equipment_type(event, node) {
                                 var this_vue = this;
                                 event.stopPropagation();
                                 self.do_action({
@@ -184,9 +184,9 @@ odoo.define('equipment_tree_domain', function (require) {
                                         "default_parent_id": node.data.id,
                                         "node": node.data.id
                                     },
-                                })
+                                }, {size: 'medium'})
                             },
-                            del_equipment(event, node) {
+                            del_equipment_type(event, node) {
                                 var this_vue = this;
                                 event.stopPropagation();
                                 this_vue.$confirm('設備類型刪除后不可修改，是否確認刪除？', '提示', {
@@ -215,7 +215,7 @@ odoo.define('equipment_tree_domain', function (require) {
                     });
                     core.bus.on('update_type_tree', self, function (data) {
                         var this_vue = self.app;
-                        var parent_node = this_vue.$refs.tree.getNode(data.node_id);
+                        var parent_node = this_vue.$refs.tree.getNode(data.parent_id);
                         // 父節點下添加子節點并設置父節點為isLeaf = false狀態
                         this_vue.$refs.tree.append(data, parent_node);
                         parent_node.isLeaf = false;
