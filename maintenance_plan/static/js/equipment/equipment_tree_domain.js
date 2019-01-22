@@ -21,6 +21,7 @@ odoo.define('equipment_tree_domain', function (require) {
         init: function (parent, state, params) {
             this._super(parent, state, params);
             this.record = state
+            this.search_domains = []
         },
 
         _add_equipment: function () {
@@ -28,12 +29,16 @@ odoo.define('equipment_tree_domain', function (require) {
             self._rpc({
                 model: 'maintenance_plan.config',
                 method: 'get_ref_id',
-                kwargs: {list_string_name: ['maintenance_plan.maintenance_plan_equipment_form']}
+                kwargs: {
+                    list_string_name: ['maintenance_plan.maintenance_plan_equipment_form']
+                }
             }).then(function (result) {
                 self.do_action({
                     type: "ir.actions.act_window",
                     res_model: "maintenance_plan.equipment",
-                    views: [[result[0], "form"]],
+                    views: [
+                        [result[0], "form"]
+                    ],
                     target: "new",
                     context: {
                         "default_equipment_type_id": self.app.current_id
@@ -132,23 +137,23 @@ odoo.define('equipment_tree_domain', function (require) {
                         },
                         methods: {
                             handleNodeClick(data) {
-                                var domains;
-                                if (data.id == 0) {
-                                    domains = []
-                                }
-                                else {
-                                    domains = [[["equipment_type_id.id", "=", data.id]]]
+                                if (data.id != 0) {
+                                    self.search_domains.push([
+                                        ["equipment_type_id.id", "=", data.id]
+                                    ])
                                 }
                                 var this_vue = this;
                                 self.trigger_up("search", {
-                                    domains: domains,
+                                    domains: self.search_domains,
                                     contexts: [],
                                     groupbys: []
                                 });
                                 self._rpc({
                                     model: 'maintenance_plan.equipment.type',
                                     method: 'get_type_route',
-                                    kwargs: {type_id: data.id}
+                                    kwargs: {
+                                        type_id: data.id
+                                    }
                                 }).then(function (route) {
                                     self.$('#type_route').html(route);
                                     this_vue.current_id = data.id;
@@ -166,7 +171,9 @@ odoo.define('equipment_tree_domain', function (require) {
                                 self._rpc({
                                     model: 'maintenance_plan.equipment.type',
                                     method: 'get_type_tree',
-                                    kwargs: {type_id: id}
+                                    kwargs: {
+                                        type_id: id
+                                    }
                                 }).then(function (data) {
                                     return resolve(data);
                                 });
@@ -178,13 +185,17 @@ odoo.define('equipment_tree_domain', function (require) {
                                 self.do_action({
                                     type: "ir.actions.act_window",
                                     res_model: "maintenance_plan.equipment.type",
-                                    views: [[false, "form"]],
+                                    views: [
+                                        [false, "form"]
+                                    ],
                                     target: "new",
                                     context: {
                                         "default_parent_id": node.data.id,
                                         "node": node.data.id
                                     },
-                                }, {size: 'medium'})
+                                }, {
+                                    size: 'medium'
+                                })
                             },
                             del_equipment_type(event, node) {
                                 var this_vue = this;
@@ -207,7 +218,9 @@ odoo.define('equipment_tree_domain', function (require) {
                                         this_vue.$refs.tree.remove(node);
                                         this_vue.$refs.tree.setCurrentKey(0);
                                         self.$('#type_route').html(this_vue.$refs.tree.getCurrentNode().name);
-                                        self.getParent().reload({domain: []})
+                                        self.getParent().reload({
+                                            domain: []
+                                        })
                                     })
                                 });
                             }
@@ -222,8 +235,14 @@ odoo.define('equipment_tree_domain', function (require) {
                         // 重新定位到頂節點為點擊狀態
                         this_vue.$refs.tree.setCurrentKey(0);
                         self.$('#type_route').html(this_vue.$refs.tree.getCurrentNode().name);
-                        self.getParent().reload({domain: []})
-                    })
+                        self.getParent().reload({
+                            domain: []
+                        })
+                    });
+                    // 接收search欄并更改domains
+                    core.bus.on('update_equipment_domins', self, function (data) {
+                        self.search_domains = data.domains
+                    });
                 });
 
                 _.invoke(this.pagers, 'destroy');

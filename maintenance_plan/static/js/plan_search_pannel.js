@@ -5,12 +5,14 @@ odoo.define("plan_search_pannel", function (require) {
 
     var widgetRegistry = require('web.widget_registry');
     var search_pannel_default = require('layui_theme.search_pannel_default');
+    var core = require('web.core');
 
     var plan_search_pannel = search_pannel_default.extend({
         events: _.extend({}, search_pannel_default.prototype.events, {
             'click .export_excel': 'export_excel', // 導入工單
             'click .put_in_excel': 'put_in_excel', // 導出工單
             'click .equipment_search_apply': 'equipment_search_apply', // 設備頁面的搜索，因為有左側設備類型，單獨提出
+            'click .equipment_reset_search': 'equipment_reset_search', // 設備頁面的重置搜索，因為有左側設備類型，單獨提出
             'click .put_in_equipment': 'put_in_equipment', // 導入設備
             'click .export_qr_code': 'export_qr_code', // 導出設備二維碼
         }),
@@ -140,29 +142,14 @@ odoo.define("plan_search_pannel", function (require) {
             // 发送待参数的请求
             oReq.send("domain=" + JSON.stringify(self.domains) + "&limit=" + limit + "&offset=" + offset);
         },
+
         equipment_search_apply: function () {
             var domains = []
-            console.log(this.getParent().getParent().renderer.app.current_id) // 設備類型搜索的id
             var self = this;
             _.each(this.propositions, function (proposition) {
                 var domain = proposition.get_domain()
                 if (!domain) {
                     return
-                }
-                // 添加計劃時間段搜索
-                if (proposition.field.name === 'plan_start_time') {
-                    if (domain.length == 2) {
-                        var d1 = domain[0]
-                        var d2 = domain[1]
-
-                        if (!d1[2] || d1[2] == '' || !d2[2] || d2[2] == '') {
-                            return
-                        } else {
-                            domain[1][0] = 'plan_end_time' // 第二個字段改為結束時間的範圍
-                            domains.push(domain)
-                        }
-                        return
-                    }
                 }
                 // 针对时间做特别处理
                 else if (proposition.field.type == 'date' || proposition.field.type == 'datetime') {
@@ -186,10 +173,39 @@ odoo.define("plan_search_pannel", function (require) {
                     domains.push([domain])
                 }
             })
+            // 添加type搜索條件
+            if (self.getParent().getParent().renderer.app.current_id && self.getParent().getParent().renderer.app.current_id !== 0) {
+                domains.push([
+                    ['equipment_type_id.id', '=', self.getParent().getParent().renderer.app.current_id]
+                ])
+            }
             self.domains = domains;
+            core.bus.trigger('update_equipment_domins', {
+                domains: domains
+            });
             this.trigger_up('search', {
                 domains: domains
             });
+        },
+
+        equipment_reset_search: function () {
+            this.$('input').val("")
+            this.$('select[class="o_input"]').find('option').removeAttr("selected")
+            this.$('select[class="o_input"]').find('option').first().attr("selected", "selected")
+            _.each(this.propositions, function (proposition) {
+                if (proposition.reset) {
+                    proposition.reset()
+                }
+            })
+            core.bus.trigger('update_equipment_domins', {
+                domains: []
+            });
+            // flag中没有search_view的时候不显示搜索
+            if (this.search_view) {
+                this.search_view.query.reset();
+            } else {
+                this.commit_search();
+            }
         },
 
         commit_search: function () {
