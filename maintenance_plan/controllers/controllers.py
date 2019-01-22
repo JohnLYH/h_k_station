@@ -200,11 +200,11 @@ class MaintenancePlan(http.Controller):
             sheet.cell(row_num, 2).value = record.standard_job_id.name  # 标准工作
             sheet.cell(row_num, 3).value = record.plan_start_time  # 建议时间(开始)
             sheet.cell(row_num, 4).value = record.plan_end_time  # 建议时间(开始)
-            sheet.cell(row_num, 5).value = record.action_time  # 計劃執行時間
-            sheet.cell(row_num, 6).value = record.actual_start_time  # 实际开始时间
-            sheet.cell(row_num, 7).value = record.actual_end_time  # 实际结束时间
-            sheet.cell(row_num, 8).value = record.action_dep_id.name  # 执行班组
-            sheet.cell(row_num, 9).value = record.executor_id.name  # 执行人
+            sheet.cell(row_num, 5).value = record.action_time or None  # 計劃執行時間
+            sheet.cell(row_num, 6).value = record.actual_start_time or None  # 实际开始时间
+            sheet.cell(row_num, 7).value = record.actual_end_time or None  # 实际结束时间
+            sheet.cell(row_num, 8).value = record.action_dep_id.name or None  # 执行班组
+            sheet.cell(row_num, 9).value = record.executor_id.name or None  # 执行人
         response = request.make_response(save_virtual_workbook(wb))
         return response
 

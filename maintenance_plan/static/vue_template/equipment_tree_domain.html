@@ -3,11 +3,11 @@
         <span class="custom-tree-node" slot-scope="{ node, data }">
         <span>{{ node.label }}</span>
         <span>
-          <el-button type="text" size="mini" @click="add_equipment($event, node)">
+          <el-button type="text" size="mini" @click="add_equipment_type($event, node)">
                        <i class="el-icon-plus" style="border: 1px solid"/>
           </el-button>
 
-          <el-button :disabled="!node.isLeaf" v-if="node.level !== 1" type="text" size="mini" @click="del_equipment($event, node)">
+          <el-button :disabled="!node.isLeaf" v-if="node.level !== 1" type="text" size="mini" @click="del_equipment_type($event, node)">
                        <i class="el-icon-minus" style="border: 1px solid"/>
           </el-button>
         </span>

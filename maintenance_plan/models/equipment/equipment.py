@@ -25,6 +25,8 @@ class Equipment(models.Model):
     parent_equipment_num = fields.Char('父設備編號', required=True)
     serial_number = fields.Char('設備序列號', required=True)  # 唯一
     equipment_type_id = fields.Many2one('maintenance_plan.equipment.type', string='設備類型', required=True)
+    line = fields.Char('線別')
+    station = fields.Char('車站')
     equipment_model = fields.Many2one('maintenance_plan.equipment_model', '設備型號', required=True)
     description = fields.Text('設備描述', required=True)
     status = fields.Selection(STATUS, required=True, default='Effective', string='狀態')
