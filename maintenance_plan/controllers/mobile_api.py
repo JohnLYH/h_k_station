@@ -240,7 +240,8 @@ class WorkOrder(http.Controller):
         output_status_map = dict([(index, word) for (word, index) in STATUS_MAP.items()])
         result = dict(
             no=record.num, status='' if record.status is False else output_status_map[record.status],
-            equipmentNo=record.equipment_id.name, fatherEquipmentNo=record.equipment_id.parent_equipment_num,
+            equipmentNo=record.equipment_id.num,
+            fatherEquipmentNo=record.equipment_id.parent_equipment_num,
             equipmentSerialNo=record.equipment_id.serial_number,
             equipmentLocation=record.equipment_id.detailed_location,
             executionTime=record.action_time, group=record.action_dep_id.name,
@@ -272,10 +273,11 @@ class WorkOrder(http.Controller):
             test_form.approval_ids.filtered(lambda f: f.to_status == 'CHECK')
         )
         assert len(test_form) in [0, 1]
+        # TODO: 待验证
         return to_json({
             'errcode': 0, 'msg': '', 'data': {
                 'no': order_record.num, 'equipmentNo': order_record.equipment_num,
-                'station': order_record.equipment_id.equipment_type_id.station_id.name,
+                'station': order_record.equipment_id.station,
                 'submitStatus': test_form.status, 'submitData': test_form.content or None,
                 'submitUser': {
                     'id': last_submit_approval.execute_user_id.id or None,
@@ -310,7 +312,8 @@ class WorkOrder(http.Controller):
         '''
         params = request.jsonrequest
         no = params['key']
-        domain = [('status', '=', '正常')]
+        domain = [('status', '=', 'OK')]
+        # TODO: 需要验证
         if no != '':
             domain.append(('equipment_name', 'ilike', no))
         tools_records = request.env['maintenance_plan.other_equipment'].search(domain)
@@ -318,12 +321,16 @@ class WorkOrder(http.Controller):
             'errcode': 0, 'data': {
                 'list': [{
                     'id': tool.id, 'no': tool.equipment_num, 'name': tool.equipment_name,
-                    'modle': tool.model, 'expired': False if tool.status == '正常' else True
+                    'modle': tool.model, 'expired': False if tool.status == 'OK' else True
                 } for tool in tools_records]
             },
             'msg': ''
         }
         return to_json(result)
+
+    @http.route('/mtr/wo/tools/input', type='json', auth='user')
+    def tools_input(self, **kwargs):
+        pass
 
     @http.route('/mtr/wo/test/save', type='json', auth='user')
     def auto_save_form(self, **kwargs):
