@@ -32,7 +32,7 @@
                                     <group>
                                         <field name="parent_equipment_num"/>
                                         <field name="num"/>
-                                        <field name="serial_number"/>
+                                        <field name="serial_number_id"/>
                                         <field name="equipment_model"/>
                                         <field name="item_code"/>
                                         <field name="description"/>
@@ -108,10 +108,17 @@
                         </group>
 
                         <group>
-                            <field name="serial_number"/>
+                            <field name="serial_number_id"/>
                         </group>
                         <group>
                             <field name="equipment_model"/>
+                        </group>
+
+                        <group>
+                            <field name="line"/>
+                        </group>
+                        <group>
+                            <field name="station"/>
                         </group>
 
                         <group>

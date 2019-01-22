@@ -131,7 +131,7 @@
                         <button type="button" class="btn btn-primary equipment_search_apply">
                             搜索
                         </button>
-                        <button type="button" class="btn btn-default search_extend_reset">
+                        <button type="button" class="btn btn-default equipment_reset_search">
                             重置
                         </button>
                         <button type="button" class="btn btn-warning put_in_equipment">

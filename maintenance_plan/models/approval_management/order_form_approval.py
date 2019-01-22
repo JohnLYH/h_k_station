@@ -17,3 +17,4 @@ class OrderFormApproval(models.Model):
     to_status = fields.Char('目標狀態')
     signature = fields.Char('簽名')  # 圖片url
     reason = fields.Char('拒絕原因')  # 當被拒絕是才有這項數據
+    approval_time = fields.Datetime('簽署時間')

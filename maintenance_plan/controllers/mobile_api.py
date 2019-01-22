@@ -108,6 +108,7 @@ def get_last_record(query):
         return query[-1]
 
 
+
 class Public(http.Controller):
     '''
     公共接口類
@@ -163,6 +164,9 @@ class Public(http.Controller):
 
 
 class WorkOrder(http.Controller):
+    '''
+    工單接口
+    '''
 
     @http.route('/mtr/wo/list', type='json', auth='user')
     def get_work_oder_list(self, **kwargs):
@@ -312,11 +316,14 @@ class WorkOrder(http.Controller):
         '''
         params = request.jsonrequest
         no = params['key']
+        pageIndex = int(params['pageIndex', 0])
+        pageSize = params['pageSize']
         domain = [('status', '=', 'OK')]
         # TODO: 需要验证
         if no != '':
             domain.append(('equipment_name', 'ilike', no))
-        tools_records = request.env['maintenance_plan.other_equipment'].search(domain)
+        tools_records = request.env['maintenance_plan.other_equipment'].search(
+            domain, limit=pageSize, offset=pageSize * (pageIndex - 1))
         result = {
             'errcode': 0, 'data': {
                 'list': [{
@@ -364,7 +371,7 @@ class WorkOrder(http.Controller):
             order_record.write({
                 'action_dep_id': userid,
                 'status': 'executing',
-                # 'actual_start_time': datetime.datetime.now()
+                'actual_start_time': datetime.datetime.now()
             })
             return to_json({'errcode': 0, 'data': '', 'msg': '保存成功'})
         return to_json({'errcode': 1, 'data': '', 'msg': '保存失敗,此組沒有這個人'})
@@ -391,12 +398,12 @@ class WorkOrder(http.Controller):
         test_form = order_record.order_form_ids.filtered(lambda f: f.name == '對向波口測試')
         if submitStatus == 'SUBMIT':
             test_form.write({
-                'content': params['submitData'],
+                'content': submitData,
                 'status': submitStatus
             })
-            # order_record.write({
-            #     'actual_end_time': datetime.datetime.now()
-            # })
+            order_record.write({
+                'actual_end_time': datetime.datetime.now()
+            })
         else:
             test_form.write({
                 'status': submitStatus
@@ -420,6 +427,7 @@ class WorkOrder(http.Controller):
             'old_status': old_status,
             'to_status': to_status,
             'signature': signature,
+            'approval_time': datetime.datetime.now()
         })
         # TODO: 判断是否要修改工单状态到审批
         return to_json({'errcode': 0, 'data': '', 'msg': '提交成功'})
@@ -493,10 +501,19 @@ class WorkOrder(http.Controller):
         # 原有設備的設備序列號
         old_serialNo = equipment_id.serial_number
         equipment = equipment_id.description
-        station = equipment_id.detailed_location
+        station = equipment_id.station
         equipmentNo = equipment_id.num
-        # 中間過度用的序列號
-        serialNo_str = str(int(time.time()) + random.randint(1, 1000000))
+        # 找到序列號的id
+        serial_number_id = request.env['maintenance_plan.equipment.serial_number'].search([('num', '=', serialNo)])
+        if not serial_number_id:
+            return to_json({'errcode': 1, 'data': '', 'msg': '未找到該序列號'})
+        serial_number_id = serial_number_id.id
+        # 找到舊設備序列號id
+        old_serial_number_id = request.env['maintenance_plan.equipment.serial_number'].search(
+            [('num', '=', old_serialNo)])
+        if not old_serial_number_id:
+            return to_json({'errcode': 1, 'data': '', 'msg': '未找到舊序列號'})
+        old_serial_number_id = old_serial_number_id.id
         # 去找到新設備序列號的原來那台設備并更改設備序列號為過度序列號
         to_old_equipment = request.env['maintenance_plan.equipment'].search([{
             ('serial_number', '=', serialNo), ('num', '=', None)
@@ -526,9 +543,6 @@ class WorkOrder(http.Controller):
             'executor_user_id': execute_user_id,
             'signature': signature
         })
-        to_old_equipment = to_old_equipment.write({
-            'serial_number': serialNo_str
-        })
         # 新序列號的安裝記錄
         request.env['maintenance_plan.migrate.records'].write({
             'info': '安裝到設備No.：{}'.format(equipment_id.num),
@@ -537,13 +551,21 @@ class WorkOrder(http.Controller):
             'executor_user_id': execute_user_id,
             'signature': signature
         })
+        # 新序列號的安裝記錄
+        request.env['maintenance_plan.migrate.records'].write({
+            'info': '安裝到設備No.：{}'.format(to_old_equipment.num),
+            'equipment_serial_number': old_serialNo,
+            'remark': reason,
+            'executor_user_id': execute_user_id,
+            'signature': signature
+        })
         # 更改序列號
         equipment_id.write({
-            'serial_number': serialNo
+            'serial_number_id': serial_number_id
         })
         # 丟棄老設備
-        to_old_equipment = to_old_equipment.write({
-            'serial_number': old_serialNo,
+        to_old_equipment.write({
+            'serial_number_id': old_serial_number_id,
             'num': None,
         })
         user = request.env['res.users'].browse(execute_user_id)
@@ -574,69 +596,37 @@ class WorkOrder(http.Controller):
         :return:
         '''
         params = request.jsonrequest
-        # 工單id
-        id = int(params['id'])
-        # 獲取工單
-        order_record = request.env['maintenance_plan.maintenance.plan'].browse(id)
-        # 當前操作人
-        execute_user_id = request.uid
-        test_form = order_record.order_form_ids.filtered(lambda f: f.name == '對向波口測試')
-        # 數據
-        content = json.loads(test_form.content)
-        no = content['no']
-        name = content['name']
-        date = content['date']
-        test_form2 = order_record.order_form_ids.filtered(lambda f: f.name == '檢測證書')
-        # 找到對應的審批記錄
-        order_form_approval = request.env['maintenance_plan.order.form.approval'].search([(
-            'order_form_id', '=', test_form2.id)])
-        if order_form_approval:
-            status = 'SIGNATURED'
-            execute_user_id = order_form_approval.execute_user_id
-            signatureUser = {
-                'id': execute_user_id.id,
-                'role': execute_user_id.role,
-                'time': datetime.datetime.now(),
-                'signature': order_form_approval.signature
-            }
-            return to_json({'errcode': 0, 'data': {'no': no, 'date': date, 'name': name, 'status': status,
-                                                   'signatureUser': signatureUser}, 'msg': '成功'})
-        else:
-            status = 'UNSIGNATURE'
-            return to_json(
-                {'errcode': 0, 'data': {'no': no, 'date': date, 'name': name, 'status': status}, 'msg': '成功'})
-
-    @http.route('/mtr/wo/certificate', type='json', auth='user')
-    def auto_certificate_form(self, **kwargs):
-        '''
-        獲取檢測證書數據
-        :param kwargs:
-        :return:
-        '''
-        params = request.jsonrequest
         if request.httprequest.method == 'GET':
             # 工單id
             id = int(params['id'])
             # 獲取工單
             order_record = request.env['maintenance_plan.maintenance.plan'].browse(id)
+            # 當前操作人
+            execute_user_id = request.uid
             test_form = order_record.order_form_ids.filtered(lambda f: f.name == '對向波口測試')
-            # 數據
-            content = json.loads(test_form.content)
-            # TODO:數據待定
-            no = content['no']
-            name = content['name']
-            date = content['date']
+            if test_form.content:
+                # 數據
+                content = json.loads(test_form.content)
+                # TODO: 查看检测证书里面的数据是不是这样
+                no = content['no']
+                name = content['name']
+                date = content['date']
+            else:
+                no = '無'
+                name = '無'
+                date = '無'
             test_form2 = order_record.order_form_ids.filtered(lambda f: f.name == '檢測證書')
             # 找到對應的審批記錄
             order_form_approval = request.env['maintenance_plan.order.form.approval'].search([(
                 'order_form_id', '=', test_form2.id)])
+            # TODO:檢驗證書多個人都要簽署還是什麼
             if order_form_approval:
                 status = 'SIGNATURED'
                 execute_user_id = order_form_approval.execute_user_id
                 signatureUser = {
                     'id': execute_user_id.id,
                     'role': execute_user_id.role,
-                    'time': datetime.datetime.now(),
+                    'time': order_form_approval.approval_time,
                     'signature': order_form_approval.signature
                 }
                 return to_json({'errcode': 0, 'data': {'no': no, 'date': date, 'name': name, 'status': status,
@@ -661,6 +651,7 @@ class WorkOrder(http.Controller):
                 'old_status': 'UNSIGNATURE',
                 'to_status': 'SIGNATURED',
                 'signature': signature,
+                'approval_time': datetime.datetime.now()
             })
             return to_json({"errcode": "0", "msg": "", "data": {}})
 
@@ -695,3 +686,70 @@ class WorkOrder(http.Controller):
             'status': 'pending_approval'
         })
         return to_json({"errcode": "0", "msg": "", "data": {}})
+
+
+class Approval(http.Controller):
+    """
+    審批接口
+    """
+    @http.route('/mtr/approval/list', type='json', auth='user')
+    def approval_list(self, **kwargs):
+        """
+        审批列表
+        :param kwargs:
+        :return:
+        """
+        params = request.jsonrequest
+        page = params['pageIndex']
+        limit = params['pageSize']
+        # 搜索值
+        key = params['key']
+        # 狀態:PENDING:待审批，PROGRESS:审批中，APPROVED: 已审批
+        status = params['status']
+        beginDate = params['beginDate']
+        endDate = params['endDate']
+
+class Center_User(http.Controller):
+    """
+    個人中心
+    """
+    @http.route('/mtr/center', type='json', auth='user')
+    def center(self, **kwargs):
+        '''
+        获取个人中心数据
+        :param kwargs:
+        :return:
+        '''
+        params = request.jsonrequest
+        # 請求人id
+        id = request.uid
+        name = request.env.user.name
+        department = request.env.user.branch
+        position = request.env.user.role
+        email = request.env.user.email
+        userInfo = {
+            'name': name,
+            'position': position,
+            'department': department,
+            'email': email,
+        }
+        return to_json({'errcode': 0, 'data': {'userInfo': userInfo}, 'msg': ''})
+
+    @http.route('/mtr/password/reset', type='json', auth='user')
+    def password_reset(self, **kwargs):
+        '''
+        修改密码
+        :param kwargs:
+        :return:
+        '''
+        params = request.jsonrequest
+        # 原始密碼
+        original = params['original']
+        # 新密碼
+        new = params['new']
+        try:
+            if request.env['res.users'].change_password(original, new):
+                return to_json({'errcode': 0, 'data': {}, 'msg': ''})
+        except Exception:
+            return to_json({'errcode': 1, 'data': {}, 'msg': '原始密碼輸入錯誤'})
+        return to_json({'errcode': 1, 'data': {}, 'msg': '更改密碼失敗'})
