@@ -16,6 +16,7 @@ class ApprovalManagement(models.Model):
     approver_user_id = fields.Many2one('res.users', '下級審批人')
     old_status = fields.Selection(STATUS, string='原始狀態')
     to_status = fields.Selection(STATUS, string='目標狀態')
+    approval_type = fields.Char('審批類型', default='Maintenance Reference')
 
 
 class ReferenceExaminationApproval(models.Model):
@@ -24,8 +25,9 @@ class ReferenceExaminationApproval(models.Model):
     _description = '參考資料審批'
 
     equipment_id = fields.Many2one('maintenance_plan.equipment', string='設備')
-    submitter = fields.Many2one('user.employees_get', '提交人')
+    submitter = fields.Many2one('res.users', '提交人')
     submit_time = fields.Datetime('提交時間')
-    approver = fields.Many2one('user.employees_get', '審批人')
+    approver = fields.Many2one('res.users', '審批人')
     status = fields.Selection(STATUS, string='審批狀態')
     approval_time = fields.Datetime('審批時間')
+    approval_type = fields.Char('審判類型', default='WO')

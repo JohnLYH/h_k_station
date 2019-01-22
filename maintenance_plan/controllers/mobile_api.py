@@ -708,6 +708,16 @@ class Approval(http.Controller):
         status = params['status']
         beginDate = params['beginDate']
         endDate = params['endDate']
+        # 先去搜索
+        domian = []
+        if key != '':
+            domain.extend([
+                '|', '|', '|',
+                ('num', 'ilike', search_key),
+                ('equipment_num', 'ilike', search_key),
+                ('executor_id.name', 'ilike', search_key),
+                ('action_dep_id.name', 'ilike', search_key)
+            ])
 
 class Center_User(http.Controller):
     """
