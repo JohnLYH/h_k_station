@@ -80,15 +80,12 @@ odoo.define('rights_management', function (require) {
 
                     methods: {
                         date_return: function (data) {
-
                             self._rpc({
                                 model: 'res.users',
                                 method: 'get_users',
                                 kwargs: {'department_id': data.id}
                             }).then(function (get_data) {
                             });
-
-
                         },
 
                         date_return_act: function (data) {
@@ -165,7 +162,7 @@ odoo.define('rights_management', function (require) {
                                     per: row.permission_illust,
                                     groups_id: row.id
                                 },
-                            }, {
+                            },{size: 'medium'} ,{
                                 on_close: function () {
                                     self_act.handleCurrentChange(self.vue_data.currentPage4)
                                 }
@@ -224,6 +221,7 @@ odoo.define('rights_management', function (require) {
                             self.vue_data.input = '';
                             self.vue_data.value = '';
                         },
+                        
                         create_rec: function () {
                             var this_vue = this
                             self.do_action({
@@ -246,10 +244,8 @@ odoo.define('rights_management', function (require) {
                             }).then(function (get_data) {
                                 start_act.date_return_act(start_act)
                             });
-
                         },
                     },
-
                 });
             })
         },
