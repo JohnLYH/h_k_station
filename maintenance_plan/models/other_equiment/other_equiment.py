@@ -74,18 +74,22 @@ class OtherEquipment(models.Model):
         if 'type' in vals:
             vals.pop('type')
             return super(OtherEquipment, self).write(vals)
+        content = ''
         for i in vals:
             old_value = self[i]
             field_string = self._fields[i].get_description(self.env)['string']
-            content = '修改{}{}為{}'.format(field_string, old_value, vals[i]) if old_value else '修改{}為{}'.format(
+            if old_value:
+                content += '修改{}{}為{}'.format(field_string, old_value, vals[i])
+            else:
+                content += '修改{}為{}'.format(
                 field_string, vals[i])
-            new_records = self.env['maintenance_plan.other_equipment_records'].create({
-                'other_equipment_id': self.id,
-                'operation_time': datetime.now(),
-                'operation_type': '編輯',
-                'content': content,
-                'user_id': self._uid,
-            })
+        new_records = self.env['maintenance_plan.other_equipment_records'].create({
+            'other_equipment_id': self.id,
+            'operation_time': datetime.now(),
+            'operation_type': '編輯',
+            'content': content,
+            'user_id': self._uid,
+        })
         return super(OtherEquipment, self).write(vals)
 
     @api.model

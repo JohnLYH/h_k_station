@@ -28,11 +28,13 @@ class PermissManage(models.Model):
 
     @api.model
     def get_permiss_role(self):
+
         config_dict = self.env['res.groups'].get_config_info()
         category_id = self.env.ref('{}.{}'.format(config_dict['module_name'], config_dict['custom_group_id']))
         category_id.ensure_one()
-        record = self.search_read([('category_id', '=', category_id.id)])
-        return {'record': record, 'view_id': self.env.ref('user.create_new_rec_form').id}
+        count_date = self.search_count([('category_id', '=', category_id.id)])
+        record = self.search_read([('category_id', '=', category_id.id)], limit=30)
+        return {'record': record, 'view_id': self.env.ref('user.create_new_rec_form').id, 'cont_data': count_date}
 
     @api.model
     def get_disable_info_act(self, **kwargs):
@@ -55,16 +57,20 @@ class PermissManage(models.Model):
     def permissions_search(self, **kw):
         if kw.get('chose') == 'all':
             record = self.search_read([('name', '=', kw.get('name'))])
-            return record
+            count = self.search_read([('name', '=', kw.get('name'))])
+            return {'record': record, 'count':count}
         elif kw.get('chose') == 'disable':
-            record = self.search_read([('name', '=', kw.get('name')), ('state', '=', '禁用')])
-            return record
+            record = self.search_read([('name', '=', kw.get('name')), ('state', '=', '已禁用')])
+            count = self.search_count([('name', '=', kw.get('name')), ('state', '=', '已禁用')])
+            return {'record': record, 'count':count}
         elif kw.get('chose') == 'normal':
             record = self.search_read([('name', '=', kw.get('name')), ('state', '=', '正常')])
-            return record
+            count = self.search_count([('name', '=', kw.get('name')), ('state', '=', '正常')])
+            return {'record': record, 'count':count}
         else:
             record = []
-            return record
+            count=0
+            return {'record': record, 'count':count}
 
     # 删除数据
     @api.model
@@ -72,13 +78,56 @@ class PermissManage(models.Model):
         print(kwargs)
         self.search([('id', '=', kwargs.get('self_id'))]).unlink()
 
-    def creste_new_record(self):
+    @api.model
+    def creste_new_record(self, **kwargs):
         config_dict = self.get_config_info()
         category_id = self.env.ref('{}.{}'.format(config_dict['module_name'], config_dict['custom_group_id']))
         category_id.ensure_one()
+        # 獲取名字的ID
+        name_id = []
+        for i in kwargs.get('user_name'):
+            print(i)
+            self_id = self.env['res.users'].search([('name', '=', i)])
+            print(self_id.id)
+            name_id.append(self_id.id)
+
         self.create({
-            'name': self.name,
+            'name': kwargs.get('name'),
             'category_id': category_id.id,
-            'users': [(6, 0, self.users.ids)],
-            'permission_illust': self.permission_illust,
+            'users': [(6, 0, name_id)],
+            'permission_illust': kwargs.get('permiss'),
+            'implied_ids': [(6, 0, kwargs.get('tree_id'))],
         })
+
+    @api.model
+    def start_button_act(self, **kwargs):
+        self.browse(kwargs.get('self_id')).write({'state': '正常'})
+
+    # 新增记录
+    @api.model
+    def get_new_create_data(self):
+        record = self.env['res.users'].search([])
+        lis = []
+        for i in record:
+            dic = {}
+            dic['value'] = i.name
+            dic['table'] = i.id
+            lis.append(dic)
+
+        return lis
+
+    #  编辑的时候 关闭弹窗返回的页面
+    @api.model
+    def current_page_data(self,**kw):
+        config_dict = self.env['res.groups'].get_config_info()
+        category_id = self.env.ref('{}.{}'.format(config_dict['module_name'], config_dict['custom_group_id']))
+        category_id.ensure_one()
+
+        users = self.env['res.groups'].search_read([('category_id', '=', category_id.id)],
+                                                   limit=kw.get('record') * 30)[-30:]
+        page_count = kw.get('message') // 30
+        remainder = kw.get('message') % 30  # 余数来判断最后一页的数据
+        if kw.get('record') == page_count + 1:
+            users = self.env['res.groups'].search_read([('category_id', '=', category_id.id)],
+                                                       limit=kw.get('record') * 30)[-remainder:]
+        return users
