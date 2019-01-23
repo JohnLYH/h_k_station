@@ -6,6 +6,7 @@ odoo.define('equipment_notebook', function (require) {
 
     var Widget = require('web.Widget');
     var widget_registry = require('web.widget_registry');
+    var data_manager = require('web.data_manager');
 
     var equipment_notebook = Widget.extend({
         init: function (parent, record, node) {
@@ -71,6 +72,18 @@ odoo.define('equipment_notebook', function (require) {
                             return function (datetime) {
                                 return datetime.replace(/-/g, "/")
                             }
+                        }
+                    },
+                    methods: {
+                        turn_to_order: function (order_id) {
+                            data_manager.load_action('maintenance_plan.act_order_approval').then(function (result) {
+                                self.do_action(result, {
+                                    res_id: order_id,
+                                    view_type: 'form',
+                                }, {
+                                    replace_last_action: true
+                                })
+                            })
                         }
                     },
                 })

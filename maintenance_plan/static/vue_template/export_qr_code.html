@@ -1,0 +1,11 @@
+<div id="export_qr_code_div">
+    <el-row id="table" :gutter="30">
+
+    </el-row>
+    <el-row style="margin-top: 20px;" type="flex" justify="center">
+        <el-button @click="cancel" size="small">取消</el-button>
+        <el-button v-if="checked_equipment_type_tree_data.length > 0" style="margin-left: 15px" @click="enter" size="small"
+            type="primary">確定</el-button>
+    </el-row>
+
+</div>

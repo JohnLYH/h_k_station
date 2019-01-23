@@ -23,6 +23,7 @@ class Equipment(models.Model):
     line = fields.Char('線別')
     station = fields.Char('車站')
     equipment_model = fields.Many2one('maintenance_plan.equipment_model', '設備型號', required=True)
+    display_equipment_model_name = fields.Char('設備型號', compute='_com_equipment_model')  # 設備型號名稱的展示字段
     description = fields.Text('設備描述', compute='_com_equipment_model', store=True)
     status = fields.Selection(STATUS, required=True, default='Effective', string='狀態')
     item_code = fields.Char('庫存編號', required=True)
@@ -52,3 +53,4 @@ class Equipment(models.Model):
     def _com_equipment_model(self):
         if len(self.equipment_model) != 0:
             self.description = self.equipment_model.description
+            self.display_equipment_model_name = self.equipment_model.equipment_model
