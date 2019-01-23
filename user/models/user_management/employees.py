@@ -178,13 +178,13 @@ class EmployeesGet(models.Model):
     # 修改密码
     @api.model
     def change_password_usr(self, **kw):
-        usr_record = self.search([('login', '=', kw.get('login'))])
         record = self.search([('id', '=', kw.get('user_id'))])
         record.write({'password': 123456})
+        name = record.name
 
         # TODO: 密碼重置發送郵件
         # 重置密碼的時候發送郵件
-        receive_name = ''  # 收件人的人名
+        receive_name = name  # 收件人的人名
         sender = 'businessempire@163.com'  # 发送人的邮箱
         receiver = 'merchantfield@163.com'  # 接收人的邮箱 是list
         subject = '密碼重置'  # 标题
@@ -194,11 +194,8 @@ class EmployeesGet(models.Model):
         password = '57624530asd'  # 发送人的授权码,不是密码
         info = '''
                         內容：管理員已將您MTR移動管理應用密碼重置為初始密碼。
-                
                 APP下載地址：https://pro.modao.cc/app/wtl9bDa7gySi56dReeSDeH9IhnXSHko，
-                
                 管理後台地址：https://pro.modao.cc/app/XsU5ZiLTlpyAoAV59PHOPQpC1QdVKo6，
-                
                 請盡快登錄修改密碼。
                 '''
         msg = MIMEText(info, 'plain', 'utf-8')  # 中文需参数‘utf-8'，单字节字符不需要
@@ -211,9 +208,13 @@ class EmployeesGet(models.Model):
         smtp.sendmail(sender, [receiver], msg.as_string())
         smtp.quit()  # 退出
 
-        self.env['user.send_email'].create(
-            {'email_theme': subject, 'recipient_person': receive_name,
-             'send_time': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')})
+        self.env['user.send_email'].create({
+            'send_person': 'admin' + '<' + sender + '>',
+            'email_theme': subject,
+            'recipient_person': receive_name,
+            'send_time': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'send_content': info
+        })
 
     @api.model
     def enable_button_act(self, **kwargs):
@@ -233,7 +234,7 @@ class EmployeesGet(models.Model):
 
     def create_new_send_email(self):
         # TODO: 新建賬號發送郵件
-        # 重置密碼的時候發送郵件
+        # 新建賬號發送郵件的時候發送郵件
         receive_name = ''  # 收件人的人名
         sender = 'businessempire@163.com'  # 发送人的邮箱
         receiver = 'merchantfield@163.com'  # 接收人的邮箱 是list
@@ -244,9 +245,7 @@ class EmployeesGet(models.Model):
         password = '57624530asd'  # 发送人的授权码,不是密码
         info = '''
                         管理員已為您開通MTR移動管理應用，賬號：%s，初始密碼：123456，APP下載地址：https://pro.modao.cc/app/wtl9bDa7gySi56dReeSDeH9IhnXSHko，
-                        
                         管理後台地址：https://pro.modao.cc/app/XsU5ZiLTlpyAoAV59PHOPQpC1QdVKo6，
-                        
                         請盡快登錄修改密碼。
                         ''' % self.login
         msg = MIMEText(info, 'plain', 'utf-8')  # 中文需参数‘utf-8'，单字节字符不需要
@@ -263,9 +262,13 @@ class EmployeesGet(models.Model):
         lis_rec.append(self.id)
         rec.write({'users': [(6, 0, lis_rec)]})
         self.write({'password': 123456})
-        self.env['user.send_email'].create(
-            {'email_theme': subject, 'recipient_person': self.name,
-             'send_time': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')})
+        self.env['user.send_email'].create({
+            'send_person': 'admin' + '<' + sender + '>',
+            'email_theme': subject,
+            'recipient_person': self.name,
+            'send_time': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'send_content': info
+        })
 
     # 添加tree数据
     @api.model

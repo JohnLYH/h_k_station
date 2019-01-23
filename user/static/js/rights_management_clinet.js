@@ -221,7 +221,7 @@ odoo.define('rights_management', function (require) {
                             self.vue_data.input = '';
                             self.vue_data.value = '';
                         },
-                        
+
                         create_rec: function () {
                             var this_vue = this
                             self.do_action({
