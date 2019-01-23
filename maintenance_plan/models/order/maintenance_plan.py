@@ -14,6 +14,7 @@ class MaintenancePlan(models.Model):
     _name = 'maintenance_plan.maintenance.plan'
     _description = '維修計劃'
     _rec_name = 'num'
+    _order = 'create_date DESC'
 
     def _default_order_forms(self):
         return [(0, 0, {'name': '對向波口測試', 'status': 'WRITE'}), (0, 0, {'name': '檢測證書', 'status': 'WRITE'})]
@@ -24,6 +25,7 @@ class MaintenancePlan(models.Model):
     standard_job_id = fields.Many2one('maintenance_plan.standard.job', string='標準工作', required=True)
     equipment_id = fields.Many2one('maintenance_plan.equipment', string='設備', required=True)
     equipment_num = fields.Char('設備編號', compute='_com_equipment', store=True)
+    equipment_serial_number = fields.Char('設備序列號')  # 因設備序列號會變，故在此記錄生成工單時的瞬時設備序列號
     plan_start_time = fields.Date('建議時間(開始)', required=True)
     plan_end_time = fields.Date('建議時間(結束)', required=True)
     display_plan_time = fields.Char('建議時間', compute='_com_plan_time', store=True)
@@ -45,6 +47,12 @@ class MaintenancePlan(models.Model):
     order_form_ids = fields.One2many('maintenance_plan.order.form', 'order_id', string='工單內審批表單',
                                      default=_default_order_forms)
     approval_type = fields.Char('審批類型', default='Maintenance Reference')
+
+    @api.model
+    def create(self, vals):
+        serial_number = self.env['maintenance_plan.equipment'].browse(vals['equipment_id']).serial_number
+        vals['equipment_serial_number'] = serial_number
+        return super().create(vals)
 
     @api.one
     @api.depends('order_approval_ids')
