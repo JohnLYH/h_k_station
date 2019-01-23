@@ -258,7 +258,6 @@ class WorkOrder(http.Controller):
         )
         return to_json({'errcode': 0, 'data': result, 'msg': ''})
 
-    # TODO: 待验证,等待重新定義需要數據
     @http.route('/mtr/wo/test', type='json', auth='user')
     def get_work_order_test_form(self, **kwargs):
         '''
@@ -269,7 +268,12 @@ class WorkOrder(http.Controller):
         params = request.jsonrequest
         order_record = request.env['maintenance_plan.maintenance.plan'].browse(params['id'])
         test_form = order_record.order_form_ids.filtered(lambda f: f.name == '對向波口測試')
-        flow = test_form.approval_ids.filtered(lambda f: f.old_status in ['WRITE', 'SUBMIT','CHECK'])
+        values = []
+        flows = test_form.approval_ids.filtered(lambda f: f.old_status in ['WRITE', 'SUBMIT','CHECK'])
+        for flow in flows:
+            values.append(dict(id=flow.id, name=flow.execute_user_id.name, role=flow.execute_user_id.role,
+                               time=flow.create_date, signature=flow.signature,
+                               reject=True if flow.to_status == 'WRITE' else False, rejectReson=flow.reason))
         assert len(test_form) in [0, 1]
         # 簽署狀態
         status = test_form.status
@@ -277,13 +281,12 @@ class WorkOrder(http.Controller):
             status = status
         else:
             status = 'COMPLETE'
-        # TODO: 待验证,等待重新定義需要數據
         return to_json({
             'errcode': 0, 'msg': '', 'data': {
                 'no': order_record.num, 'equipmentNo': order_record.equipment_num,
                 'station': order_record.equipment_id.station,
                 'submitStatus': status, 'submitData': test_form.content or None,
-                'flow': flow,
+                'flow': values,
             }
         })
 
@@ -299,7 +302,6 @@ class WorkOrder(http.Controller):
         pageIndex = int(params['pageIndex', 0])
         pageSize = params['pageSize']
         domain = [('status', '=', 'OK')]
-        # TODO: 需要验证
         if no != '':
             domain.append(('equipment_name', 'ilike', no))
         tools_records = request.env['maintenance_plan.other_equipment'].search(
@@ -392,8 +394,8 @@ class WorkOrder(http.Controller):
             old_status = 'WRITE'
         else:
             # 找到之前的最後條記錄
-            order_form_approval = request.env['maintenance_plan.order.form.approval'].search([
-                ('next_execute_user_id', '=', execute_user_id), ('order_form_id', '=', order_form_id)], limit=1)
+            order_form_approval = get_last_record(request.env['maintenance_plan.order.form.approval'].search([
+                ('next_execute_user_id', '=', execute_user_id), ('order_form_id', '=', order_form_id)]))
             old_status = order_form_approval.to_status if order_form_approval else 'WRITE'
         to_status = submitStatus
         request.env['maintenance_plan.order.form.approval'].create({
@@ -405,7 +407,6 @@ class WorkOrder(http.Controller):
             'signature': signature,
             'approval_time': datetime.datetime.now()
         })
-        # TODO: 判断是否要修改工单状态到审批
         return to_json({'errcode': 0, 'data': '', 'msg': '提交成功'})
 
     @http.route('/mtr/wo/test/reject', type='json', auth='user')
@@ -428,24 +429,19 @@ class WorkOrder(http.Controller):
         execute_user_id = request.uid
         # 獲取工單
         order_record = request.env['maintenance_plan.maintenance.plan'].browse(id)
-        # 修改状态为前一步
+        # 修改状态填表人填寫
         test_form = order_record.order_form_ids.filtered(lambda f: f.name == '對向波口測試')
         test_form.write({
-            'status': rejectStatus
+            'status': 'WRITE'
         })
         # 表單id
         order_form_id = test_form.id
-        # 找到之前的最後條記錄
-        order_form_approval = request.env['maintenance_plan.order.form.approval'].search([
-            ('next_execute_user_id', '=', execute_user_id), ('order_form_id', '=', order_form_id)], limit=1)
-        old_status = order_form_approval.to_status if order_form_approval else 'SUBMIT'
-        next_execute_user_id = order_form_approval.execute_user_id.id
         request.env['maintenance_plan.order.form.approval'].create({
             'order_form_id': order_form_id,
             'execute_user_id': execute_user_id,
-            'next_execute_user_id': next_execute_user_id,
-            'old_status': old_status,
-            'to_status': rejectStatus,
+            'next_execute_user_id': order_record.executor_id.id,
+            'old_status': rejectStatus,
+            'to_status': 'WRITE',
             'signature': signature,
         })
         return to_json({'errcode': 0, 'data': '', 'msg': '拒絕成功'})
