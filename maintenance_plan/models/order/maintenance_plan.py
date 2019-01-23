@@ -64,8 +64,8 @@ class MaintenancePlan(models.Model):
             # 最後審批的記錄，可能為空記錄
             last_approver_approver = approver_approver_ids[-1] if len(approver_approver_ids) > 0 else None
             self.approver_status = last_approver_approver.to_status if last_approver_approver is not None else None
-            self.submit_user_id = last_submit_approver.executer_id
-            self.approver_user_id = last_approver_approver.executer_id if last_approver_approver is not None else None
+            self.submit_user_id = last_submit_approver.execute_user_id
+            self.approver_user_id = last_approver_approver.approver_user_id if last_approver_approver is not None else None
             self.last_submit_date = last_submit_approver.create_date
             self.last_approver_date = last_approver_approver.create_date if last_approver_approver is not None else None
 
