@@ -366,7 +366,6 @@ class MaintenancePlan(http.Controller):
             # 刪除臨時文件夾
             shutil.rmtree(file_name)
             return response
-        # TODO: 導出設備二維碼
 
     @http.route('/maintenance_plan/materials_upload_files', auth='user', csrf=False, methods=['POST'])
     def materials_upload_files(self, **kw):
