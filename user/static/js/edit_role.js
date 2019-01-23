@@ -71,7 +71,6 @@ odoo.define('edit_role', function (require) {
 
                     methods: {
                         click_node: function (data) {
-                            console.log('888', data)
                         },
 
                         onSubmit: function (date) {
@@ -90,8 +89,9 @@ odoo.define('edit_role', function (require) {
                                     per_id: implied_ids,
                                     self_id: self.vue_data.group_id
                                 }
+                            }).then( function () {
+                                self.do_action({"type": "ir.actions.act_window_close"})
                             })
-                            self.do_action({"type": "ir.actions.act_window_close"})
                         },
                         cancel: function () {
                             self.do_action({"type": "ir.actions.act_window_close"})

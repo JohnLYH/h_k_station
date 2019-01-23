@@ -34,10 +34,15 @@ odoo.define('employees_management_action', function (require) {
                     {value: 'disable', label: '禁用'},
                     {value: 'all', label: '全部'}
                 ],
-                size_: 10,
-                list_size: [10, 20, 30, 40],
+                size_: 30,
                 node_record: '',
                 edit_department_id: '',
+                act_id: '',
+                data5: '',
+                tree_input: false,
+                tree_date: '',
+                tree_data5: '',
+                data5_data: '',
             };
         },
 
@@ -49,7 +54,8 @@ odoo.define('employees_management_action', function (require) {
                 model: 'res.users',
                 method: 'get_department_users',
             }).then(function (data) {
-                self.vue_data.departmentList = data
+                self.vue_data.data5 = data.department_tree
+                self.vue_data.act_id = data.act_id
             })
         },
 
@@ -70,12 +76,12 @@ odoo.define('employees_management_action', function (require) {
 
                     methods: {
                         click_node: function (data) {
-                            self.vue_data.node_record = data.id;
+                            self.vue_data.node_record = data.value;
                             self.vue_data.currentPage4 = 1;
                             self._rpc({
                                 model: 'res.users',
                                 method: 'get_users_info',
-                                kwargs: {'department_id': data.id, 'page': 1, 'limit': 10}
+                                kwargs: {'department_id': data.value, 'page': 1, 'limit': 30}
                             }).then(function (get_data) {
                                 self.vue_data.tableData = get_data.users;
                                 self.vue_data.message = get_data.count;
@@ -87,7 +93,7 @@ odoo.define('employees_management_action', function (require) {
                             self._rpc({
                                 model: 'res.users',
                                 method: 'get_users_info',
-                                kwargs: {'department_id': data.id, 'page': self.vue_data.currentPage4, 'limit': 10}
+                                kwargs: {'department_id': data.value, 'page': self.vue_data.currentPage4, 'limit': 30}
                             }).then(function (get_data) {
                                 self.vue_data.tableData = get_data.users;
                                 self.vue_data.message = get_data.count;
@@ -110,11 +116,17 @@ odoo.define('employees_management_action', function (require) {
                         },
 
                         handleCurrentChange: function (page) {
-                            self.vue_data.currentPage4 = page
+                            self.vue_data.currentPage4 = page;
                             self._rpc({
                                 model: 'res.users',
-                                method: 'current_change',
-                                kwargs: {'record': page, 'page': self.vue_data.tableData.length}
+                                method: 'per_current_change',
+                                kwargs: {
+                                    'record': page,
+                                    'page': self.vue_data.tableData.length,
+                                    'name': self.vue_data.input,
+                                    'chose': self.vue_data.value,
+                                    'message': self.vue_data.message,
+                                }
                             }).then(function (get_data) {
                                 self.vue_data.tableData = get_data;
                             });
@@ -129,6 +141,7 @@ odoo.define('employees_management_action', function (require) {
                                 tag: 'person_edit',
                                 target: 'new',
                                 context: {
+                                    'self_id': row.id,
                                     'name': row.name,
                                     'login': row.login,
                                     'post': row.post,
@@ -140,7 +153,7 @@ odoo.define('employees_management_action', function (require) {
                                 }
                             }, {
                                 on_close: function () {
-                                    this_vue.click_node_page(this_vue.$refs.tree.getCurrentNode())
+                                    this_vue.handleCurrentChange(self.vue_data.currentPage4)
                                 }
                             });
                         },
@@ -190,6 +203,74 @@ odoo.define('employees_management_action', function (require) {
                                 target: 'new',
                             });
                         },
+
+                        enable: function (index, row) {
+                            var start_act = this
+                            self._rpc({
+                                model: 'res.users',
+                                method: 'enable_button_act',
+                                kwargs: {value: row.state, self_id: row.id}
+                            }).then(function (get_data) {
+                                start_act.click_node_page(start_act.$refs.tree.getCurrentNode())
+                            });
+                        },
+                        crete_new_record: function () {
+                            var this_vue = this
+                            self.do_action({
+                                name: '新增',
+                                type: 'ir.actions.act_window',
+                                res_model: 'res.users',
+                                views: [[self.vue_data.act_id, 'form']],
+                                target: 'new',
+                            });
+                        },
+
+                        append(data) {
+                            console.log('567', data.value)
+                            self.vue_data.data5_data = data
+                            self.vue_data.tree_data5 = data.value;
+                            var data_chose = this;
+                            $.when(self.vue_data.tree_input = true,
+                            )
+                        },
+
+                        remove(node, data) {
+                            self._rpc({
+                                model: 'res.users',
+                                method: 'delete_tree_button',
+                                kwargs: {value: data.value}
+                            })
+                            const parent = node.parent;
+                            const children = parent.data.children || parent.data;
+                            const index = children.findIndex(d => d.id === data.value);
+                            children.splice(index, 1);
+                        },
+
+                        sure_tree: function () {
+                            var button = this;
+                            self._rpc({
+                                model: 'res.users',
+                                method: 'add_tree_button',
+                                kwargs: {parent_id: self.vue_data.tree_data5, value: self.vue_data.tree_date}
+                            }).then(function (get_data) {
+                                var id = get_data;
+                                const newChild = {id: id++, label: self.vue_data.tree_date, children: []};
+                                if (!self.vue_data.data5_data.children) {
+                                    button.$set(self.vue_data.data5_data, 'children', []);
+                                }
+                                self.vue_data.data5_data.children.push(newChild);
+                            });
+                            $.when(this.tree_input = false)
+
+                        },
+
+                        before_data: function () {
+                            return self.vue_data.data5;
+                        },
+
+                        cancel_tree: function () {
+                            this.tree_input = false
+                        }
                     },
 
                 });

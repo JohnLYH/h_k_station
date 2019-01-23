@@ -1,0 +1,80 @@
+<div id="permiss_add_button">
+    <el-row :gutter="20">
+        <el-col :span="12">
+            <div class="grid-content bg-purple">
+                <el-row>
+                    <el-col :span="4">
+                        <div class="grid-content bg-purple">角色名称</div>
+                    </el-col>
+                    <el-col :span="20">
+                        <div class="grid-content bg-purple-light">
+                            <el-input v-model="name" placeholder="请输入内容"></el-input>
+                        </div>
+                    </el-col>
+                </el-row>
+
+                <el-row>
+                    <el-col :span="4">
+                        <div class="grid-content bg-purple">權限說明</div>
+                    </el-col>
+                    <el-col :span="20">
+                        <div class="grid-content bg-purple-light">
+                            <el-input v-model="permiss" placeholder="请输入内容"></el-input>
+                        </div>
+                    </el-col>
+                </el-row>
+
+                <el-row>
+                    <el-col :span="4">
+                        <div class="grid-content bg-purple">使用人</div>
+                    </el-col>
+                    <el-col :span="20">
+                        <div class="grid-content bg-purple-light">
+                            <template>
+                                <el-select v-model="person_data" multiple filterable placeholder="请选择"
+                                           style="width: 100%">
+                                    <el-option
+                                            v-for="item in options"
+                                            :key="item.value"
+                                            :label="item.label"
+                                            :value="item.value">
+                                    </el-option>
+                                </el-select>
+                            </template>
+                        </div>
+                    </el-col>
+                </el-row>
+
+
+            </div>
+        </el-col>
+        <el-col :span="12">
+            <div class="grid-content bg-purple">
+                <div class="grid-content bg-purple">
+                    <el-card class="box-card">
+                        <div slot="header" class="clearfix">
+                        </div>
+                        <div class="text item">
+                            <el-tree
+                                    :data="departmentList"
+                                    show-checkbox
+                                    node-key="id"
+                                    ref="tree"
+                                    highlight-current
+                                    :default-expanded-keys="[]"
+                                    :default-checked-keys="default_checked_keys"
+                                    :props="defaultProps"
+                                    @check="click_node"
+                            >
+                            </el-tree>
+                        </div>
+                    </el-card>
+                </div>
+            </div>
+        </el-col>
+    </el-row>
+    <div style='text-align:center; margin-top: 100px;'>
+        <el-button type="primary" @click="onSubmit">確認</el-button>
+        <el-button @click="cancel">取消</el-button>
+    </div>
+</div>
