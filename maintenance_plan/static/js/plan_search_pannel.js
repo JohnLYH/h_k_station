@@ -53,7 +53,8 @@ odoo.define("plan_search_pannel", function (require) {
                     target: 'new',
                     type: 'ir.actions.act_url',
                     url: '/maintenance_plan/down_wrong_file?file_id=' + response.file_id
-                })
+                });
+                return
             }
             var dialog = new Dialog(self, {
                 title: "導入設備",
