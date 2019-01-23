@@ -32,11 +32,27 @@
         </div>
     </t>
 
-    <t t-name="tem_equipment_type_tree_button">
-        <div style="text-align: center">
-            <a t-attf-record-id="#{widget.id}" class="maintenance_plan_detail" href="javascript: void 0">詳情</a>
-            <t t-if="widget.record.data.equipment_ids.count === 0">
-                <a t-attf-record-id="#{widget.id}" class="maintenance_plan_delete" href="javascript: void 0">刪除</a>
+    <!-- 導入設備回調頁面 -->
+    <t t-name="tem_equipment_callback">
+        <div style="text-align: center;padding-bottom: 0px">
+            <span style="font-size: 17px;font-weight: bold;color: green;">
+                <t t-esc="response.message"/>
+            </span>
+        </div>
+        <div style="text-align: center;padding-top: 0px;">
+            <t t-if="response.qr_code_record_ids.length > 0">
+                <span style="font-size: 17px;font-weight: bold;color: green;">
+                    如需下載打印設備對應二維碼表單，請點擊下方按鈕
+                </span>
+                <div style="text-align: center;margin-top: 40px">
+                    <button class="btn-primary btn download_qr">下載二維碼</button>
+                    <button class="btn-default btn dialog_close">關閉</button>
+                </div>
+            </t>
+            <t t-else="">
+                <div style="text-align: center;margin-top: 40px">
+                    <button class="btn-default btn dialog_close">關閉</button>
+                </div>
             </t>
         </div>
     </t>
@@ -89,7 +105,7 @@
             <t t-if="widget.value == 'ON CONDITION'">
                 <label>
                     <input name="freq_of_cal" type="radio" value=""/>
-                    <input type="text" id="freq_of_cal_id" />個月
+                    <input type="text" id="freq_of_cal_id"/>個月
                 </label>
 
                 <label>
@@ -100,7 +116,7 @@
             <t t-if="widget.value == false">
                 <label>
                     <input name="freq_of_cal" type="radio" value=""/>
-                    <input type="text" id="freq_of_cal_id" />個月
+                    <input type="text" id="freq_of_cal_id"/>個月
                 </label>
 
                 <label>
