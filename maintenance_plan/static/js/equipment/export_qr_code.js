@@ -7,29 +7,9 @@ odoo.define('export_qr_code', function (require) {
     var export_qr_code = Widget.extend({
         init: function (parent, record, node) {
             this._super(parent, record, node);
-            this.records_list = record.params.records_list;
-            console.log(this.records_list)
             this.vue_data = {
-                props: {
-                    label: 'name',
-                    children: 'children'
-                },
-                checked_equipment_type_tree_data: [],
-                equipment_type_tree_data: [],
-                count: 0
+                tableData: record.params.records_list
             }
-        },
-        willStart: function () {
-            var self = this;
-            var get_equipment_type_tree_data = self._rpc({
-                model: 'maintenance_plan.equipment.type',
-                method: 'get_equipment_type_tree_data'
-            })
-
-            return $.when(get_equipment_type_tree_data).then(function (data) {
-                self.vue_data.equipment_type_tree_data = data.records;
-                self.vue_data.count = data.records_count
-            })
         },
         start: function () {
             var self = this;
@@ -51,38 +31,40 @@ odoo.define('export_qr_code', function (require) {
                         cancel: function () {
                             self.do_action(false)
                         },
-
-                        /**
-                         * 選擇節點時子節點也一起變更選擇狀態
-                         * @param {*} node 
-                         * @param {*} checked 
-                         */
-                        change_children(node, checked) {
-                            var this_vue = this;
-                            if (node.child_ids.length > 0) {
-                                for (var children_node in node.children) {
-                                    this_vue.$refs.equipment_type_tree.setChecked(node.children[children_node].id, checked);
-                                }
-                            }
-                        },
-                        /**
-                         * 選擇節點時觸發函數
-                         * @param {*} node 
-                         * @param {*} checked 
-                         */
-                        check_change: function (node, checked) {
-                            var this_vue = this;
-                            if (checked === true) {
-                                this_vue.checked_equipment_type_tree_data.push(node.name);
-                                this_vue.change_children(node, checked)
-                            } else {
-                                this_vue.checked_equipment_type_tree_data.splice(this_vue.checked_equipment_type_tree_data.indexOf(node.name), 1)
-                                this_vue.change_children(node, checked)
-                            }
-                        },
                         enter: function () {
+                            // 導出設備的二維碼
                             var this_vue = this;
-                            console.log(this_vue.$refs.equipment_type_tree.getCheckedKeys())
+                            this_vue.loading = this_vue.$loading({
+                                lock: true
+                            })
+                            var oReq = new XMLHttpRequest();
+                            oReq.open("POST", '/maintenance_plan/export_qr_code_zip', true);
+                            oReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                            //指定返回类型
+                            oReq.responseType = "arraybuffer";
+                            oReq.onload = function (oEvent) {
+                                this_vue.loading.close();
+                                self.do_action(false);
+                                if (oReq.readyState == 4 && oReq.status == 200) {
+                                    var blob = new Blob([oReq.response], {
+                                        type: "application/zip"
+                                    });
+                                    // 转换Blob完成，创建一个a标签用于下载
+                                    var a = document.createElement('a');
+                                    //点击事件
+                                    var evt = document.createEvent("HTMLEvents");
+                                    evt.initEvent("click", false, false);
+                                    // 设置文件名
+                                    a.download = moment().format("YYYY-MM-DD") + '下載设备二维码.zip';
+                                    // 利用URL.createObjectURL()方法为a元素生成blob URL
+                                    a.href = URL.createObjectURL(blob);
+                                    a.click();
+                                }
+                            };
+                            // 发送待参数的请求
+                            oReq.send("qr_list=" + JSON.stringify(this_vue.tableData.map(function (record) {
+                                return record.id
+                            })));
                         }
                     },
                 })

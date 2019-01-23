@@ -12,7 +12,7 @@ odoo.define("plan_search_pannel", function (require) {
         events: _.extend({}, search_pannel_default.prototype.events, {
             // 導出工單
             'click .export_excel': function (event) {
-                var controller = self.getParent().getParent().pager.state
+                var controller = this.getParent().getParent().pager.state
                 this.export_excel('/maintenance_plan/export_work_order', this.domains, controller.limit, controller.current_min)
             },
             // 導入維修計劃管理

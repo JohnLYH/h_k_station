@@ -26,7 +26,6 @@ odoo.define('freq_of_cal_btn', function (require) {
             }
         },
 
-        <!--保存的时候更改值-->
         commitChanges: function () {
             var self = this;
             var req_value = self.$el.find('input#freq_of_cal_id').val();
