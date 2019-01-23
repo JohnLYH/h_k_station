@@ -33,16 +33,9 @@
 .custom-tree-node i{
     border-radius: 0.3em;
 }
-/*#equipment_tree_box .el-tree-node__expand-icon{*/
-    /*!*自定义，必要时用!important*!*/
-    /*height: 24px;*/
-    /*width: 24px;*/
-    /*content: url("/maintenance_plan/static/description/close_icon.png");*/
-/*}*/
-/*#equipment_tree_box .el-tree-node__expand-icon.expanded{*/
-    /*!*自定义，必要时用!important*!*/
-    /*height: 24px;*/
-    /*width: 24px;*/
-    /*transform: none;*/
-    /*content: url("/maintenance_plan/static/description/open_icon.png");*/
-/*}*/
+#export_qr_code_div #table{
+    border: solid 2px #f5f5f5;
+    padding: 10px 20px;
+    height: 300px;
+    overflow-y: scroll;
+}
