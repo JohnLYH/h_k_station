@@ -39,10 +39,12 @@ class MaintenancePlan(models.Model):
     approver_status = fields.Selection(APPROVER_STATUS, string='審批狀態', compute='_com_approval', store=True)
     submit_user_id = fields.Many2one('res.users', string='提交人', compute='_com_approval', store=True)
     approver_user_id = fields.Many2one('res.users', string='審批人', compute='_com_approval', store=True)
+    submit_date = fields.Datetime('提交時間')
     last_submit_date = fields.Datetime('最後提交時間', compute='_com_approval', store=True)
     last_approver_date = fields.Datetime('最後審批時間', compute='_com_approval', store=True)
     order_form_ids = fields.One2many('maintenance_plan.order.form', 'order_id', string='工單內審批表單',
                                      default=_default_order_forms)
+    approval_type = fields.Char('審批類型', default='Maintenance Reference')
 
     @api.one
     @api.depends('order_approval_ids')

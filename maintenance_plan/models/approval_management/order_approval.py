@@ -16,8 +16,6 @@ class ApprovalManagement(models.Model):
     approver_user_id = fields.Many2one('res.users', '下級審批人')
     old_status = fields.Selection(STATUS, string='原始狀態')
     to_status = fields.Selection(STATUS, string='目標狀態')
-    approval_type = fields.Char('審批類型', default='Maintenance Reference')
-
 
 class ReferenceExaminationApproval(models.Model):
     '''參考資料審批'''

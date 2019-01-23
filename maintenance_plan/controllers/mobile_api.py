@@ -672,6 +672,7 @@ class WorkOrder(http.Controller):
         # 結束時間
         end = params['end']
         approver = int(params['approver'])
+        # 新建審批記錄
         request.env['maintenance_plan.order.approval'].create({
             'work_order_id': id,
             'execute_user_id': request.uid,
@@ -703,21 +704,101 @@ class Approval(http.Controller):
         page = params['pageIndex']
         limit = params['pageSize']
         # 搜索值
-        key = params['key']
+        search_key = params['key']
         # 狀態:PENDING:待审批，PROGRESS:审批中，APPROVED: 已审批
         status = params['status']
         beginDate = params['beginDate']
         endDate = params['endDate']
-        # 先去搜索
-        domian = []
-        if key != '':
+
+        # 所有內容
+        values = []
+        domain = []
+        domain2 = []
+        domain3 = []
+        if search_key != '':
+            # 先去搜索 表單審批
             domain.extend([
                 '|', '|', '|',
-                ('num', 'ilike', search_key),
-                ('equipment_num', 'ilike', search_key),
-                ('executor_id.name', 'ilike', search_key),
-                ('action_dep_id.name', 'ilike', search_key)
+                ('approval_type', 'ilike', search_key),
+                ('order_id.equipment_id.num', 'ilike', search_key),
+                ('order_id.equipment_id.equipment_model.equipment_model', 'ilike', search_key),
+                ('id', 'ilike', search_key),
+                ('create_date', '>=', beginDate),
+                ('create_date', '<=', endDate),
             ])
+            if status != '':
+                domain.extend([('status', '=', status), ])
+            else:
+                domain.extend([('approval_type', '!=', 'WRITE'), ])
+            records = request.env['maintenance_plan.order.form'].search(domain)
+            for record in records:
+                status = record.status
+                creator = record.order_id.submit_user_id.name
+                position = record.order_id.submit_user_id.role
+                equipmentNo = record.order_id.equipment_id.num
+                values.append(dict(mode=record.approval_type, status=status, creator=creator, position=position,
+                                   woNo=record.order_id.id, formNo=record.id, equipmentNo=equipmentNo))
+            # 在去搜索 工單審批
+            domain2.extend([
+                '|', '|', '|',
+                ('approver_status', 'ilike', search_key),
+                ('work_order_id.equipment_id.num', 'ilike', search_key),
+                ('work_order_id.equipment_id.equipment_model.equipment_model', 'ilike', search_key),
+                ('id', 'ilike', search_key),
+                ('submit_date', '>=', beginDate),
+                ('submit_date', '<=', endDate),
+            ])
+            if status != '':
+                domain2.extend([('approver_status', '=', status), ])
+            else:
+                domain2.extend(['|', ('status', '=', 'pending_approval'), ('status', '=', 'closed')])
+            records = request.env['maintenance_plan.maintenance.plan'].search(domain2)
+            for record in records:
+                status = record.approver_status
+                creator = record.submit_user_id.name
+                position = record.submit_user_id.role
+                equipmentNo = record.equipment_id.num
+                values.append(dict(mode=record.approval_type, status=status, creator=creator, position=position,
+                                   woNo=record.id, equipmentNo=equipmentNo))
+            # TODO:參考資料審批記錄
+        else:
+            # 先去搜索 表單審批
+            domain.extend([
+                ('create_date', '>=', beginDate),
+                ('create_date', '<=', endDate),
+            ])
+            if status != '':
+                domain.extend([('status', '=', status), ])
+            else:
+                domain.extend([('status', '!=', 'WRITE'), ])
+            records = request.env['maintenance_plan.order.form'].search(domain)
+            for record in records:
+                status = record.status
+                creator = record.order_id.submit_user_id.name
+                position = record.order_id.submit_user_id.role
+                equipmentNo = record.order_id.equipment_id.num
+                values.append(dict(mode=record.approval_type, status=status, creator=creator, position=position,
+                                   woNo=record.order_id.id, formNo=record.id, equipmentNo=equipmentNo))
+            # 在去搜索 工單審批
+            domain2.extend([
+                ('submit_date', '>=', beginDate),
+                ('submit_date', '<=', endDate),
+            ])
+            if status != '':
+                domain2.extend([('approver_status', '=', status), ])
+            else:
+                domain2.extend(['|', ('status', '=', 'pending_approval'), ('status', '=', 'closed')])
+            records = request.env['maintenance_plan.maintenance.plan'].search(domain2)
+            for record in records:
+                status = record.approver_status
+                creator = record.submit_user_id.name
+                position = record.submit_user_id.role
+                equipmentNo = record.equipment_id.num
+                values.append(dict(mode=record.approval_type, status=status, creator=creator, position=position,
+                                   woNo=record.id, equipmentNo=equipmentNo))
+            # TODO:參考資料審批記錄
+        return to_json({'errcode': 0, 'data': {'list': values}, 'msg': ''})
+
 
 class Center_User(http.Controller):
     """

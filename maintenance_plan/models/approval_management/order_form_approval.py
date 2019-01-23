@@ -12,7 +12,7 @@ class OrderFormApproval(models.Model):
     order_form_id = fields.Many2one('maintenance_plan.order.form', string='審批表單')
     execute_user_id = fields.Many2one('res.users', '操作人')
     next_execute_user_id = fields.Many2one('res.users', '下級審批人')
-    # 表單狀態：對向波口測試 WRITE、SUBMIT、CHECK、COMPLETE
+    # 表單狀態：對向波口測試 WRITE、SUBMIT、CHECK、COMPLETE(為簽署狀態,此時表單狀態為未到審批)，PENDING 待審批, PROGRESS 審批中 ，APPROVED 已審批
     old_status = fields.Char('原始狀態')
     to_status = fields.Char('目標狀態')
     signature = fields.Char('簽名')  # 圖片url
