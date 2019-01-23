@@ -5,8 +5,11 @@ import json
 import random
 import time
 from datetime import datetime as dt
+from dateutil.relativedelta import relativedelta
 import os
+import shutil
 import xlwt
+import zipfile
 
 from odoo import http
 from odoo.http import request
@@ -40,20 +43,20 @@ class MaintenancePlan(http.Controller):
         :param value:
         :return:
         '''
+        low_value = value.replace(' ', '').lower()
         try:
-            return {'col': value, 'num': row1_list.index(value) + 1}
+            return {'col': value, 'num': row1_list.index(low_value) + 1}
         except ValueError as e:
             return {'col': value, 'num': None}
 
     @staticmethod
-    def excel_validate(sheet, num, cols_list, style, has_date_col=True):
+    def excel_validate(sheet, num, cols_list, style):
         '''
         驗證excel的一行的錯誤性
         :param sheet: sheet活動表
         :param num: 行數，1開始
         :param cols_list: 需要驗證的列數列表
         :param style: sheet顏色style
-        :param has_date_col: 是否驗證第17、18列的時間格式
         :return:
         '''
         row_error = False
@@ -61,12 +64,6 @@ class MaintenancePlan(http.Controller):
             if sheet.cell(num, col).value is None:
                 sheet.cell(num, col).fill = style
                 row_error = True
-            elif (col == 17 or col == 18) and has_date_col is True:
-                try:
-                    dt.strptime(sheet.cell(num, col).value, '%Y-%m-%d %H:%M')
-                except Exception as e:
-                    sheet.cell(num, col).fill = style
-                    row_error = True
         return row_error
 
     @http.route('/maintenance_plan/put_in_excel', type='http', csrf=False, auth='user')
@@ -86,17 +83,17 @@ class MaintenancePlan(http.Controller):
             n_row += 1
             if n_row == 1:
                 title_list = [None if i.value is None else i.value.replace(' ', '').lower() for i in row]
-                work_num = self.get_row1_list_colnum(title_list, 'workordernumber')  # 工單編號WorkOrderNumber
-                work_order_type = self.get_row1_list_colnum(title_list, 'worknaturel1')  # 工單類型WorkNatureL1
-                equipment_num = self.get_row1_list_colnum(title_list, 'equipmentnumber')  # 設備編號EquipmentNumber
-                standard_job = self.get_row1_list_colnum(title_list, 'standardjobcode')  # 標準工作StandardJobCode
+                work_num = self.get_row1_list_colnum(title_list, 'Work Order Number')  # 工單編號WorkOrderNumber
+                work_order_type = self.get_row1_list_colnum(title_list, 'Work Nature L1')  # 工單類型WorkNatureL1
+                equipment_num = self.get_row1_list_colnum(title_list, 'Equipment Number')  # 設備編號EquipmentNumber
+                standard_job = self.get_row1_list_colnum(title_list, 'Standard Job Code')  # 標準工作StandardJobCode
                 standard_job_description = self.get_row1_list_colnum(title_list,
-                                                                     'standardjobdescription')  # 標準工作描述StandardJobDescription
+                                                                     'Standard Job Description')  # 標準工作描述StandardJobDescription
                 work_order_description = self.get_row1_list_colnum(title_list,
-                                                                   'workorderdescription')  # 工單描述WorkOrderDescription
-                plan_start_time = self.get_row1_list_colnum(title_list, 'plannedstartdate')  # 建議開始時間PlannedStartDate
+                                                                   'Work Order Description')  # 工單描述WorkOrderDescription
+                plan_start_time = self.get_row1_list_colnum(title_list, 'Planned Start   Date')  # 建議開始時間PlannedStartDate
                 plan_end_time = self.get_row1_list_colnum(title_list,
-                                                          'plannedcompleteddate')  # 建議結束時間PlannedCompletedDate
+                                                          'Planned Completed Date')  # 建議結束時間PlannedCompletedDate
                 # 檢查是否有colnum未存在的列
                 none_col_list = []
                 col_list = [work_num, work_order_type, equipment_num, standard_job, standard_job_description,
@@ -126,12 +123,6 @@ class MaintenancePlan(http.Controller):
                     standard_job_record = request.env['maintenance_plan.standard.job'].search([
                         ('name', '=', standard_job['num'])
                     ])
-                    # 檢查標準工作是否已經存在
-                    if len(standard_job_record) == 0:
-                        standard_job_record = request.env['maintenance_plan.standard.job'].create({
-                            'name': sheet.cell(n_row, standard_job['num']).value,
-                            'description': sheet.cell(n_row, standard_job_description['num']).value
-                        })
                     # 檢查是否已經存在工單
                     if work_order_count != 0 and sheet.cell(n_row, 1).value is not None:
                         sheet.cell(n_row, work_num['num']).fill = green_style
@@ -140,6 +131,12 @@ class MaintenancePlan(http.Controller):
                     if len(equipment_record) == 0:
                         sheet.cell(n_row, equipment_num['num']).fill = red_style
                         error = True
+                    # 檢查標準工作是否已經存在
+                    if len(standard_job_record) == 0 and work_order_count == 0 and len(equipment_record) != 0:
+                        standard_job_record = request.env['maintenance_plan.standard.job'].create({
+                            'name': sheet.cell(n_row, standard_job['num']).value,
+                            'description': sheet.cell(n_row, standard_job_description['num']).value
+                        })
                     if work_order_count == 0 and len(equipment_record) != 0:
                         request.env['maintenance_plan.maintenance.plan'].create({
                             'num': sheet.cell(n_row, work_num['num']).value,
@@ -150,7 +147,6 @@ class MaintenancePlan(http.Controller):
                             'plan_start_time': sheet.cell(n_row, plan_start_time['num']).value.split(' ')[0],
                             'plan_end_time': sheet.cell(n_row, plan_end_time['num']).value.split(' ')[0],
                         })
-                        sheet.delete_rows(n_row - 1, 1)
                 else:
                     error = True
         if error is True:
@@ -161,6 +157,136 @@ class MaintenancePlan(http.Controller):
             return to_json({'error': error, 'message': '文件有部分錯誤信息，請修改后再次傳入', 'file_id': new_file.id})
         else:
             return to_json({'error': error, 'message': '上傳成功'})
+
+    @http.route('/maintenance_plan/equipment_put_in_excel', type='http', csrf=False, auth='user')
+    def equipment_put_in_excel(self, **kwargs):
+        '''
+        設備管理頁面上傳設備excel
+        :param kwargs:
+        :return:
+        '''
+        file = kwargs['file']
+        filename = kwargs['file'].filename
+        workbook = openpyxl.load_workbook(file, data_only=True)
+        sheet = workbook.active
+        error = False
+        n_row = 0
+        qr_code_record_ids = []
+        for row in sheet.rows:
+            n_row += 1
+            if n_row == 1:
+                title_list = [None if i.value is None else i.value.replace(' ', '').lower() for i in row]
+                equipment_num = self.get_row1_list_colnum(title_list, 'Equipment No.')  # 設備編號
+                parent_equipment_num = self.get_row1_list_colnum(title_list, 'parent_equipment_NO.')  # 父設備編號
+                serial_num = self.get_row1_list_colnum(title_list, 'Serial No.')  # 序列號
+                detailed_location = self.get_row1_list_colnum(title_list, 'LOCATION CODE')  # 詳細位置
+                equipment_type = self.get_row1_list_colnum(title_list, 'Equipment Class')  #設備類別
+                equipment_model = self.get_row1_list_colnum(title_list, 'Model')  # 設備型號
+                description = self.get_row1_list_colnum(title_list, 'Equipment Description')  # 設備名稱(即設備描述)
+                status = self.get_row1_list_colnum(title_list, 'status')  # 設備狀態
+                item_code = self.get_row1_list_colnum(title_list, 'Item Code')  # 庫存編碼
+                line = self.get_row1_list_colnum(title_list, 'Line')  # 線別
+                station = self.get_row1_list_colnum(title_list, 'station')  # 站點
+                direction = self.get_row1_list_colnum(title_list, 'Direction')  # 方向
+                start_chainage = self.get_row1_list_colnum(title_list, 'Chainage-start')  # 起始公里標
+                end_chainage = self.get_row1_list_colnum(title_list, 'Chainage-end')  # 終點公里標
+                last_installation_date = self.get_row1_list_colnum(title_list, ' Last installation date')  # 最後安裝日期
+                service_since = self.get_row1_list_colnum(title_list, 'service date/service since')  # 啟用時間
+                expected_asset_life = self.get_row1_list_colnum(title_list, 'Expected asset life')  # 預計使用時間
+                warranty = self.get_row1_list_colnum(title_list, 'Warranty')  # 質保期
+                supplier = self.get_row1_list_colnum(title_list, 'Supplier')  # 供應商
+                oem_manufacturer = self.get_row1_list_colnum(title_list, 'OEM Manufacturer')  # 原始設備製造商
+                lead_maintainer = self.get_row1_list_colnum(title_list, ' lead maintainer')  # 設備維護者
+                # 檢查是否有colnum未存在的列
+                none_col_list = []
+                col_list = [equipment_num, parent_equipment_num, serial_num, detailed_location, equipment_type,
+                            equipment_model, description, status, item_code, line, station, direction, start_chainage,
+                            end_chainage, last_installation_date, last_installation_date, service_since,
+                            expected_asset_life, warranty, supplier, oem_manufacturer, lead_maintainer]
+                for check_col in col_list:
+                    if check_col['num'] is None:
+                        none_col_list.append(check_col['col'])
+                # 如果有未存在的列，返回error
+                if len(none_col_list) > 0:
+                    return to_json({'error': True, 'message': '{}列不存在'.format([col for col in none_col_list])})
+                else:
+                    col_index = [serial_num['num'], equipment_model['num'], equipment_type['num'], status['num'],
+                                 item_code['num']]
+                    # 单元格背景色紅色
+                    red_style = PatternFill(fill_type='solid', fgColor="FF3030")
+                    # 单元格背景色綠色
+                    green_style = PatternFill(fill_type='solid', fgColor="458B74")
+            else:
+                # 校驗特定列是否有空值或錯值
+                row_error = self.excel_validate(sheet, n_row, col_index, red_style)
+                # 檢查狀態是否符合選擇項
+                if sheet.cell(n_row, status['num']).value not in ['Expired', 'Effective']:
+                    sheet.cell(n_row, status['num']).fill = red_style
+                    error = True
+                    row_error = True
+                if row_error is False:
+                    serial_number_record = request.env['maintenance_plan.equipment'].search([
+                        ('serial_number', '=', sheet.cell(n_row, serial_num['num']).value)
+                    ])
+                    equipment_type_record = request.env['maintenance_plan.equipment.type'].search([
+                        ('name', '=', sheet.cell(n_row, equipment_type['num']).value)
+                    ])
+                    equipment_model_record = request.env['maintenance_plan.equipment_model'].search([
+                        ('equipment_model', '=', sheet.cell(n_row, equipment_model['num']).value)
+                    ])
+                    # 檢查設備類型是否存在，不存在則標記，不允許創建
+                    if len(equipment_type_record) == 0:
+                        sheet.cell(n_row, equipment_type['num']).fill = red_style
+                        error = True
+                    # 檢查序列號是否存在，存在則跳過并標綠
+                    if len(serial_number_record) != 0:
+                        sheet.cell(n_row, serial_num['num']).fill = green_style
+                        error = True
+                        continue
+                    # 檢查設備型號是否存在，不存在則創建
+                    if len(equipment_model_record) == 0 and len(equipment_type_record) != 0:
+                        equipment_model_record = request.env['maintenance_plan.equipment_model'].create({
+                            'equipment_model': sheet.cell(n_row, equipment_model['num']).value,
+                            'description': sheet.cell(n_row, description['num']).value
+                        })
+                    # 創建設備記錄
+                    if len(equipment_type_record) != 0:
+                        eq = request.env['maintenance_plan.equipment'].create({
+                            'num': sheet.cell(n_row, equipment_num['num']).value,
+                            'parent_equipment_num': sheet.cell(n_row, parent_equipment_num['num']).value,
+                            'serial_number_id': request.env['maintenance_plan.equipment.serial_number'].create({
+                                'num': sheet.cell(n_row, serial_num['num']).value
+                            }).id,
+                            'equipment_type_id': equipment_type_record.id,
+                            'line': sheet.cell(n_row, line['num']).value,
+                            'station': sheet.cell(n_row, station['num']).value,
+                            'equipment_model': equipment_model_record.id,
+                            'status': sheet.cell(n_row, status['num']).value,
+                            'item_code': sheet.cell(n_row, item_code['num']).value,
+                            'direction': sheet.cell(n_row, direction['num']).value,
+                            'start_chainage': sheet.cell(n_row, start_chainage['num']).value,
+                            'end_chainage': sheet.cell(n_row, end_chainage['num']).value,
+                            'detailed_location': sheet.cell(n_row, detailed_location['num']).value,
+                            'last_installation_date': sheet.cell(n_row, last_installation_date['num']).value,
+                            'service_since': sheet.cell(n_row, service_since['num']).value,
+                            'expected_asset_life': sheet.cell(n_row, expected_asset_life['num']).value,
+                            'warranty': sheet.cell(n_row, warranty['num']).value,
+                            'supplier': sheet.cell(n_row, supplier['num']).value,
+                            'oem_manufacturer': sheet.cell(n_row, oem_manufacturer['num']).value,
+                            'lead_maintainer': sheet.cell(n_row, lead_maintainer['num']).value,
+                        })
+                        qr_code_record_ids.append(eq.id)
+                else:
+                    error = True
+        if error is True:
+            new_file = request.env['maintenance_plan.trans.excel'].create({
+                'name': filename.split('.')[0],
+                'file': save_virtual_workbook(workbook)
+            })
+            return to_json({'error': error, 'message': '文件有部分錯誤信息，請修改后再次傳入', 'file_id': new_file.id,
+                            'qr_code_record_ids': qr_code_record_ids})
+        else:
+            return to_json({'error': error, 'message': '上傳成功', 'qr_code_record_ids': qr_code_record_ids})
 
     @http.route('/maintenance_plan/down_wrong_file', type='http', auth="user", methods=['GET'])
     def down_wrong_file(self, **kwargs):
@@ -207,6 +333,36 @@ class MaintenancePlan(http.Controller):
             sheet.cell(row_num, 9).value = record.executor_id.name or None  # 执行人
         response = request.make_response(save_virtual_workbook(wb))
         return response
+
+    @http.route('/maintenance_plan/export_qr_code_zip', auth='user', csrf=False, type='http', method=['POST'])
+    def export_qr_code_zip(self, **kwargs):
+        qr_list = json.loads(kwargs['qr_list'])
+        now_day = dt.strftime(dt.now() + relativedelta(hours=8), '%Y-%m-%d')
+        zip_name = '{}{}/new.zip'.format(now_day, '导入设备二维码')
+        if qr_list is not None:
+            equipment_records = request.env['maintenance_plan.equipment'].browse(qr_list)
+            file_name = os.path.join(APP_DIR, 'static/trans_zip', str(int(time.time())) + str(random.randint(1, 1000)))
+            # 創建臨時文件夾
+            os.mkdir(file_name)
+            # 創建臨時壓縮文件
+            new_zip = zipfile.ZipFile(os.path.join(file_name, 'new.zip'), 'w')
+            # 打包二維碼圖片
+            for record in equipment_records:
+                # 圖片保存路徑
+                image_path = os.path.join(file_name, '{}+{}.png'.format(record.num or 'none', record.serial_number))
+                with open(image_path, "wb") as f:
+                    # 加入壓縮文件，并更換在壓縮文件中的路徑及名稱
+                    f.write(base64.b64decode(record.serial_number_id.qr_code))
+                new_zip.write(image_path, '{}/{}+{}.png'.format(zip_name, record.num or 'none', record.serial_number),
+                              compress_type=zipfile.ZIP_DEFLATED)
+            new_zip.close()
+            # 讀取壓縮文件內容
+            with open(os.path.join(file_name, 'new.zip'), 'rb') as zip_f:
+                response = request.make_response(zip_f.read())
+            # 刪除臨時文件夾
+            shutil.rmtree(file_name)
+            return response
+        # TODO: 導出設備二維碼
 
     @http.route('/maintenance_plan/materials_upload_files', auth='user', csrf=False, methods=['POST'])
     def materials_upload_files(self, **kw):

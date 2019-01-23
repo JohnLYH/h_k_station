@@ -22,6 +22,7 @@
                     <group>
                         <field name="parent_id" string="上級類別" options='{"no_open": True, "no_create": True}'/>
                         <field name="name" string="類別名稱"/>
+                        <field name="description"/>
                     </group>
                     <footer>
                         <div>

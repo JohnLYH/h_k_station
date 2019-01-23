@@ -108,7 +108,7 @@
         </div>
     </t>
 
-    <!--設備類別搜索-->
+    <!--設備搜索-->
     <t t-name="equipment_search_template">
         <div class="form-inline custom_search_box" search_pannel_js_class="plan_search_pannel">
             <div class="container-fluid">
@@ -137,6 +137,9 @@
                         <button type="button" class="btn btn-warning put_in_equipment">
                             導入設備
                         </button>
+                        <form style="display:none" action="">
+                            <input type="file" name="file" value=""/>
+                        </form>
                         <button type="button" class="btn btn-warning export_qr_code">
                             導出二維碼
                         </button>
