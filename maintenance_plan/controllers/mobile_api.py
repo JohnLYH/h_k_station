@@ -258,6 +258,7 @@ class WorkOrder(http.Controller):
         )
         return to_json({'errcode': 0, 'data': result, 'msg': ''})
 
+    # TODO: 待验证,等待重新定義需要數據
     @http.route('/mtr/wo/test', type='json', auth='user')
     def get_work_order_test_form(self, **kwargs):
         '''
@@ -268,42 +269,21 @@ class WorkOrder(http.Controller):
         params = request.jsonrequest
         order_record = request.env['maintenance_plan.maintenance.plan'].browse(params['id'])
         test_form = order_record.order_form_ids.filtered(lambda f: f.name == '對向波口測試')
-        last_submit_approval = get_last_record(
-            test_form.approval_ids.filtered(lambda f: f.to_status == 'SUBMIT'))
-        last_check_user_approval = get_last_record(
-            test_form.approval_ids.filtered(lambda f: f.to_status == 'CHECK')
-        )
-        last_complete_user_approval = get_last_record(
-            test_form.approval_ids.filtered(lambda f: f.to_status == 'CHECK')
-        )
+        flow = test_form.approval_ids.filtered(lambda f: f.old_status in ['WRITE', 'SUBMIT','CHECK'])
         assert len(test_form) in [0, 1]
-        # TODO: 待验证
+        # 簽署狀態
+        status = test_form.status
+        if status == 'WRITE' or status == 'SUBMIT' or status == 'CHECK':
+            status = status
+        else:
+            status = 'COMPLETE'
+        # TODO: 待验证,等待重新定義需要數據
         return to_json({
             'errcode': 0, 'msg': '', 'data': {
                 'no': order_record.num, 'equipmentNo': order_record.equipment_num,
                 'station': order_record.equipment_id.station,
-                'submitStatus': test_form.status, 'submitData': test_form.content or None,
-                'submitUser': {
-                    'id': last_submit_approval.execute_user_id.id or None,
-                    'name': last_submit_approval.execute_user_id.name or None,
-                    'role': last_submit_approval.execute_user_id.role or None,
-                    'time': last_submit_approval.create_date,
-                    'signature': last_submit_approval.signature_url
-                },
-                'checkUser': {
-                    'id': last_check_user_approval.execute_user_id.id or None,
-                    'name': last_check_user_approval.execute_user_id.name or None,
-                    'role': last_check_user_approval.execute_user_id.role or None,
-                    'time': last_check_user_approval.create_date,
-                    'signature': last_check_user_approval.signature_url
-                },
-                'completeUser': {
-                    'id': last_complete_user_approval.execute_user_id.id or None,
-                    'name': last_complete_user_approval.execute_user_id.name or None,
-                    'role': last_complete_user_approval.execute_user_id.role or None,
-                    'time': last_complete_user_approval.create_date,
-                    'signature': last_complete_user_approval.signature_url
-                }
+                'submitStatus': status, 'submitData': test_form.content or None,
+                'flow': flow,
             }
         })
 
@@ -335,10 +315,6 @@ class WorkOrder(http.Controller):
         }
         return to_json(result)
 
-    @http.route('/mtr/wo/tools/input', type='json', auth='user')
-    def tools_input(self, **kwargs):
-        pass
-
     @http.route('/mtr/wo/test/save', type='json', auth='user')
     def auto_save_form(self, **kwargs):
         '''
@@ -350,7 +326,7 @@ class WorkOrder(http.Controller):
         order_record = request.env['maintenance_plan.maintenance.plan'].browse(params['id'])
         test_form = order_record.order_form_ids.filtered(lambda f: f.name == '對向波口測試')
         test_form.write({
-            'content': params['submitDataBODY']
+            'content': params['submitData']
         })
         return to_json({'errcode': 0, 'data': '', 'msg': '保存成功'})
 
@@ -373,7 +349,7 @@ class WorkOrder(http.Controller):
                 'status': 'executing',
                 'actual_start_time': datetime.datetime.now()
             })
-            return to_json({'errcode': 0, 'data': '', 'msg': '保存成功'})
+            return to_json({'errcode': 0, 'data': '', 'msg': '開始測試'})
         return to_json({'errcode': 1, 'data': '', 'msg': '保存失敗,此組沒有這個人'})
 
     @http.route('/mtr/wo/test/submit', type='json', auth='user')
@@ -474,6 +450,7 @@ class WorkOrder(http.Controller):
         })
         return to_json({'errcode': 0, 'data': '', 'msg': '拒絕成功'})
 
+    # TODO: 待修改
     @http.route('/mtr/wo/equipment/exchange', type='json', auth='user')
     def auto_exchange_form(self, **kwargs):
         '''
@@ -727,7 +704,13 @@ class Approval(http.Controller):
                 ('create_date', '<=', endDate),
             ])
             if status != '':
-                domain.extend([('status', '=', status), ])
+                if status == 'PENDING' or status == '待審批':
+                    # TODO:待審批是還沒有人審批過
+                    domain.extend([('status', '=', status), ])
+                elif status == 'PROGRESS' or status == '待審中':
+                    domain.extend([('status', '=', status), ])
+                else:
+                    domain.extend([('status', '=', status), ])
             else:
                 domain.extend([('approval_type', '!=', 'WRITE'), ])
             records = request.env['maintenance_plan.order.form'].search(domain)
