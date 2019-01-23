@@ -108,24 +108,40 @@
         </div>
     </t>
 
-    <!--設備類別搜索-->
-    <t t-name="equipment_type_search_template">
+    <!--設備搜索-->
+    <t t-name="equipment_search_template">
         <div class="form-inline custom_search_box" search_pannel_js_class="plan_search_pannel">
             <div class="container-fluid">
                 <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
-                    <span class="search_label" style="float:left;">類型名稱:</span>
+                    <span class="search_label" style="float:left;">設備編號:</span>
                     <div class="col-md-8 col-sm-12 col-xs-12">
-                        <div for="name" class="form-widget-item"/>
+                        <div for="num" class="form-widget-item"/>
                     </div>
                 </div>
 
                 <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;">設備序列號:</span>
+                    <div class="col-md-8 col-sm-12 col-xs-12">
+                        <div for="serial_number" class="form-widget-item"/>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-sm-12 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
                     <div class="form-widget-item col-md-12 col-sm-12 col-xs-12">
-                        <button type="button" class="btn btn-primary search_extend_apply">
+                        <button type="button" class="btn btn-primary equipment_search_apply">
                             搜索
                         </button>
-                        <button type="button" class="btn btn-default search_extend_reset">
+                        <button type="button" class="btn btn-default equipment_reset_search">
                             重置
+                        </button>
+                        <button type="button" class="btn btn-warning put_in_equipment">
+                            導入設備
+                        </button>
+                        <form style="display:none" action="">
+                            <input type="file" name="file" value=""/>
+                        </form>
+                        <button type="button" class="btn btn-warning export_qr_code">
+                            導出二維碼
                         </button>
                     </div>
                 </div>
@@ -212,6 +228,76 @@
                         <button type="button" class="btn btn-default search_extend_reset">
                             重置
                         </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <!-- 工器具搜索 -->
+    <t t-name="tool_maintenance_search_template">
+        <div class="form-inline custom_search_box" search_pannel_js_class="tool_search">
+            <div class="container-fluid">
+                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;">設備名稱:</span>
+                    <div class="col-md-8 col-sm-12 col-xs-12">
+                        <div for="equipment_name" class="form-widget-item"/>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;">設備編號:</span>
+                    <div class="col-md-8 col-sm-12 col-xs-12">
+                        <div for="equipment_num" class="form-widget-item"/>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;">所屬班組:</span>
+                    <div class="col-md-8 col-sm-12 col-xs-12">
+                        <div for="departments" class="form-widget-item"/>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;">型號:</span>
+                    <div class="col-md-8 col-sm-12 col-xs-12">
+                        <div for="model" class="form-widget-item"/>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;">狀態:</span>
+                    <div class="col-md-8 col-sm-12 col-xs-12">
+                        <div for="status" class="form-widget-item"/>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
+                    <div class="form-widget-item col-md-12 col-sm-12 col-xs-12">
+                        <button type="button" class="btn btn-primary search_extend_apply">
+                            搜索
+                        </button>
+                        <button type="button" class="btn btn-default search_extend_reset">
+                            重置
+                        </button>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
+                    <div class="form-widget-item col-md-12 col-sm-12 col-xs-12">
+                        <button type="button" class="btn search_import btn-primary">
+                            導入
+                        </button>
+                        <button type="button" class="btn search_export btn-primary">
+                            導出
+                        </button>
+                        <button type="button" class="btn search_new btn-primary">
+                            新增
+                        </button>
+                        <form style="display:none" action="/other_equipment/put_in_excel" method="post" enctype="multipart/form-data">
+                            <input type="file" name="file" value=""/>
+                        </form>
                     </div>
                 </div>
             </div>

@@ -6,13 +6,15 @@
         <menuitem id="work_order_management" name="工單管理" sequence="2" action="act_work_order_management"/>
 
         <menuitem id="equipment_management" name="設備管理" sequence="3" action="act_equipment_management"/>
-        
-        <menuitem id="approval_management" name="審批管理" sequence="4" />
-                <menuitem id="job_approval" name="工單審批"  parent="approval_management" action="act_order_approval"/>
-                <menuitem id="reference_examination_approval" name="參考資料審批" parent="approval_management"/>
-        
+
+        <menuitem id="approval_management" name="審批管理" sequence="4"/>
+            <menuitem id="job_approval" name="工單審批" parent="approval_management" action="act_order_approval"/>
+            <menuitem id="reference_examination_approval" name="參考資料審批" parent="approval_management"/>
+
         <menuitem id="equipment_model" name="參考資料管理" sequence="5" action="act_equipment_model"/>
 
-        <menuitem id="reference_materials" name="參數設置" sequence="6" action="act_maintenance_plan_config"/>
+        <menuitem id="tool_management_id" name="工器具管理" sequence="6" action="action_tool_management"/>
+
+        <menuitem id="reference_materials" name="參數設置" sequence="7" action="act_maintenance_plan_config"/>
     </data>
 </odoo>

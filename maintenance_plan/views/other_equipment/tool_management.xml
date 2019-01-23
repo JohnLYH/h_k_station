@@ -4,10 +4,8 @@
     <!--  工器具管理tree -->
         <record model="ir.ui.view" id="tool_maintenance_tree">
             <field name="name">工器具管理</field>
-            <field name="model">other_equipment.other_equipment</field>
+            <field name="model">maintenance_plan.other_equipment</field>
             <field name="arch" type="xml">
-                <!--<tree import="false" edit="0" create="0" delete="0" search_ex_template="maintenance_plan_approval_search_template"-->
-                      <!--search_pannel_js_class="plan_search_pannel">-->
                 <tree import="false"  search_ex_template="tool_maintenance_search_template"
                   search_pannel_js_class="tool_search" class="noOpen" limit="4" delete="0" edit="0" create="0">
                     <field name="equipment_name"/>
@@ -27,10 +25,10 @@
       <!--  工器具管理form -->
         <record model="ir.ui.view" id="tool_maintenance_form">
             <field name="name">工器具管理</field>
-            <field name="model">other_equipment.other_equipment</field>
+            <field name="model">maintenance_plan.other_equipment</field>
             <field name="arch" type="xml">
                 <form delete="0">
-                    <group col="8">
+                    <group col="6">
                         <field name="equipment_name"/>
                         <field name="equipment_num"/>
                         <field name="brand"/>
@@ -55,15 +53,15 @@
 
         <record model="ir.actions.act_window" id="action_tool_management">
               <field name="name">工器具管理</field>
-              <field name="res_model">other_equipment.other_equipment</field>
+              <field name="res_model">maintenance_plan.other_equipment</field>
               <field name="view_mode">tree,form</field>
         </record>
 
       <record model="ir.ui.view" id="other_equipment_records_tree">
 			<field name="name">操作記錄</field>
-			<field name="model">other_equipment.other_equipment_records</field>
+			<field name="model">maintenance_plan.other_equipment_records</field>
 			<field name="arch" type="xml">
-				<tree default_order="create_date desc" limit="4" edit="0" create="0" delete="0">
+				<tree default_order="create_date desc" limit="4" edit="0" create="0" delete="0" class="noOpen">
 					<field name="operation_type"/>
 					<field name="content"/>
 					<field name="user_id"/>

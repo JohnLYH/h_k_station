@@ -19,11 +19,15 @@
                 <script type="text/javascript" src="/maintenance_plan/static/js/reference_materials_manage/materials_upload_btn.js"/>
                 <script type="text/javascript" src="/maintenance_plan/static/js/reference_materials_manage/manage_record_tree_button.js"/>
                 <script type="text/javascript" src="/maintenance_plan/static/js/reference_materials_manage/manage_record_details.js"/>
+                <script type="text/javascript" src="/maintenance_plan/static/js/other_equipment/search.js"/>
+                <script type="text/javascript" src="/maintenance_plan/static/js/other_equipment/toll_management.js"/>
+                <script type="text/javascript" src="/maintenance_plan/static/js/other_equipment/freq_of_cal.js"/>
+                <script type="text/javascript" src="/maintenance_plan/static/js/reference_materials_manage/manage_record_tree.js"/>
                 <script type="text/javascript" src="/maintenance_plan/static/js/equipment/equipment_tree_domain.js"/>
                 <script type="text/javascript" src="/maintenance_plan/static/js/equipment/qr_code_to_image.js"/>
                 <script type="text/javascript" src="/maintenance_plan/static/js/equipment/equipment_tree_button.js"/>
                 <script type="text/javascript" src="/maintenance_plan/static/js/equipment/create_equipment_type_to_core_bus.js"/>
-                <script type="text/javascript" src="/maintenance_plan/static/js/equipment/equipment_foot.js"/>
+                <script type="text/javascript" src="/maintenance_plan/static/js/equipment/equipment_notebook.js"/>
                 <script type="text/javascript" src="/maintenance_plan/static/js/layui/layui_pager.js"/>
                 <script type="text/javascript" src="/maintenance_plan/static/js/layui/layui_theme_list_renderer.js"/>
             </xpath>

@@ -22,6 +22,7 @@ odoo.define('create_equipment_type_to_core_bus', function (require) {
                 self.do_action(false);
                 core.bus.trigger('update_type_tree', {
                     id: record.res_id,
+                    parent_id: record.data.parent_id ? record.data.parent_id.res_id : 0,
                     name: record.data.name,
                     leaf: true,
                     node_id: self.node_id

@@ -1,0 +1,56 @@
+<div id="app">
+    <el-tabs v-model="activeName" type="card">
+        <el-tab-pane label="維修記錄" name="record">
+            <el-table size="small" :data="record_data" style="width: 100%">
+                <el-table-column align="center" prop="num" label="工單編號">
+                </el-table-column>
+
+                <el-table-column align="center" prop="equipment_serial_number" label="設備序列號">
+                </el-table-column>
+
+                <el-table-column align="center" prop="action_dep_id[1]" label="執行班組">
+                </el-table-column>
+
+                <el-table-column align="center" prop="executor_id[1]" label="執行人">
+                </el-table-column>
+
+                <el-table-column align="center" label="實際開始時間">
+                    <template slot-scope="scope">
+                        <span>{{ format_datetime(scope.row.actual_start_time) }}</span>
+                    </template>
+                </el-table-column>
+
+                <el-table-column align="center" label="實際結束時間">
+                    <template slot-scope="scope">
+                        <span>{{ format_datetime(scope.row.actual_end_time) }}</span>
+                    </template>
+                </el-table-column>
+
+                <el-table-column align="center" label="操作">
+                    <template slot-scope="scope">
+                        <span>查看詳情</span>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </el-tab-pane>
+
+        <el-tab-pane label="遷移歷史" name="migrate">
+            <el-table size="small" :data="migrate_data" style="width: 100%">
+                <el-table-column align="center" prop="info" label="遷移信息">
+                </el-table-column>
+
+                <el-table-column align="center" prop="remark" label="遷移原因">
+                </el-table-column>
+
+                <el-table-column align="center" prop="executor_user_id[1]" label="操作人">
+                </el-table-column>
+
+                <el-table-column align="center" label="操作時間">
+                    <template slot-scope="scope">
+                        <span>{{ add_create_date(scope.row.create_date) }}</span>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </el-tab-pane>
+    </el-tabs>
+</div>

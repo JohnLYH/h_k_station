@@ -33,6 +33,8 @@
         'views/maintenance_plan/maintenance_plan_view.xml',
         'views/maintenance_plan/work_order_view.xml',
         'views/equipment/equipment_view.xml',
+        'views/equipment/equipment_type_view.xml',
+        'views/other_equipment/tool_management.xml',
         'views/menu.xml',
         'views/inventory_management/inventory.xml',
         'views/inventory_management/inventory_export.xml',
