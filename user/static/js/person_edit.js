@@ -22,6 +22,7 @@ odoo.define('person_edit', function (require) {
                 selectedOptions: action.context.edit_id,
                 self_id: action.context.self_id,
                 tree_input:false,
+                old_deparment: action.context.node
 
             };
         },
@@ -71,6 +72,7 @@ odoo.define('person_edit', function (require) {
                                     name: self.vue_data.role_name,
                                     role_id: self.vue_data.role_id,
                                     deparment: self.vue_data.selectedOptions,
+                                    old_deparment: self.vue_data.old_deparment,
                                     post: self.vue_data.post,
                                     role: self.vue_data.role,
                                     role_email: self.vue_data.role_email

@@ -166,7 +166,6 @@ odoo.define('employees_management_action', function (require) {
                                 }
                             }, {
                                 on_close: function () {
-                                    this_vue.handleCurrentChange(self.vue_data.currentPage4)
                                 }
                             });
                         },

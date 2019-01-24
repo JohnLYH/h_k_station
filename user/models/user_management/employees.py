@@ -127,17 +127,14 @@ class EmployeesGet(models.Model):
     # 编辑人员信息
     @api.model
     def edit_per_information(self, **kw):
-        record = self.search([('id', '=', kw.get('self_id'))])
-
-        record = self.env['user.department'].search_read([('id', '=', kw.get('deparment')[-1])], ['name'])
-        dic = {
-            'name': kw.get('name'),
-            'branch': record[0].get('name'),
-            'post': kw.get('post'),
-            'role': kw.get('role'),
-            'email': kw.get('role_email')
-        }
-        record.write(dic)
+        old_record = self.env['user.department'].search([('id', '=', kw.get('old_deparment'))])
+        old_data = old_record.users.ids
+        old_data.remove(kw.get('self_id'))
+        old_record.write({'users': [(6, 0, old_data)]})
+        record_depar = self.env['user.department'].search([('id', '=', kw.get('deparment')[-1])])
+        data_ids = record_depar.users.ids
+        data_ids.append(kw.get('self_id'))
+        record_depar.write({'users': [(6, 0, data_ids)]})
 
     # 獲取所有的部門 崗位 和員工角色
     @api.model
@@ -232,26 +229,26 @@ class EmployeesGet(models.Model):
         # 新建賬號發送郵件的時候發送郵件
         receive_name = ''  # 收件人的人名
         sender = 'businessempire@163.com'  # 发送人的邮箱
-        receiver = 'merchantfield@163.com'  # 接收人的邮箱 是list
+        # receiver = 'merchantfield@163.com'  # 接收人的邮箱 是list
         subject = '賬號信息詳情'  # 标题
-        email_name = '賬號信息詳情'  # 邮箱的标题
-        smtpserver = 'smtp.163.com'  # 邮箱的server
-        username = 'businessempire@163.com'  # 发送人的邮箱
-        password = '57624530asd'  # 发送人的授权码,不是密码
+        # email_name = '賬號信息詳情'  # 邮箱的标题
+        # smtpserver = 'smtp.163.com'  # 邮箱的server
+        # username = 'businessempire@163.com'  # 发送人的邮箱
+        # password = '57624530asd'  # 发送人的授权码,不是密码
         info = '''
                         管理員已為您開通MTR移動管理應用，賬號：%s，初始密碼：123456，APP下載地址：https://pro.modao.cc/app/wtl9bDa7gySi56dReeSDeH9IhnXSHko，
                         管理後台地址：https://pro.modao.cc/app/XsU5ZiLTlpyAoAV59PHOPQpC1QdVKo6，
                         請盡快登錄修改密碼。
                         ''' % self.login
-        msg = MIMEText(info, 'plain', 'utf-8')  # 中文需参数‘utf-8'，单字节字符不需要
-        msg['Subject'] = Header(subject, 'utf-8')  # 标题
-        msg['From'] = '%s<merchantfield@163.com>' % email_name
-        msg['To'] = 'merchantfield@163.com'
-        smtp = smtplib.SMTP()
-        smtp.connect(smtpserver, 25)
-        smtp.login(username, password)
-        smtp.sendmail(sender, [receiver], msg.as_string())
-        smtp.quit()  # 退出
+        # msg = MIMEText(info, 'plain', 'utf-8')  # 中文需参数‘utf-8'，单字节字符不需要
+        # msg['Subject'] = Header(subject, 'utf-8')  # 标题
+        # msg['From'] = '%s<merchantfield@163.com>' % email_name
+        # msg['To'] = 'merchantfield@163.com'
+        # smtp = smtplib.SMTP()
+        # smtp.connect(smtpserver, 25)
+        # smtp.login(username, password)
+        # smtp.sendmail(sender, [receiver], msg.as_string())
+        # smtp.quit()  # 退出
         rec = self.env['user.department'].search([('id', '=', self.department_list)])  # 獲取部門的記錄
         lis_rec = rec.users.ids  # 獲取當前部門下面的人員id
         lis_rec.append(self.id)
@@ -268,7 +265,7 @@ class EmployeesGet(models.Model):
     # 添加tree数据
     @api.model
     def add_tree_button(self, **kwargs):
-        if kwargs.get('parent_id') == '':
+        if not kwargs.get('parent_id'):
             there_data = self.env['user.department'].search([('name', '=', kwargs.get('value'))])
             if there_data:
                 return 'err'
@@ -294,7 +291,7 @@ class EmployeesGet(models.Model):
     @api.model
     def create_per_data(self, **kwargs):
         record = self.env['res.groups'].search([('id', '=', kwargs.get('self_id'))])
-        lis=record.users.ids
+        lis = record.users.ids
         for i in kwargs.get('per_name_id'):
             lis.append(i)
         self.env['res.groups'].search([('id', '=', kwargs.get('self_id'))]).write(
