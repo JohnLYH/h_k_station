@@ -39,6 +39,8 @@
         'views/menu.xml',
         'views/inventory_management/inventory.xml',
         'views/inventory_management/inventory_export.xml',
+        # 定時任務
+        'data/cron/order_check_overdue.xml'
     ],
     # only loaded in demonstration mode
     'demo': [
