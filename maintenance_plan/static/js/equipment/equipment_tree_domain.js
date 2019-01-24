@@ -180,7 +180,6 @@ odoo.define('equipment_tree_domain', function (require) {
                             },
 
                             add_equipment_type(event, node) {
-                                var this_vue = this;
                                 event.stopPropagation();
                                 self.do_action({
                                     type: "ir.actions.act_window",
