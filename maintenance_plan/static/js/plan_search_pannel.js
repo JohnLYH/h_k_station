@@ -12,12 +12,35 @@ odoo.define("plan_search_pannel", function (require) {
         events: _.extend({}, search_pannel_default.prototype.events, {
             // 導出工單
             'click .export_excel': function (event) {
-                var controller = this.getParent().getParent().pager.state
-                this.export_excel('/maintenance_plan/export_work_order', this.domains, controller.limit, controller.current_min)
+                var controller = this.getParent().getParent().pager.state;
+                this.download_template_excel(
+                    '/maintenance_plan/export_work_order',
+                    'application/vnd.ms-excel',
+                    '導出工單.xlsx',
+                    'domain=' + JSON.stringify(this.domains) + '&limit=' + controller.limit + '&offset=' + controller.current_min
+                )
             },
             // 導入維修計劃管理
             'click .put_in_excel': function (event) {
-                this.put_in_excel(this.$el.find('[name="file"]'), '/maintenance_plan/put_in_excel/', this.success_callback)
+                var target = this.$el.find('[name="file"]');
+                var self = this;
+                target.change(function () {
+                    if ($(this).val()) {
+                        var fileName = $(this).val().substring($(this).val().lastIndexOf(".") + 1).toLowerCase();
+                        if (fileName != "xlsx") {
+                            self.vue.$notify({
+                                title: '錯誤',
+                                message: '请选择xlsx格式文件上传！',
+                                type: 'error'
+                            });
+                            $(this).val("");
+                            return
+                        }
+                        self.uploadExcel(this, '/maintenance_plan/put_in_excel/', self.success_callback);
+                        $(this).val("");
+                    }
+                });
+                target.trigger('click');
             },
             'click .equipment_search_apply': 'equipment_search_apply', // 設備頁面的搜索，因為有左側設備類型，單獨提出
             'click .equipment_reset_search': 'equipment_reset_search', // 設備頁面的重置搜索，因為有左側設備類型，單獨提出
@@ -41,171 +64,43 @@ odoo.define("plan_search_pannel", function (require) {
             });
             return self._super()
         },
-        /**
-         * 導入設備后的回調
-         * @param {*} self 
-         * @param {*} response 
-         */
-        put_in_equipment_callback: function (self, response) {
-            self.trigger_up('reload');
-            if (response.error === true && !response.file_id) {
-                self.vue.$notify({
-                    title: '錯誤',
-                    message: response.message,
-                    type: 'error'
-                });
-                return
-            }
-            if (response.error === true && response.file_id) {
-                self.do_action({
-                    name: '返回錯誤文件',
-                    target: 'new',
-                    type: 'ir.actions.act_url',
-                    url: '/maintenance_plan/down_wrong_file?file_id=' + response.file_id
-                })
-                return
-            }
-            var dialog = new Dialog(self, {
-                title: "導入設備",
-                size: 'medium',
-                buttons: [],
-                $content: core.qweb.render('tem_equipment_callback', {
-                    response: response
-                })
-            });
-            dialog.opened().then(function () {
-                dialog.$('.download_qr').click(function () {
-                    // 導出設備的二維碼
-                    self.loading = self.vue.$loading({
-                        lock: true
-                    })
-                    var oReq = new XMLHttpRequest();
-                    oReq.open("POST", '/maintenance_plan/export_qr_code_zip', true);
-                    oReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-                    //指定返回类型
-                    oReq.responseType = "arraybuffer";
-                    oReq.onload = function (oEvent) {
-                        self.loading.close();
-                        if (oReq.readyState == 4 && oReq.status == 200) {
-                            var blob = new Blob([oReq.response], {
-                                type: "application/zip"
-                            });
-                            // 转换Blob完成，创建一个a标签用于下载
-                            var a = document.createElement('a');
-                            //点击事件
-                            var evt = document.createEvent("HTMLEvents");
-                            evt.initEvent("click", false, false);
-                            // 设置文件名
-                            a.download = moment().format("YYYY-MM-DD") + '导入设备二维码.zip';
-                            // 利用URL.createObjectURL()方法为a元素生成blob URL
-                            a.href = URL.createObjectURL(blob);
-                            a.click();
-                        }
-                    };
-                    // 发送待参数的请求
-                    oReq.send("qr_list=" + JSON.stringify(response.qr_code_record_ids));
-                });
-                dialog.$('.dialog_close').click(function () {
-                    dialog.close()
-                });
-            });
-            dialog.open();
-        },
 
         /**
-         * 導出二維碼
-         * @param {*} event 
+         * 請求後台下載excel模板
+         * @param url
+         * @param type
+         * @param name
+         * @param params
          */
-        export_qr_code: function (event) {
+        download_template_excel: function (url, type, name, params) {
             var self = this;
-            // 獲取勾選記錄
-            var records_list = self.getParent().getParent().getSelectedRecords().map(function (record) {
-                return {
-                    id: record.res_id,
-                    num: record.data.num || '',
-                    description: record.data.description,
-                    serial_number: record.data.serial_number,
-                    model_name: record.data.display_equipment_model_name
+            var oReq = new XMLHttpRequest();
+            oReq.open("POST", url, true);
+            oReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            //指定返回类型
+            oReq.responseType = "arraybuffer";
+            oReq.onload = function (oEvent) {
+                if (self.loading) {
+                    self.loading.close();
                 }
-            })
-            if (records_list.length > 0) {
-                self.do_action({
-                    type: 'ir.actions.client',
-                    name: '導出設備',
-                    tag: 'export_qr_code',
-                    target: 'new',
-                    params: {
-                        records_list: records_list
-                    }
-                }, {
-                    size: 'medium'
-                })
-            } else {
-                self.vue.$notify({
-                    title: '警告',
-                    message: '未勾選需要導出二維碼的設備',
-                    type: 'warning'
-                });
-            }
-        },
-
-        /**
-         * ajax成功后的回調
-         * @param {*} response 
-         */
-        success_callback: function (self, response) {
-            if (response.error === false) {
-                self.vue.$notify({
-                    title: '成功',
-                    message: '上傳成功',
-                    type: 'success'
-                });
-                self.trigger_up('reload')
-            } else if (response.error === true && response.file_id) {
-                self.vue.$notify({
-                    title: '警告',
-                    message: response.message,
-                    type: 'warning'
-                });
-                self.trigger_up('reload');
-                self.do_action({
-                    name: '返回錯誤文件',
-                    target: 'new',
-                    type: 'ir.actions.act_url',
-                    url: '/maintenance_plan/down_wrong_file?file_id=' + response.file_id
-                })
-            } else {
-                self.vue.$notify({
-                    title: '錯誤',
-                    message: response.message,
-                    type: 'error'
-                });
-            }
-        },
-        /**
-         * 導入excel
-         * @param {*} 上傳的文件input[name=file]的dom 
-         * @param {str} 上傳url
-         */
-        put_in_excel: function (target, url, success_callback) {
-            var self = this;
-            target.change(function () {
-                if ($(this).val()) {
-                    var fileName = $(this).val().substring($(this).val().lastIndexOf(".") + 1).toLowerCase();
-                    if (fileName != "xlsx") {
-                        self.vue.$notify({
-                            title: '錯誤',
-                            message: '请选择xlsx格式文件上传！',
-                            type: 'error'
-                        });
-                        $(this).val("");
-                        return
-                    }
-                    self.uploadExcel(this, url, success_callback);
-                    $(this).val("");
+                if (oReq.readyState == 4 && oReq.status == 200) {
+                    var blob = new Blob([oReq.response], {
+                        type: type
+                    });
+                    // 转换Blob完成，创建一个a标签用于下载
+                    var a = document.createElement('a');
+                    //点击事件
+                    var evt = document.createEvent("HTMLEvents");
+                    evt.initEvent("click", false, false);
+                    // 设置文件名
+                    a.download = name;
+                    // 利用URL.createObjectURL()方法为a元素生成blob URL
+                    a.href = URL.createObjectURL(blob);
+                    a.click();
                 }
-            });
-            target.trigger('click');
+            };
+            // 发送待参数的请求
+            oReq.send(params);
         },
 
         /**
@@ -240,7 +135,9 @@ odoo.define("plan_search_pannel", function (require) {
                     });
                 },
                 success: function (response) {
-                    self.loading.close();
+                    if (self.loading) {
+                        self.loading.close();
+                    }
                     response = JSON.parse(response);
                     success_callback(self, response)
                 }
@@ -248,37 +145,176 @@ odoo.define("plan_search_pannel", function (require) {
         },
 
         /**
-         * 工單管理導出excel
-         * @param {*} url 
-         * @param {*} domains 
-         * @param {*} limit 
-         * @param {*} offset 
+         * ajax成功后的回調
+         * @param {*} response
          */
-        export_excel: function (url, domains, limit, offset) {
-            var oReq = new XMLHttpRequest();
-            oReq.open("POST", url, true);
-            oReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-            //指定返回类型
-            oReq.responseType = "arraybuffer";
-            oReq.onload = function (oEvent) {
-                if (oReq.readyState == 4 && oReq.status == 200) {
-                    var blob = new Blob([oReq.response], {
-                        type: "application/vnd.ms-excel"
+        success_callback: function (self, response) {
+            if (response.error === false) {
+                self.vue.$notify({
+                    title: '成功',
+                    message: '上傳成功',
+                    type: 'success'
+                });
+                self.trigger_up('reload')
+            } else if (response.error === true && response.file_id) {
+                self.vue.$notify({
+                    title: '警告',
+                    message: response.message,
+                    type: 'warning'
+                });
+                self.trigger_up('reload');
+                self.do_action({
+                    name: '返回錯誤文件',
+                    target: 'new',
+                    type: 'ir.actions.act_url',
+                    url: '/maintenance_plan/down_wrong_file?file_id=' + response.file_id
+                })
+            } else {
+                self.vue.$notify({
+                    title: '錯誤',
+                    message: response.message,
+                    type: 'error'
+                });
+            }
+        },
+
+        /**
+         * 導入設備后的回調
+         * @param {*} self
+         * @param {*} response
+         */
+        put_in_equipment_callback: function (self, response) {
+            self.trigger_up('reload');
+            if (response.error === true && !response.file_id) {
+                self.vue.$notify({
+                    title: '錯誤',
+                    message: response.message,
+                    type: 'error'
+                });
+                return
+            }
+            if (response.error === true && response.file_id) {
+                self.do_action({
+                    name: '返回錯誤文件',
+                    target: 'new',
+                    type: 'ir.actions.act_url',
+                    url: '/maintenance_plan/down_wrong_file?file_id=' + response.file_id
+                });
+            }
+            var dialog = new Dialog(self, {
+                title: "導入設備",
+                size: 'medium',
+                buttons: [],
+                $content: core.qweb.render('tem_equipment_callback', {
+                    response: response
+                })
+            });
+            dialog.opened().then(function () {
+                dialog.$('.download_qr').click(function () {
+                    // 導出設備的二維碼
+                    self.loading = self.vue.$loading({
+                        lock: true
+                    })
+                    self.download_template_excel(
+                        '/maintenance_plan/export_qr_code_zip',
+                        'application/zip',
+                        moment().format("YYYY-MM-DD") + '导入设备二维码.zip',
+                        "qr_list=" + JSON.stringify(response.qr_code_record_ids)
+                    )
+                });
+                dialog.$('.dialog_close').click(function () {
+                    dialog.close()
+                });
+            });
+            dialog.open();
+        },
+
+        /**
+         * 點擊導入設備
+         * @param {*} 上傳的文件input[name=file]的dom
+         * @param {str} 上傳url
+         */
+        put_in_excel: function (target, url, success_callback) {
+            var self = this;
+            var dialog = new Dialog(self, {
+                title: "導入設備",
+                size: 'small',
+                buttons: [],
+                $content: core.qweb.render('tem_equipment_put_in_excel')
+            });
+            dialog.opened().then(function () {
+                // 上傳文件
+                dialog.$('.put_in').click(function () {
+                    target.change(function () {
+                        if ($(this).val()) {
+                            var fileName = $(this).val().substring($(this).val().lastIndexOf(".") + 1).toLowerCase();
+                            if (fileName != "xlsx") {
+                                self.vue.$notify({
+                                    title: '錯誤',
+                                    message: '请选择xlsx格式文件上传！',
+                                    type: 'error'
+                                });
+                                $(this).val("");
+                                return
+                            }
+                            dialog.close()
+                            self.uploadExcel(this, url, success_callback);
+                            $(this).val("");
+                        }
                     });
-                    // 转换Blob完成，创建一个a标签用于下载
-                    var a = document.createElement('a');
-                    //点击事件
-                    var evt = document.createEvent("HTMLEvents");
-                    evt.initEvent("click", false, false);
-                    // 设置文件名
-                    a.download = '導出工單.xlsx';
-                    // 利用URL.createObjectURL()方法为a元素生成blob URL
-                    a.href = URL.createObjectURL(blob);
-                    a.click();
+                    target.trigger('click');
+                });
+                // 下載模板
+                dialog.$('.download').click(function () {
+                    self.download_template_excel(
+                        '/maintenance_plan/download_template_excel',
+                        "application/vnd.ms-excel",
+                        '導入設備模板.xlsx',
+                        'path=static/excel/equipment_template.xlsx'
+                    )
+                });
+                dialog.$('.dialog_close').click(function () {
+                    dialog.close()
+                });
+            });
+            dialog.open();
+        },
+
+        /**
+         * 導出tree勾選二維碼
+         * @param {*} event
+         */
+        export_qr_code: function (event) {
+            var self = this;
+            // 獲取勾選記錄
+            var records_list = self.getParent().getParent().getSelectedRecords().map(function (record) {
+                return {
+                    id: record.res_id,
+                    num: record.data.num || '',
+                    description: record.data.description,
+                    serial_number: record.data.serial_number,
+                    model_name: record.data.display_equipment_model_name
                 }
-            };
-            // 发送待参数的请求
-            oReq.send("domain=" + JSON.stringify(domains) + "&limit=" + limit + "&offset=" + offset);
+            })
+            if (records_list.length > 0) {
+                self.do_action({
+                    type: 'ir.actions.client',
+                    name: '導出設備',
+                    tag: 'export_qr_code',
+                    target: 'new',
+                    params: {
+                        records_list: records_list
+                    }
+                }, {
+                    size: 'medium'
+                })
+            } else {
+                self.vue.$notify({
+                    title: '警告',
+                    message: '未勾選需要導出二維碼的設備',
+                    type: 'warning'
+                });
+            }
         },
 
         /**
