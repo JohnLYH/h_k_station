@@ -13,7 +13,12 @@ odoo.define("plan_search_pannel", function (require) {
             // 導出工單
             'click .export_excel': function (event) {
                 var controller = this.getParent().getParent().pager.state;
-                this.export_excel('/maintenance_plan/export_work_order', this.domains, controller.limit, controller.current_min)
+                this.download_template_excel(
+                    '/maintenance_plan/export_work_order',
+                    'application/vnd.ms-excel',
+                    '導出工單.xlsx',
+                    'domain=' + JSON.stringify(this.domains) + '&limit=' + controller.limit + '&offset=' + controller.current_min
+                )
             },
             // 導入維修計劃管理
             'click .put_in_excel': function (event) {
@@ -50,12 +55,16 @@ odoo.define("plan_search_pannel", function (require) {
          * @param params
          */
         download_template_excel: function (url, type, name, params) {
+            var self = this;
             var oReq = new XMLHttpRequest();
             oReq.open("POST", url, true);
             oReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
             //指定返回类型
             oReq.responseType = "arraybuffer";
             oReq.onload = function (oEvent) {
+                if (self.loading) {
+                    self.loading.close();
+                }
                 if (oReq.readyState == 4 && oReq.status == 200) {
                     var blob = new Blob([oReq.response], {
                         type: type
@@ -77,92 +86,44 @@ odoo.define("plan_search_pannel", function (require) {
         },
 
         /**
-         * 導入設備后的回調
-         * @param {*} self
-         * @param {*} response
+         * 上傳excel的具體執行函數
+         * @param {*} dom: 上傳的文件input[name=file]的dom
+         * @param {str} url: 上傳url
          */
-        put_in_equipment_callback: function (self, response) {
-            self.trigger_up('reload');
-            if (response.error === true && !response.file_id) {
-                self.vue.$notify({
-                    title: '錯誤',
-                    message: response.message,
-                    type: 'error'
-                });
-                return
-            }
-            if (response.error === true && response.file_id) {
-                self.do_action({
-                    name: '返回錯誤文件',
-                    target: 'new',
-                    type: 'ir.actions.act_url',
-                    url: '/maintenance_plan/down_wrong_file?file_id=' + response.file_id
-                });
-                return
-            }
-            var dialog = new Dialog(self, {
-                title: "導入設備",
-                size: 'medium',
-                buttons: [],
-                $content: core.qweb.render('tem_equipment_callback', {
-                    response: response
-                })
-            });
-            dialog.opened().then(function () {
-                dialog.$('.download_qr').click(function () {
-                    // 導出設備的二維碼
+        uploadExcel: function (dom, url, success_callback) {
+            var file = dom.files[0];
+            var self = this;
+            // new一个FormData实例
+            var formData = new FormData();
+            formData.append('file', file);
+            return $.ajax({
+                url: url,
+                type: 'POST',
+                data: formData,
+                processData: false, //tell jQuery not to process the data
+                contentType: false, //tell jQuery not to set contentType
+                //这儿的三个参数其实就是XMLHttpRequest里面带的信息。
+                beforeSend: function (xhr) {
                     self.loading = self.vue.$loading({
                         lock: true
                     })
-                    self.download_template_excel(
-                        '/maintenance_plan/export_qr_code_zip',
-                        'application/zip',
-                        moment().format("YYYY-MM-DD") + '导入设备二维码.zip',
-                        "qr_list=" + JSON.stringify(response.qr_code_record_ids)
-                    )
-                });
-                dialog.$('.dialog_close').click(function () {
-                    dialog.close()
-                });
-            });
-            dialog.open();
-        },
-
-        /**
-         * 導出二維碼
-         * @param {*} event
-         */
-        export_qr_code: function (event) {
-            var self = this;
-            // 獲取勾選記錄
-            var records_list = self.getParent().getParent().getSelectedRecords().map(function (record) {
-                return {
-                    id: record.res_id,
-                    num: record.data.num || '',
-                    description: record.data.description,
-                    serial_number: record.data.serial_number,
-                    model_name: record.data.display_equipment_model_name
+                },
+                error: function (textStatus) {
+                    self.loading.close();
+                    self.vue.$notify({
+                        title: '錯誤',
+                        message: '導入發生了錯誤，請聯繫管理員',
+                        type: 'error'
+                    });
+                },
+                success: function (response) {
+                    if (self.loading) {
+                        self.loading.close();
+                    }
+                    response = JSON.parse(response);
+                    success_callback(self, response)
                 }
             })
-            if (records_list.length > 0) {
-                self.do_action({
-                    type: 'ir.actions.client',
-                    name: '導出設備',
-                    tag: 'export_qr_code',
-                    target: 'new',
-                    params: {
-                        records_list: records_list
-                    }
-                }, {
-                    size: 'medium'
-                })
-            } else {
-                self.vue.$notify({
-                    title: '警告',
-                    message: '未勾選需要導出二維碼的設備',
-                    type: 'warning'
-                });
-            }
         },
 
         /**
@@ -198,8 +159,60 @@ odoo.define("plan_search_pannel", function (require) {
                 });
             }
         },
+
         /**
-         * 導入excel
+         * 導入設備后的回調
+         * @param {*} self
+         * @param {*} response
+         */
+        put_in_equipment_callback: function (self, response) {
+            self.trigger_up('reload');
+            if (response.error === true && !response.file_id) {
+                self.vue.$notify({
+                    title: '錯誤',
+                    message: response.message,
+                    type: 'error'
+                });
+                return
+            }
+            if (response.error === true && response.file_id) {
+                self.do_action({
+                    name: '返回錯誤文件',
+                    target: 'new',
+                    type: 'ir.actions.act_url',
+                    url: '/maintenance_plan/down_wrong_file?file_id=' + response.file_id
+                });
+            }
+            var dialog = new Dialog(self, {
+                title: "導入設備",
+                size: 'medium',
+                buttons: [],
+                $content: core.qweb.render('tem_equipment_callback', {
+                    response: response
+                })
+            });
+            dialog.opened().then(function () {
+                dialog.$('.download_qr').click(function () {
+                    // 導出設備的二維碼
+                    self.loading = self.vue.$loading({
+                        lock: true
+                    })
+                    self.download_template_excel(
+                        '/maintenance_plan/export_qr_code_zip',
+                        'application/zip',
+                        moment().format("YYYY-MM-DD") + '导入设备二维码.zip',
+                        "qr_list=" + JSON.stringify(response.qr_code_record_ids)
+                    )
+                });
+                dialog.$('.dialog_close').click(function () {
+                    dialog.close()
+                });
+            });
+            dialog.open();
+        },
+
+        /**
+         * 點擊導入設備
          * @param {*} 上傳的文件input[name=file]的dom
          * @param {str} 上傳url
          */
@@ -226,6 +239,7 @@ odoo.define("plan_search_pannel", function (require) {
                                 $(this).val("");
                                 return
                             }
+                            dialog.close()
                             self.uploadExcel(this, url, success_callback);
                             $(this).val("");
                         }
@@ -249,58 +263,40 @@ odoo.define("plan_search_pannel", function (require) {
         },
 
         /**
-         * 上傳excel的具體執行函數
-         * @param {*} dom: 上傳的文件input[name=file]的dom
-         * @param {str} url: 上傳url
+         * 導出tree勾選二維碼
+         * @param {*} event
          */
-        uploadExcel: function (dom, url, success_callback) {
-            var file = dom.files[0];
+        export_qr_code: function (event) {
             var self = this;
-            // new一个FormData实例
-            var formData = new FormData();
-            formData.append('file', file);
-            return $.ajax({
-                url: url,
-                type: 'POST',
-                data: formData,
-                processData: false, //tell jQuery not to process the data
-                contentType: false, //tell jQuery not to set contentType
-                //这儿的三个参数其实就是XMLHttpRequest里面带的信息。
-                beforeSend: function (xhr) {
-                    self.loading = self.vue.$loading({
-                        lock: true
-                    })
-                },
-                error: function (textStatus) {
-                    self.loading.close();
-                    self.vue.$notify({
-                        title: '錯誤',
-                        message: '導入發生了錯誤，請聯繫管理員',
-                        type: 'error'
-                    });
-                },
-                success: function (response) {
-                    self.loading.close();
-                    response = JSON.parse(response);
-                    success_callback(self, response)
+            // 獲取勾選記錄
+            var records_list = self.getParent().getParent().getSelectedRecords().map(function (record) {
+                return {
+                    id: record.res_id,
+                    num: record.data.num || '',
+                    description: record.data.description,
+                    serial_number: record.data.serial_number,
+                    model_name: record.data.display_equipment_model_name
                 }
             })
-        },
-
-        /**
-         * 工單管理導出excel
-         * @param {*} url
-         * @param {*} domains
-         * @param {*} limit
-         * @param {*} offset
-         */
-        export_excel: function (url, domains, limit, offset) {
-            this.download_template_excel(
-                url,
-                'application/vnd.ms-excel',
-                '導出工單.xlsx',
-                'domain=' + JSON.stringify(domains) + '&limit=' + limit + '&offset=' + offset
-            )
+            if (records_list.length > 0) {
+                self.do_action({
+                    type: 'ir.actions.client',
+                    name: '導出設備',
+                    tag: 'export_qr_code',
+                    target: 'new',
+                    params: {
+                        records_list: records_list
+                    }
+                }, {
+                    size: 'medium'
+                })
+            } else {
+                self.vue.$notify({
+                    title: '警告',
+                    message: '未勾選需要導出二維碼的設備',
+                    type: 'warning'
+                });
+            }
         },
 
         /**
