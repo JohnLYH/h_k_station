@@ -8,9 +8,8 @@ odoo.define('manage_record_tree', function (require) {
     var view_registry = require("web.view_registry");
     var ListRenderer = require("web.ListRenderer");
     var ListController = require("web.ListController");
-    var core = require('web.core');
 
-    var manage_record_tree = ListRenderer.extend({
+    var manage_record_render = ListRenderer.extend({
         app: undefined,
         $tree_list_box: undefined,
 
@@ -27,11 +26,12 @@ odoo.define('manage_record_tree', function (require) {
             }
             this.$el.before($el);
             return this._super()
-        },
+        }
     });
+
     var manage_record_tree = ListView.extend({
         config: _.extend({}, ListView.prototype.config, {
-            Renderer: manage_record_tree,
+            Renderer: manage_record_render,
             Controller: ListController
         }),
         viewType: "list"

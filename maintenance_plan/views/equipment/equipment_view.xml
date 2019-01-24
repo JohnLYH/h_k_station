@@ -9,6 +9,7 @@
                       search_ex_template="equipment_search_template" search_pannel_js_class="plan_search_pannel"
                       js_class="equipment_tree_domain" class="noOpen">
                     <field name="parent_equipment_num"/>
+                    <field name="display_equipment_model_name" invisible="1"/>
                     <field name="num"/>
                     <field name="description"/>
                     <field name="serial_number" string="序列號"/>

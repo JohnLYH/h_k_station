@@ -82,4 +82,36 @@
         <el-button type="primary" @click="onSubmit">確認</el-button>
         <el-button @click="cancel">取消</el-button>
     </div>
+    <el-dialog
+            title="提示"
+            :visible.sync="tree_input"
+            width="30%"
+            append-to-body
+    >
+        <el-row>
+            <el-col :span="6">
+                <div class="grid-content bg-purple">角色</div>
+            </el-col>
+            <el-col :span="18">
+                <div class="grid-content bg-purple-light">
+                    <template>
+                        <el-select v-model="tree_date" multiple filterable placeholder="请选择"
+                                   style="width: 100%">
+                            <el-option
+                                    v-for="item in options_per"
+                                    :key="item.value"
+                                    :label="item.name"
+                                    :value="item.id">
+                            </el-option>
+                        </el-select>
+                    </template>
+                    </el-input></div>
+            </el-col>
+        </el-row>
+        <span slot="footer" class="dialog-footer">
+        <el-button @click="cancel_tree">取 消</el-button>
+        <el-button type="primary" @click="sure_tree">确 定</el-button>
+      </span>
+    </el-dialog>
+
 </div>

@@ -38,11 +38,16 @@ odoo.define('employees_management_action', function (require) {
                 node_record: '',
                 edit_department_id: '',
                 act_id: '',
-                data5: '',
+                data5: [{'value': 'login', 'label': '部門分組', 'children': []}],
                 tree_input: false,
                 tree_date: '',
                 tree_data5: '',
                 data5_data: '',
+                selectedDepartment: '',
+                department_data: [],
+                handleChange: '',
+                handledepartment: '',
+                optionsdepartment: '',
             };
         },
 
@@ -50,13 +55,21 @@ odoo.define('employees_management_action', function (require) {
 
             var self = this;
 
-            return self._rpc({
+            var re_data = self._rpc({
                 model: 'res.users',
                 method: 'get_department_users',
             }).then(function (data) {
-                self.vue_data.data5 = data.department_tree
+                self.vue_data.data5[0].children = data.department_tree
                 self.vue_data.act_id = data.act_id
             })
+
+            var select_data = self._rpc({
+                model: 'user.department',
+                method: 'get_equipment_class',
+            }).then(function (data) {
+                self.vue_data.optionsdepartment = data
+            })
+            return $.when(re_data,select_data)
         },
 
         start: function () {
@@ -226,9 +239,10 @@ odoo.define('employees_management_action', function (require) {
                         },
 
                         append(data) {
-                            console.log('567', data.value)
                             self.vue_data.data5_data = data
                             self.vue_data.tree_data5 = data.value;
+                            self.vue_data.tree_date = '';
+                            self.vue_data.selectedDepartment = [];
                             var data_chose = this;
                             $.when(self.vue_data.tree_input = true,
                             )
@@ -246,19 +260,34 @@ odoo.define('employees_management_action', function (require) {
                             children.splice(index, 1);
                         },
 
+                        data_return: function(){
+                             self._rpc({
+                                model: 'res.users',
+                                method: 'get_department_users',
+                            }).then(function (data) {
+                                self.vue_data.data5[0].children = data.department_tree
+                                self.vue_data.act_id = data.act_id
+                            })
+                        },
+
                         sure_tree: function () {
                             var button = this;
                             self._rpc({
                                 model: 'res.users',
                                 method: 'add_tree_button',
-                                kwargs: {parent_id: self.vue_data.tree_data5, value: self.vue_data.tree_date}
+                                kwargs: {parent_id: self.vue_data.selectedDepartment, value: self.vue_data.tree_date}
                             }).then(function (get_data) {
-                                var id = get_data;
-                                const newChild = {id: id++, label: self.vue_data.tree_date, children: []};
-                                if (!self.vue_data.data5_data.children) {
-                                    button.$set(self.vue_data.data5_data, 'children', []);
+                                if(get_data=='err'){
+                                    alert('部門已近存在請從星輸入')
+
+                                }else {
+                                    var id = get_data;
+                                    const newChild = {id: id++, label: self.vue_data.tree_date, children: []};
+                                    if (!self.vue_data.data5_data.children) {
+                                        button.$set(self.vue_data.data5_data, 'children', []);
+                                    }
+                                    button.data_return(button)
                                 }
-                                self.vue_data.data5_data.children.push(newChild);
                             });
                             $.when(this.tree_input = false)
 
@@ -270,6 +299,9 @@ odoo.define('employees_management_action', function (require) {
 
                         cancel_tree: function () {
                             this.tree_input = false
+                        },
+
+                        add_department: function () {
                         }
                     },
 

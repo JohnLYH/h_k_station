@@ -23,12 +23,15 @@ class EmployeesGet(models.Model):
         部门下的人员
         :return:
         '''
+        if kw.get('department_id') == 'login':
+            return {'users': [], 'count': 0}
         role_ids = self.env['user.department'].search([('id', '=', kw.get('department_id'))])
-        count = self.env['res.users'].search_count([('id', 'in', role_ids.users.ids)])
+
         users = self.env['res.users'].search_read(
             [('id', 'in', role_ids.users.ids)],
             fields=['name', 'login', 'post', 'role', 'state', 'branch', 'email'
                     ], limit=30)
+        count = self.env['res.users'].search_count([('id', 'in', role_ids.users.ids)])
         lis = []  # 用来存放部门
         lis.append(kw.get('department_id'))
         dep_id = self.env['user.department'].search_read([('id', '=', kw.get('department_id'))], ['parent_id'])
@@ -83,14 +86,6 @@ class EmployeesGet(models.Model):
             children = self.get_department_edit(record['id'])
             if children:
                 vals['children'] = children
-            rst.append(vals)
-        if not rst:
-            rst = []
-            rec = self.env['user.department'].create({'name': '部門分組'})
-            vals = {
-                'value': rec['id'],
-                'label': rec['name'],
-            }
             rst.append(vals)
         act_id = self.env.ref('user.create_new_ifo').id
         return {'department_tree': rst, 'act_id': act_id}
@@ -273,11 +268,34 @@ class EmployeesGet(models.Model):
     # 添加tree数据
     @api.model
     def add_tree_button(self, **kwargs):
-        date_int = max(self.env['user.department'].search([]).ids)
-        self.env['user.department'].create({'name': kwargs.get('value'), 'parent_id': kwargs.get('parent_id')})
-        return date_int + 1
+        if kwargs.get('parent_id') == '':
+            there_data = self.env['user.department'].search([('name', '=', kwargs.get('value'))])
+            if there_data:
+                return 'err'
+            record = self.env['user.department'].create({'name': kwargs.get('value')})
+        else:
+            there_data = self.env['user.department'].search([('name', '=', kwargs.get('value'))])
+            if there_data:
+                return 'err'
+            record = self.env['user.department'].create(
+                {'name': kwargs.get('value'), 'parent_id': kwargs.get('parent_id')[-1]})
+        return record.id
 
     # 删除tree数据
     @api.model
     def delete_tree_button(self, **kwargs):
         self.env['user.department'].search([('id', '=', kwargs.get('value'))]).unlink()
+
+    @api.model
+    def get_per_data(self, **kwargs):
+        record = self.search_read([], ['name'])
+        return record
+
+    @api.model
+    def create_per_data(self, **kwargs):
+        record = self.env['res.groups'].search([('id', '=', kwargs.get('self_id'))])
+        lis=record.users.ids
+        for i in kwargs.get('per_name_id'):
+            lis.append(i)
+        self.env['res.groups'].search([('id', '=', kwargs.get('self_id'))]).write(
+            {'users': [(6, 0, lis)]})

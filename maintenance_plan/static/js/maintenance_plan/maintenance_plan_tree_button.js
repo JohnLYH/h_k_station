@@ -24,10 +24,11 @@ odoo.define('maintenance_plan_tree_button', function (require) {
                     }
                 })
             } else {
-                data_manager.load_action('maintenance_plan.act_order_approval').then(function (result) {
+                data_manager.load_action('maintenance_plan.act_maintenance_plan_management').then(function (result) {
                     self.do_action(result, {
                         res_id: self.id,
                         view_type: 'form',
+                        replace_last_action: true
                     })
                 })
             }

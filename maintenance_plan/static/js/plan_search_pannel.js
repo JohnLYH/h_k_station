@@ -12,7 +12,7 @@ odoo.define("plan_search_pannel", function (require) {
         events: _.extend({}, search_pannel_default.prototype.events, {
             // 導出工單
             'click .export_excel': function (event) {
-                var controller = self.getParent().getParent().pager.state
+                var controller = this.getParent().getParent().pager.state
                 this.export_excel('/maintenance_plan/export_work_order', this.domains, controller.limit, controller.current_min)
             },
             // 導入維修計劃管理
@@ -21,9 +21,10 @@ odoo.define("plan_search_pannel", function (require) {
             },
             'click .equipment_search_apply': 'equipment_search_apply', // 設備頁面的搜索，因為有左側設備類型，單獨提出
             'click .equipment_reset_search': 'equipment_reset_search', // 設備頁面的重置搜索，因為有左側設備類型，單獨提出
+            // 導入設備
             'click .put_in_equipment': function (event) {
                 this.put_in_excel(this.$el.find('[name="file"]'), '/maintenance_plan/equipment_put_in_excel/', this.put_in_equipment_callback)
-            }, // 導入設備
+            },
             'click .export_qr_code': 'export_qr_code', // 導出設備二維碼
         }),
 
@@ -47,6 +48,14 @@ odoo.define("plan_search_pannel", function (require) {
          */
         put_in_equipment_callback: function (self, response) {
             self.trigger_up('reload');
+            if (response.error === true && !response.file_id) {
+                self.vue.$notify({
+                    title: '錯誤',
+                    message: response.message,
+                    type: 'error'
+                });
+                return
+            }
             if (response.error === true && response.file_id) {
                 self.do_action({
                     name: '返回錯誤文件',
@@ -54,6 +63,7 @@ odoo.define("plan_search_pannel", function (require) {
                     type: 'ir.actions.act_url',
                     url: '/maintenance_plan/down_wrong_file?file_id=' + response.file_id
                 })
+                return
             }
             var dialog = new Dialog(self, {
                 title: "導入設備",
@@ -102,8 +112,41 @@ odoo.define("plan_search_pannel", function (require) {
             dialog.open();
         },
 
+        /**
+         * 導出二維碼
+         * @param {*} event 
+         */
         export_qr_code: function (event) {
-            // TODO: 導出設備二維碼
+            var self = this;
+            // 獲取勾選記錄
+            var records_list = self.getParent().getParent().getSelectedRecords().map(function (record) {
+                return {
+                    id: record.res_id,
+                    num: record.data.num || '',
+                    description: record.data.description,
+                    serial_number: record.data.serial_number,
+                    model_name: record.data.display_equipment_model_name
+                }
+            })
+            if (records_list.length > 0) {
+                self.do_action({
+                    type: 'ir.actions.client',
+                    name: '導出設備',
+                    tag: 'export_qr_code',
+                    target: 'new',
+                    params: {
+                        records_list: records_list
+                    }
+                }, {
+                    size: 'medium'
+                })
+            } else {
+                self.vue.$notify({
+                    title: '警告',
+                    message: '未勾選需要導出二維碼的設備',
+                    type: 'warning'
+                });
+            }
         },
 
         /**

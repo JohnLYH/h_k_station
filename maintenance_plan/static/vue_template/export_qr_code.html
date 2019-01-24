@@ -1,0 +1,23 @@
+<div id="export_qr_code_div">
+    <el-row :gutter="30">
+        <div id="div_table">
+            <el-table max-height="300" size="mini" :data="tableData" style="width: 100%">
+                <el-table-column align="center" type="index" label="序號" width="50">
+                </el-table-column>
+                <el-table-column align="center" prop="num" label="設備編號">
+                </el-table-column>
+                <el-table-column align="center" prop="description" label="設備描述">
+                </el-table-column>
+                <el-table-column align="center" prop="serial_number" label="序列號">
+                </el-table-column>
+                <el-table-column align="center" prop="model_name" label="型號">
+                </el-table-column>
+            </el-table>
+        </div>
+    </el-row>
+    <el-row style="margin-top: 20px;" type="flex" justify="center">
+        <el-button @click="cancel" size="small">取消</el-button>
+        <el-button style="margin-left: 15px" @click="enter" size="small" type="primary">確定</el-button>
+    </el-row>
+
+</div>

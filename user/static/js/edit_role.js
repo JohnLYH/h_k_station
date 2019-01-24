@@ -26,31 +26,40 @@ odoo.define('edit_role', function (require) {
                 role: action.context.role_name,
                 per: action.context.per,
                 group_id: action.context.groups_id,
+                tree_input: false,
+                tree_date: '',
+                options_per: '',
 
 
             };
         },
         willStart: function () {
-
             var self = this;
 
-            return $.when(self._rpc({
-                    model: 'res.groups',
-                    method: 'get_group_data',
-                    kwargs: {group_id: self.vue_data.group_id},
-                }).then(function (data) {
-                    self.vue_data.departmentList = data.cats
-                    self.vue_data.default_checked_keys = data.checked_groups_ids
-                }),
+            var data_defau = self._rpc({
+                model: 'res.groups',
+                method: 'get_group_data',
+                kwargs: {group_id: self.vue_data.group_id},
+            }).then(function (data) {
+                self.vue_data.departmentList = data.cats
+                self.vue_data.default_checked_keys = data.checked_groups_ids
+            });
+            var name_data = self._rpc({
+                model: 'res.groups',
+                method: 'get_user_name_data',
+                kwargs: {group_id: self.vue_data.group_id},
+            }).then(function (data) {
+                self.vue_data.user_name = data
+            })
 
-                self._rpc({
-                    model: 'res.groups',
-                    method: 'get_user_name_data',
-                    kwargs: {group_id: self.vue_data.group_id},
-                }).then(function (data) {
-                    self.vue_data.user_name = data
-                })
-            )
+            var per_data = self._rpc({
+                model: 'res.users',
+                method: 'get_per_data',
+            }).then(function (data) {
+                self.vue_data.options_per = data
+            })
+
+            return $.when(data_defau, name_data, per_data)
         },
 
         start: function () {
@@ -89,7 +98,7 @@ odoo.define('edit_role', function (require) {
                                     per_id: implied_ids,
                                     self_id: self.vue_data.group_id
                                 }
-                            }).then( function () {
+                            }).then(function () {
                                 self.do_action({"type": "ir.actions.act_window_close"})
                             })
                         },
@@ -97,14 +106,33 @@ odoo.define('edit_role', function (require) {
                             self.do_action({"type": "ir.actions.act_window_close"})
                         },
                         button_act: function (date) {
-                            self.do_action({
-                                name: '添加人員',
-                                type: 'ir.actions.act_window',
-                                res_model: 'res.groups',
-                                res_id: self.vue_data.group_id,
-                                views: [[false, 'form']],
-                                target: "new"
-                            });
+                            self.vue_data.tree_input = true
+                        },
+
+                        cancel_tree: function () {
+                            self.vue_data.tree_input = false
+                        },
+
+                        per_data_return: function(){
+                            self._rpc({
+                                model: 'res.groups',
+                                method: 'get_user_name_data',
+                                kwargs: {group_id: self.vue_data.group_id},
+                            }).then(function (data) {
+                                self.vue_data.user_name = data
+                            })
+                        },
+
+                        sure_tree: function () {
+                            var per_data = this;
+                            self._rpc({
+                                model: 'res.users',
+                                method: 'create_per_data',
+                                kwargs: {self_id: self.vue_data.group_id, per_name_id: self.vue_data.tree_date}
+                            }).then(function (data) {
+                                self.vue_data.tree_input = false
+                                per_data.per_data_return(per_data)
+                            })
                         }
                     },
 

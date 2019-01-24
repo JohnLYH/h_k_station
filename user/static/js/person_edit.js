@@ -20,7 +20,8 @@ odoo.define('person_edit', function (require) {
                 role_email: action.context.email,
                 department_list: [],
                 selectedOptions: action.context.edit_id,
-                self_id: action.context.self_id
+                self_id: action.context.self_id,
+                tree_input:false,
 
             };
         },

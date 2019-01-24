@@ -14,4 +14,4 @@ class ExtendResGroup(models.Model):
         :return:
         '''
         return {
-            'module_name': 'user', 'category_id_list': ['category_fuenc1','category_fuenc2'], 'custom_group_id': 'myself_catetory_id'}
+            'module_name': 'user', 'category_id_list': ['category_fuenc'], 'custom_group_id': 'myself_catetory_id'}
