@@ -16,6 +16,7 @@
                     <field name="actual_start_time"/>
                     <field name="actual_end_time"/>
                     <field name="status"/>
+                    <field name="is_overdue"/>
                     <widget name="work_order_tree_button" string="操作"/>
                 </tree>
             </field>

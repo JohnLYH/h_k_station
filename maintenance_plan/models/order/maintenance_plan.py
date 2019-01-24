@@ -1,6 +1,9 @@
 # !user/bin/env python3
 # -*- coding: utf-8 -*-
 # Author: Artorias
+import datetime as dt
+from dateutil.relativedelta import relativedelta
+
 from odoo import models, fields, api
 
 from ..approval_management.order_approval import STATUS as APPROVER_STATUS
@@ -35,6 +38,7 @@ class MaintenancePlan(models.Model):
     actual_start_time = fields.Datetime('實際開始時間')
     actual_end_time = fields.Datetime('實際結束時間')
     status = fields.Selection(STATUS, string='狀態')
+    is_overdue = fields.Selection([('yes', '是'), ('no', '否')], string='是否逾期', default='no')
     executor_id = fields.Many2one('res.users', string='執行人')  # 執行人一旦開始填表，則不可更改，執行人只能在執行班組中
     # 審批關聯
     order_approval_ids = fields.One2many('maintenance_plan.order.approval', 'work_order_id', string='審批')
@@ -50,6 +54,11 @@ class MaintenancePlan(models.Model):
 
     @api.model
     def create(self, vals):
+        # 給超過當前時間仍然未完成的工單標記逾期
+        now_day = dt.datetime.now() + relativedelta(hours=8)
+        if (dt.datetime.strptime(vals['plan_end_time'].replace('/', '-'), '%Y-%m-%d') - now_day < dt.timedelta(0) and
+                vals.get('status', None) != 'closed'):
+            vals['is_overdue'] = 'yes'
         serial_number = self.env['maintenance_plan.equipment'].browse(vals['equipment_id']).serial_number
         vals['equipment_serial_number'] = serial_number
         return super().create(vals)
@@ -146,3 +155,13 @@ class MaintenancePlan(models.Model):
             'status': 'be_executed'
         })
         return
+
+    def cron_order_check_overdue(self):
+        '''
+        定时检查工單逾期
+        :return:
+        '''
+        now_day = dt.datetime.strftime(dt.datetime.now() + relativedelta(hours=8), '%Y-%m-%d')
+        # 給超過當前時間仍然未完成的工單標記逾期
+        self.search([('is_overdue', '!=', 'yes'), ('plan_end_time', '<', now_day), ('status', '=', 'closed')]) \
+            .write({'is_overdue': 'yes'})

@@ -16,10 +16,11 @@ class Equipment(models.Model):
     num = fields.Char('設備編號')  # 設備座位號，一個座位會有多個放過的設備
     parent_equipment_num = fields.Char('父設備編號')
     serial_number_id = fields.Many2one('maintenance_plan.equipment.serial_number', required=True, string='序列號',
-                                       domain="[('equipment_ids', '=', False)]", readonly=True)  # 唯一
+                                       domain="[('equipment_ids', '=', False)]")  # 唯一
     serial_number = fields.Char('序列號', compute='_com_serial_number_id', store=True)  # 唯一
     qr_code = fields.Text('二維碼', compute='_com_serial_number_id')
-    equipment_type_id = fields.Many2one('maintenance_plan.equipment.type', string='設備類型', required=True)
+    equipment_type_id = fields.Many2one('maintenance_plan.equipment.type', string='設備類型', required=True,
+                                        ondelete='restrict')
     line = fields.Char('線別')
     station = fields.Char('車站')
     equipment_model = fields.Many2one('maintenance_plan.equipment_model', '設備型號', required=True)

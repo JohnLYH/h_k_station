@@ -17,6 +17,7 @@ class EquipmentSerialNumber(models.Model):
 
     num = fields.Char('設備序列號', required=True)
     qr_code = fields.Text('二維碼', compute='_com_qr_code', store=True)
+    equipment_ids = fields.One2many('maintenance_plan.equipment', 'serial_number_id')
     # 遷移記錄
     migrate_records_ids = fields.One2many('maintenance_plan.migrate.records', 'serial_number_id', string='遷移歷史')
 
