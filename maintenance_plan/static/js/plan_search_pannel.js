@@ -12,7 +12,7 @@ odoo.define("plan_search_pannel", function (require) {
         events: _.extend({}, search_pannel_default.prototype.events, {
             // 導出工單
             'click .export_excel': function (event) {
-                var controller = this.getParent().getParent().pager.state
+                var controller = this.getParent().getParent().pager.state;
                 this.export_excel('/maintenance_plan/export_work_order', this.domains, controller.limit, controller.current_min)
             },
             // 導入維修計劃管理
@@ -41,10 +41,45 @@ odoo.define("plan_search_pannel", function (require) {
             });
             return self._super()
         },
+
+        /**
+         * 請求後台下載excel模板
+         * @param url
+         * @param type
+         * @param name
+         * @param params
+         */
+        download_template_excel: function (url, type, name, params) {
+            var oReq = new XMLHttpRequest();
+            oReq.open("POST", url, true);
+            oReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            //指定返回类型
+            oReq.responseType = "arraybuffer";
+            oReq.onload = function (oEvent) {
+                if (oReq.readyState == 4 && oReq.status == 200) {
+                    var blob = new Blob([oReq.response], {
+                        type: type
+                    });
+                    // 转换Blob完成，创建一个a标签用于下载
+                    var a = document.createElement('a');
+                    //点击事件
+                    var evt = document.createEvent("HTMLEvents");
+                    evt.initEvent("click", false, false);
+                    // 设置文件名
+                    a.download = name;
+                    // 利用URL.createObjectURL()方法为a元素生成blob URL
+                    a.href = URL.createObjectURL(blob);
+                    a.click();
+                }
+            };
+            // 发送待参数的请求
+            oReq.send(params);
+        },
+
         /**
          * 導入設備后的回調
-         * @param {*} self 
-         * @param {*} response 
+         * @param {*} self
+         * @param {*} response
          */
         put_in_equipment_callback: function (self, response) {
             self.trigger_up('reload');
@@ -62,7 +97,7 @@ odoo.define("plan_search_pannel", function (require) {
                     target: 'new',
                     type: 'ir.actions.act_url',
                     url: '/maintenance_plan/down_wrong_file?file_id=' + response.file_id
-                })
+                });
                 return
             }
             var dialog = new Dialog(self, {
@@ -79,31 +114,12 @@ odoo.define("plan_search_pannel", function (require) {
                     self.loading = self.vue.$loading({
                         lock: true
                     })
-                    var oReq = new XMLHttpRequest();
-                    oReq.open("POST", '/maintenance_plan/export_qr_code_zip', true);
-                    oReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-                    //指定返回类型
-                    oReq.responseType = "arraybuffer";
-                    oReq.onload = function (oEvent) {
-                        self.loading.close();
-                        if (oReq.readyState == 4 && oReq.status == 200) {
-                            var blob = new Blob([oReq.response], {
-                                type: "application/zip"
-                            });
-                            // 转换Blob完成，创建一个a标签用于下载
-                            var a = document.createElement('a');
-                            //点击事件
-                            var evt = document.createEvent("HTMLEvents");
-                            evt.initEvent("click", false, false);
-                            // 设置文件名
-                            a.download = moment().format("YYYY-MM-DD") + '导入设备二维码.zip';
-                            // 利用URL.createObjectURL()方法为a元素生成blob URL
-                            a.href = URL.createObjectURL(blob);
-                            a.click();
-                        }
-                    };
-                    // 发送待参数的请求
-                    oReq.send("qr_list=" + JSON.stringify(response.qr_code_record_ids));
+                    self.download_template_excel(
+                        '/maintenance_plan/export_qr_code_zip',
+                        'application/zip',
+                        moment().format("YYYY-MM-DD") + '导入设备二维码.zip',
+                        "qr_list=" + JSON.stringify(response.qr_code_record_ids)
+                    )
                 });
                 dialog.$('.dialog_close').click(function () {
                     dialog.close()
@@ -114,7 +130,7 @@ odoo.define("plan_search_pannel", function (require) {
 
         /**
          * 導出二維碼
-         * @param {*} event 
+         * @param {*} event
          */
         export_qr_code: function (event) {
             var self = this;
@@ -151,7 +167,7 @@ odoo.define("plan_search_pannel", function (require) {
 
         /**
          * ajax成功后的回調
-         * @param {*} response 
+         * @param {*} response
          */
         success_callback: function (self, response) {
             if (response.error === false) {
@@ -184,28 +200,52 @@ odoo.define("plan_search_pannel", function (require) {
         },
         /**
          * 導入excel
-         * @param {*} 上傳的文件input[name=file]的dom 
+         * @param {*} 上傳的文件input[name=file]的dom
          * @param {str} 上傳url
          */
         put_in_excel: function (target, url, success_callback) {
             var self = this;
-            target.change(function () {
-                if ($(this).val()) {
-                    var fileName = $(this).val().substring($(this).val().lastIndexOf(".") + 1).toLowerCase();
-                    if (fileName != "xlsx") {
-                        self.vue.$notify({
-                            title: '錯誤',
-                            message: '请选择xlsx格式文件上传！',
-                            type: 'error'
-                        });
-                        $(this).val("");
-                        return
-                    }
-                    self.uploadExcel(this, url, success_callback);
-                    $(this).val("");
-                }
+            var dialog = new Dialog(self, {
+                title: "導入設備",
+                size: 'small',
+                buttons: [],
+                $content: core.qweb.render('tem_equipment_put_in_excel')
             });
-            target.trigger('click');
+            dialog.opened().then(function () {
+                // 上傳文件
+                dialog.$('.put_in').click(function () {
+                    target.change(function () {
+                        if ($(this).val()) {
+                            var fileName = $(this).val().substring($(this).val().lastIndexOf(".") + 1).toLowerCase();
+                            if (fileName != "xlsx") {
+                                self.vue.$notify({
+                                    title: '錯誤',
+                                    message: '请选择xlsx格式文件上传！',
+                                    type: 'error'
+                                });
+                                $(this).val("");
+                                return
+                            }
+                            self.uploadExcel(this, url, success_callback);
+                            $(this).val("");
+                        }
+                    });
+                    target.trigger('click');
+                });
+                // 下載模板
+                dialog.$('.download').click(function () {
+                    self.download_template_excel(
+                        '/maintenance_plan/download_template_excel',
+                        "application/vnd.ms-excel",
+                        '導入設備模板.xlsx',
+                        'path=static/excel/equipment_template.xlsx'
+                    )
+                });
+                dialog.$('.dialog_close').click(function () {
+                    dialog.close()
+                });
+            });
+            dialog.open();
         },
 
         /**
@@ -249,36 +289,18 @@ odoo.define("plan_search_pannel", function (require) {
 
         /**
          * 工單管理導出excel
-         * @param {*} url 
-         * @param {*} domains 
-         * @param {*} limit 
-         * @param {*} offset 
+         * @param {*} url
+         * @param {*} domains
+         * @param {*} limit
+         * @param {*} offset
          */
         export_excel: function (url, domains, limit, offset) {
-            var oReq = new XMLHttpRequest();
-            oReq.open("POST", url, true);
-            oReq.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-            //指定返回类型
-            oReq.responseType = "arraybuffer";
-            oReq.onload = function (oEvent) {
-                if (oReq.readyState == 4 && oReq.status == 200) {
-                    var blob = new Blob([oReq.response], {
-                        type: "application/vnd.ms-excel"
-                    });
-                    // 转换Blob完成，创建一个a标签用于下载
-                    var a = document.createElement('a');
-                    //点击事件
-                    var evt = document.createEvent("HTMLEvents");
-                    evt.initEvent("click", false, false);
-                    // 设置文件名
-                    a.download = '導出工單.xlsx';
-                    // 利用URL.createObjectURL()方法为a元素生成blob URL
-                    a.href = URL.createObjectURL(blob);
-                    a.click();
-                }
-            };
-            // 发送待参数的请求
-            oReq.send("domain=" + JSON.stringify(domains) + "&limit=" + limit + "&offset=" + offset);
+            this.download_template_excel(
+                url,
+                'application/vnd.ms-excel',
+                '導出工單.xlsx',
+                'domain=' + JSON.stringify(domains) + '&limit=' + limit + '&offset=' + offset
+            )
         },
 
         /**

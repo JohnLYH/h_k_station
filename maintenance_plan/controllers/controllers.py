@@ -70,6 +70,18 @@ class MaintenancePlan(http.Controller):
                 row_error = True
         return row_error
 
+    @http.route('/maintenance_plan/download_template_excel', type='http', csrf=False, auth='user')
+    def download_template_excel(self, **kwargs):
+        '''
+        下載excel模板文件
+        :param kwargs:
+        :return:
+        '''
+        path = os.path.join(APP_DIR, kwargs['path'])
+        with open(path, 'rb') as f:
+            response = request.make_response(f.read())
+        return response
+
     @http.route('/maintenance_plan/put_in_excel', type='http', csrf=False, auth='user')
     def put_in_excel(self, **kwargs):
         '''
@@ -340,6 +352,11 @@ class MaintenancePlan(http.Controller):
 
     @http.route('/maintenance_plan/export_qr_code_zip', auth='user', csrf=False, type='http', method=['POST'])
     def export_qr_code_zip(self, **kwargs):
+        '''
+        下載設備二維碼
+        :param kwargs:
+        :return:
+        '''
         qr_list = json.loads(kwargs['qr_list'])
         now_day = dt.strftime(dt.now() + relativedelta(hours=8), '%Y-%m-%d')
         if qr_list is not None:
