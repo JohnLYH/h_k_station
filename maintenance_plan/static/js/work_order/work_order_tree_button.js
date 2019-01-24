@@ -12,8 +12,6 @@ odoo.define('work_order_tree_button', function (require) {
             var self = this;
             event.stopPropagation();
             data_manager.load_action('maintenance_plan.act_work_order_management').then(function (result) {
-                console.log(self.id);
-                console.log(result);
                 self.do_action(result, {
                     res_id: self.id,
                     view_type: 'form',

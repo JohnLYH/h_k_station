@@ -52,7 +52,6 @@
             <field name="name">工單審批</field>
             <field name="res_model">maintenance_plan.maintenance.plan</field>
             <field name="view_mode">tree</field>
-            <field name="domain">[]</field>
             <field name="domain">[('status', '!=', False), ('status', '!=', 'be_executed'), ('status', '!=', 'executing')]</field>
             <field name="view_ids" eval="[(5, 0, 0),
                           (0, 0, {'view_mode': 'tree', 'view_id': ref('order_approval_tree')}),

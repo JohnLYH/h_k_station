@@ -26,6 +26,9 @@ class MaintenancePlan(models.Model):
     equipment_id = fields.Many2one('maintenance_plan.equipment', string='設備', required=True)
     equipment_num = fields.Char('設備編號', compute='_com_equipment', store=True)
     equipment_serial_number = fields.Char('設備序列號')  # 因設備序列號會變，故在此記錄生成工單時的瞬時設備序列號
+    equipment_type_id = fields.Char(string='設備類別', compute='_com_equipment')
+    medol = fields.Char(string='設備型號', compute='_com_equipment')
+    description = fields.Char(string='設備描述', compute='_com_equipment')
     plan_start_time = fields.Date('建議時間(開始)', required=True)
     plan_end_time = fields.Date('建議時間(結束)', required=True)
     display_plan_time = fields.Char('建議時間', compute='_com_plan_time', store=True)
@@ -74,6 +77,9 @@ class MaintenancePlan(models.Model):
     def _com_equipment(self):
         if len(self.equipment_id) != 0:
             self.equipment_num = self.equipment_id.num
+            self.equipment_type_id = self.equipment_id.equipment_type_id.name
+            self.medol = self.equipment_id.equipment_model.equipment_model
+            self.description = self.equipment_id.description
 
     @api.one
     @api.depends('plan_start_time', 'plan_end_time')
