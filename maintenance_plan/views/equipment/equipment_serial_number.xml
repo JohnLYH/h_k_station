@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+        <record id="maintenance_plan_equipment_serial_number_form" model="ir.ui.view">
+            <field name="name">設備序列號</field>
+            <field name="model">maintenance_plan.equipment.serial_number</field>
+            <field name="arch" type="xml">
+                <form import="false" edit="1" create="1" delete="1">
+                    <group>
+                        <field name="num"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

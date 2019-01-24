@@ -137,14 +137,15 @@ odoo.define('equipment_tree_domain', function (require) {
                         },
                         methods: {
                             handleNodeClick(data) {
+                                var current_domains = self.search_domains.slice();
                                 if (data.id != 0) {
-                                    self.search_domains.push([
+                                    current_domains.push([
                                         ["equipment_type_id.id", "=", data.id]
                                     ])
                                 }
                                 var this_vue = this;
                                 self.trigger_up("search", {
-                                    domains: self.search_domains,
+                                    domains: current_domains,
                                     contexts: [],
                                     groupbys: []
                                 });

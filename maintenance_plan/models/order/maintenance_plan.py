@@ -35,6 +35,7 @@ class MaintenancePlan(models.Model):
     actual_start_time = fields.Datetime('實際開始時間')
     actual_end_time = fields.Datetime('實際結束時間')
     status = fields.Selection(STATUS, string='狀態')
+    is_overdue = fields.Selection([('yes', '是'), ('no', '否')], string='是否逾期')
     executor_id = fields.Many2one('res.users', string='執行人')  # 執行人一旦開始填表，則不可更改，執行人只能在執行班組中
     # 審批關聯
     order_approval_ids = fields.One2many('maintenance_plan.order.approval', 'work_order_id', string='審批')
