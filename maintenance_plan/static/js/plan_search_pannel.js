@@ -22,7 +22,25 @@ odoo.define("plan_search_pannel", function (require) {
             },
             // 導入維修計劃管理
             'click .put_in_excel': function (event) {
-                this.put_in_excel(this.$el.find('[name="file"]'), '/maintenance_plan/put_in_excel/', this.success_callback)
+                var target = this.$el.find('[name="file"]');
+                var self = this;
+                target.change(function () {
+                    if ($(this).val()) {
+                        var fileName = $(this).val().substring($(this).val().lastIndexOf(".") + 1).toLowerCase();
+                        if (fileName != "xlsx") {
+                            self.vue.$notify({
+                                title: '錯誤',
+                                message: '请选择xlsx格式文件上传！',
+                                type: 'error'
+                            });
+                            $(this).val("");
+                            return
+                        }
+                        self.uploadExcel(this, '/maintenance_plan/put_in_excel/', self.success_callback);
+                        $(this).val("");
+                    }
+                });
+                target.trigger('click');
             },
             'click .equipment_search_apply': 'equipment_search_apply', // 設備頁面的搜索，因為有左側設備類型，單獨提出
             'click .equipment_reset_search': 'equipment_reset_search', // 設備頁面的重置搜索，因為有左側設備類型，單獨提出

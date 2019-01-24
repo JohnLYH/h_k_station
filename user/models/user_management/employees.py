@@ -274,7 +274,9 @@ class EmployeesGet(models.Model):
     @api.model
     def add_tree_button(self, **kwargs):
         date_int = max(self.env['user.department'].search([]).ids)
-        self.env['user.department'].create({'name': kwargs.get('value'), 'parent_id': kwargs.get('parent_id')})
+        self.env['user.department'].create({
+            'name': kwargs['value'], 'parent_id': kwargs['parent_id']
+        })
         return date_int + 1
 
     # 删除tree数据

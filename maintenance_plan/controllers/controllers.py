@@ -5,14 +5,10 @@ import json
 import random
 import time
 from datetime import datetime as dt
-from dateutil.relativedelta import relativedelta
 import os
 import shutil
 import xlwt
 from dateutil.relativedelta import relativedelta
-from openpyxl import load_workbook, Workbook
-from openpyxl.styles import PatternFill
-from openpyxl.writer.excel import save_virtual_workbook
 import zipfile
 
 from odoo import http
@@ -107,7 +103,7 @@ class MaintenancePlan(http.Controller):
                                                                      'Standard Job Description')  # 標準工作描述StandardJobDescription
                 work_order_description = self.get_row1_list_colnum(title_list,
                                                                    'Work Order Description')  # 工單描述WorkOrderDescription
-                plan_start_time = self.get_row1_list_colnum(title_list, 'Planned Start   Date')  # 建議開始時間PlannedStartDate
+                plan_start_time = self.get_row1_list_colnum(title_list, 'Planned Start Date')  # 建議開始時間PlannedStartDate
                 plan_end_time = self.get_row1_list_colnum(title_list,
                                                           'Planned Completed Date')  # 建議結束時間PlannedCompletedDate
                 # 檢查是否有colnum未存在的列
@@ -131,16 +127,16 @@ class MaintenancePlan(http.Controller):
                 row_error = self.excel_validate(sheet, n_row, col_index, red_style)
                 if row_error is False:
                     work_order_count = request.env['maintenance_plan.maintenance.plan'].search_count([
-                        ('num', '=', sheet.cell(n_row, work_num['num']).value)
+                        ('num', '=', sheet.cell(n_row, work_num['num']).value.strip())
                     ])
                     equipment_record = request.env['maintenance_plan.equipment'].search([
-                        ('num', '=', sheet.cell(n_row, equipment_num['num']).value)
+                        ('num', '=', sheet.cell(n_row, equipment_num['num']).value.strip())
                     ])
                     standard_job_record = request.env['maintenance_plan.standard.job'].search([
-                        ('name', '=', standard_job['num'])
+                        ('name', '=', sheet.cell(n_row, standard_job['num']).value.strip())
                     ])
                     # 檢查是否已經存在工單
-                    if work_order_count != 0 and sheet.cell(n_row, 1).value is not None:
+                    if work_order_count != 0:
                         sheet.cell(n_row, work_num['num']).fill = green_style
                         error = True
                     # 檢查是否存在對應編號設備
@@ -150,18 +146,18 @@ class MaintenancePlan(http.Controller):
                     # 檢查標準工作是否已經存在
                     if len(standard_job_record) == 0 and work_order_count == 0 and len(equipment_record) != 0:
                         standard_job_record = request.env['maintenance_plan.standard.job'].create({
-                            'name': sheet.cell(n_row, standard_job['num']).value,
-                            'description': sheet.cell(n_row, standard_job_description['num']).value
+                            'name': sheet.cell(n_row, standard_job['num']).value.strip(),
+                            'description': sheet.cell(n_row, standard_job_description['num']).value.strip()
                         })
                     if work_order_count == 0 and len(equipment_record) != 0:
                         request.env['maintenance_plan.maintenance.plan'].create({
-                            'num': sheet.cell(n_row, work_num['num']).value,
-                            'work_order_type': sheet.cell(n_row, work_order_type['num']).value,
-                            'work_order_description': sheet.cell(n_row, work_order_description['num']).value,
+                            'num': sheet.cell(n_row, work_num['num']).value.strip(),
+                            'work_order_type': sheet.cell(n_row, work_order_type['num']).value.strip(),
+                            'work_order_description': sheet.cell(n_row, work_order_description['num']).value.strip(),
                             'standard_job_id': standard_job_record.id,
                             'equipment_id': equipment_record.id,
-                            'plan_start_time': sheet.cell(n_row, plan_start_time['num']).value.split(' ')[0],
-                            'plan_end_time': sheet.cell(n_row, plan_end_time['num']).value.split(' ')[0],
+                            'plan_start_time': sheet.cell(n_row, plan_start_time['num']).value.strip().split(' ')[0],
+                            'plan_end_time': sheet.cell(n_row, plan_end_time['num']).value.strip().split(' ')[0],
                         })
                 else:
                     error = True
@@ -236,19 +232,19 @@ class MaintenancePlan(http.Controller):
                 # 校驗特定列是否有空值或錯值
                 row_error = self.excel_validate(sheet, n_row, col_index, red_style)
                 # 檢查狀態是否符合選擇項
-                if sheet.cell(n_row, status['num']).value not in ['Expired', 'Effective']:
+                if sheet.cell(n_row, status['num']).value.strip() not in ['Expired', 'Effective']:
                     sheet.cell(n_row, status['num']).fill = red_style
                     error = True
                     row_error = True
                 if row_error is False:
                     serial_number_record = request.env['maintenance_plan.equipment'].search([
-                        ('serial_number', '=', sheet.cell(n_row, serial_num['num']).value)
+                        ('serial_number', '=', sheet.cell(n_row, serial_num['num']).value.strip())
                     ])
                     equipment_type_record = request.env['maintenance_plan.equipment.type'].search([
-                        ('name', '=', sheet.cell(n_row, equipment_type['num']).value)
+                        ('name', '=', sheet.cell(n_row, equipment_type['num']).value.strip())
                     ])
                     equipment_model_record = request.env['maintenance_plan.equipment_model'].search([
-                        ('equipment_model', '=', sheet.cell(n_row, equipment_model['num']).value)
+                        ('equipment_model', '=', sheet.cell(n_row, equipment_model['num']).value.strip())
                     ])
                     # 檢查設備類型是否存在，不存在則標記，不允許創建
                     if len(equipment_type_record) == 0:
@@ -262,34 +258,34 @@ class MaintenancePlan(http.Controller):
                     # 檢查設備型號是否存在，不存在則創建
                     if len(equipment_model_record) == 0 and len(equipment_type_record) != 0:
                         equipment_model_record = request.env['maintenance_plan.equipment_model'].create({
-                            'equipment_model': sheet.cell(n_row, equipment_model['num']).value,
-                            'description': sheet.cell(n_row, description['num']).value
+                            'equipment_model': sheet.cell(n_row, equipment_model['num']).value.strip(),
+                            'description': sheet.cell(n_row, description['num']).value.strip()
                         })
                     # 創建設備記錄
                     if len(equipment_type_record) != 0:
                         eq = request.env['maintenance_plan.equipment'].create({
-                            'num': sheet.cell(n_row, equipment_num['num']).value,
-                            'parent_equipment_num': sheet.cell(n_row, parent_equipment_num['num']).value,
+                            'num': sheet.cell(n_row, equipment_num['num']).value.strip(),
+                            'parent_equipment_num': sheet.cell(n_row, parent_equipment_num['num']).value.strip(),
                             'serial_number_id': request.env['maintenance_plan.equipment.serial_number'].create({
-                                'num': sheet.cell(n_row, serial_num['num']).value
+                                'num': sheet.cell(n_row, serial_num['num']).value.strip()
                             }).id,
                             'equipment_type_id': equipment_type_record.id,
-                            'line': sheet.cell(n_row, line['num']).value,
-                            'station': sheet.cell(n_row, station['num']).value,
+                            'line': sheet.cell(n_row, line['num']).value.strip(),
+                            'station': sheet.cell(n_row, station['num']).value.strip(),
                             'equipment_model': equipment_model_record.id,
-                            'status': sheet.cell(n_row, status['num']).value,
-                            'item_code': sheet.cell(n_row, item_code['num']).value,
-                            'direction': sheet.cell(n_row, direction['num']).value,
-                            'start_chainage': sheet.cell(n_row, start_chainage['num']).value,
-                            'end_chainage': sheet.cell(n_row, end_chainage['num']).value,
-                            'detailed_location': sheet.cell(n_row, detailed_location['num']).value,
-                            'last_installation_date': sheet.cell(n_row, last_installation_date['num']).value,
-                            'service_since': sheet.cell(n_row, service_since['num']).value,
-                            'expected_asset_life': sheet.cell(n_row, expected_asset_life['num']).value,
-                            'warranty': sheet.cell(n_row, warranty['num']).value,
-                            'supplier': sheet.cell(n_row, supplier['num']).value,
-                            'oem_manufacturer': sheet.cell(n_row, oem_manufacturer['num']).value,
-                            'lead_maintainer': sheet.cell(n_row, lead_maintainer['num']).value,
+                            'status': sheet.cell(n_row, status['num']).value.strip(),
+                            'item_code': sheet.cell(n_row, item_code['num']).value.strip(),
+                            'direction': sheet.cell(n_row, direction['num']).value.strip(),
+                            'start_chainage': sheet.cell(n_row, start_chainage['num']).value.strip(),
+                            'end_chainage': sheet.cell(n_row, end_chainage['num']).value.strip(),
+                            'detailed_location': sheet.cell(n_row, detailed_location['num']).value.strip(),
+                            'last_installation_date': sheet.cell(n_row, last_installation_date['num']).value.strip(),
+                            'service_since': sheet.cell(n_row, service_since['num']).value.strip(),
+                            'expected_asset_life': sheet.cell(n_row, expected_asset_life['num']).value.strip(),
+                            'warranty': sheet.cell(n_row, warranty['num']).value.strip(),
+                            'supplier': sheet.cell(n_row, supplier['num']).value.strip(),
+                            'oem_manufacturer': sheet.cell(n_row, oem_manufacturer['num']).value.strip(),
+                            'lead_maintainer': sheet.cell(n_row, lead_maintainer['num']).value.strip(),
                         })
                         qr_code_record_ids.append(eq.id)
                 else:
@@ -580,7 +576,6 @@ class OtherEquipment(http.Controller):
             if new_sheet.cell(num, col).value is None:
                 pass
             else:
-                print(new_sheet.cell(num, col).value)
                 try:
                     dt.strptime(new_sheet.cell(num, col).value, '%Y/%m/%d')
                 except Exception as e:
@@ -786,7 +781,6 @@ class OtherEquipment(http.Controller):
                 other_equipments[i - 1].remark if other_equipments[i - 1].remark else '',
             ]
             ws.append(my_records)
-        print('xxx')
         file_name = str(time.time()) + str(random.randint(1, 10000)) + "sample.xlsx"
         wb.save(file_name)
         with open(file_name, 'rb') as f:

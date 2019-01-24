@@ -112,14 +112,21 @@
     <t t-name="equipment_search_template">
         <div class="form-inline custom_search_box" search_pannel_js_class="plan_search_pannel">
             <div class="container-fluid">
-                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
+                <div class="col-md-2 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;">設備描述:</span>
+                    <div class="col-md-8 col-sm-12 col-xs-12">
+                        <div for="description" class="form-widget-item"/>
+                    </div>
+                </div>
+
+                <div class="col-md-2 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
                     <span class="search_label" style="float:left;">設備編號:</span>
                     <div class="col-md-8 col-sm-12 col-xs-12">
                         <div for="num" class="form-widget-item"/>
                     </div>
                 </div>
 
-                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
+                <div class="col-md-2 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
                     <span class="search_label" style="float:left;">設備序列號:</span>
                     <div class="col-md-8 col-sm-12 col-xs-12">
                         <div for="serial_number" class="form-widget-item"/>
