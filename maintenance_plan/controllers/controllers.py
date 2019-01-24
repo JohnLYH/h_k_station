@@ -342,7 +342,6 @@ class MaintenancePlan(http.Controller):
     def export_qr_code_zip(self, **kwargs):
         qr_list = json.loads(kwargs['qr_list'])
         now_day = dt.strftime(dt.now() + relativedelta(hours=8), '%Y-%m-%d')
-        zip_name = '{}{}/new.zip'.format(now_day, '导入设备二维码')
         if qr_list is not None:
             equipment_records = request.env['maintenance_plan.equipment'].browse(qr_list)
             file_name = os.path.join(APP_DIR, 'static/trans_zip', str(int(time.time())) + str(random.randint(1, 1000)))
@@ -357,8 +356,9 @@ class MaintenancePlan(http.Controller):
                 with open(image_path, "wb") as f:
                     # 加入壓縮文件，并更換在壓縮文件中的路徑及名稱
                     f.write(base64.b64decode(record.serial_number_id.qr_code))
-                new_zip.write(image_path, '{}/{}+{}.png'.format(zip_name, record.num or 'none', record.serial_number),
-                              compress_type=zipfile.ZIP_DEFLATED)
+                new_zip.write(image_path, '{}/{}+{}.png'.format(
+                    '%s设备二维码' % now_day, record.num or 'none', record.serial_number
+                ), compress_type=zipfile.ZIP_DEFLATED)
             new_zip.close()
             # 讀取壓縮文件內容
             with open(os.path.join(file_name, 'new.zip'), 'rb') as zip_f:
