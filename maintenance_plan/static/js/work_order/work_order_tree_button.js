@@ -5,15 +5,19 @@ odoo.define('work_order_tree_button', function (require) {
     var tree_button = require('treebtns');
     var data_manager = require('web.data_manager');
 
+    // 工單管理頁面操作按鈕
     var work_order_tree_button = tree_button.extend({
         template: 'tem_work_order_tree_button',
         _click_tree_buttons: function (event) {
             var self = this;
             event.stopPropagation();
-            data_manager.load_action('maintenance_plan.act_order_approval').then(function (result) {
+            data_manager.load_action('maintenance_plan.act_work_order_management').then(function (result) {
+                console.log(self.id);
+                console.log(result);
                 self.do_action(result, {
                     res_id: self.id,
                     view_type: 'form',
+                    replace_last_action: true
                 })
             })
         }

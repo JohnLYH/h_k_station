@@ -10,7 +10,7 @@ odoo.define('equipment_tree_domain', function (require) {
     var ListController = require("web.ListController");
     var core = require('web.core');
 
-    var equipment_tree_domain = ListRenderer.extend({
+    var equipment_tree_render = ListRenderer.extend({
         app: undefined,
         $tree_list_box: undefined,
 
@@ -20,7 +20,7 @@ odoo.define('equipment_tree_domain', function (require) {
 
         init: function (parent, state, params) {
             this._super(parent, state, params);
-            this.record = state
+            this.record = state;
             this.search_domains = []
         },
 
@@ -282,9 +282,10 @@ odoo.define('equipment_tree_domain', function (require) {
             return $.when();
         },
     });
+
     var equipment_tree_domain = ListView.extend({
         config: _.extend({}, ListView.prototype.config, {
-            Renderer: equipment_tree_domain,
+            Renderer: equipment_tree_render,
             Controller: ListController
         }),
         viewType: "list"
