@@ -17,7 +17,7 @@ class MaintenancePlan(models.Model):
     _order = 'create_date DESC'
 
     def _default_order_forms(self):
-        return [(0, 0, {'name': '對向波口測試', 'status': 'WRITE'}), (0, 0, {'name': '檢測證書', 'status': 'WRITE'})]
+        return [(0, 0, {'name': '對向波口測試', 'status': 'NOTBEGIN'}), (0, 0, {'name': '檢測證書', 'status': 'NOTBEGIN'})]
 
     num = fields.Char('工單編號')
     work_order_type = fields.Char('工單類型', required=True)

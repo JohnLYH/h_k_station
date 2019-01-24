@@ -277,7 +277,7 @@ class WorkOrder(http.Controller):
         assert len(test_form) in [0, 1]
         # 簽署狀態
         status = test_form.status
-        if status == 'WRITE' or status == 'SUBMIT' or status == 'CHECK':
+        if status == 'WRITE' or status == 'SUBMIT' or status == 'CHECK' or status == 'NOTBEGIN':
             status = status
         else:
             status = 'COMPLETE'
@@ -350,6 +350,10 @@ class WorkOrder(http.Controller):
                 'action_dep_id': userid,
                 'status': 'executing',
                 'actual_start_time': datetime.datetime.now()
+            })
+            test_form = order_record.order_form_ids.filtered(lambda f: f.name == '對向波口測試')
+            test_form.write({
+                'status': 'WRITE'
             })
             return to_json({'errcode': 0, 'data': '', 'msg': '開始測試'})
         return to_json({'errcode': 1, 'data': '', 'msg': '保存失敗,此組沒有這個人'})
