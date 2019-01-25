@@ -106,7 +106,7 @@ odoo.define('employees_management_action', function (require) {
                             self._rpc({
                                 model: 'res.users',
                                 method: 'get_users_info',
-                                kwargs: {'department_id': data.value, 'page': self.vue_data.currentPage4, 'limit': 30}
+                                kwargs: {'department_id': self.vue_data.node_record, 'page': self.vue_data.currentPage4, 'limit': 30}
                             }).then(function (get_data) {
                                 self.vue_data.tableData = get_data.users;
                                 self.vue_data.message = get_data.count;
@@ -187,7 +187,7 @@ odoo.define('employees_management_action', function (require) {
                                 method: 'disable_info',
                                 kwargs: {'disable_id': row.login}
                             }).then(function (get_data) {
-                                current_info.click_node(current_info.$refs.tree.getCurrentNode())
+                                current_info.click_node_page(current_info)
                             });
                         },
 
@@ -223,7 +223,7 @@ odoo.define('employees_management_action', function (require) {
                                 method: 'enable_button_act',
                                 kwargs: {value: row.state, self_id: row.id}
                             }).then(function (get_data) {
-                                start_act.click_node_page(start_act.$refs.tree.getCurrentNode())
+                                start_act.click_node_page(start_act)
                             });
                         },
                         crete_new_record: function () {
