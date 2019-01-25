@@ -92,6 +92,7 @@ odoo.define('materials_detail_btn', function (require) {
                                     views: [[false, 'list']],
                                     target: 'current',
                                     domain: [['reference_materials_manage_id', '=', this_detail.id]],
+                                    context: {'description': this_detail.description,'equipment_model': this_detail.equipment_model}
                                 });
                                 // TODO: 刷新了之後顯示不出來
                             },
