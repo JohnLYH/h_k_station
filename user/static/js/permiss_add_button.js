@@ -21,6 +21,8 @@ odoo.define('permiss_add_button', function (require) {
                     children: 'children',
                     label: 'name'
                 },
+                ruleForm: {name:''},
+                rules: {name: [{required: true, message: '請輸入角色組姓名', trigger: 'blur'}],},
             };
         },
 
@@ -61,23 +63,30 @@ odoo.define('permiss_add_button', function (require) {
                     methods: {
                         click_node: function (date) {
                         },
-                        onSubmit: function () {
-                            var implied_ids = [];
-                            this.$refs.tree.getCheckedNodes(false, true).map(function (node) {
-                                implied_ids.push(node.id)
-                            });
-                            self._rpc({
-                                model: 'res.groups',
-                                method: 'creste_new_record',
-                                kwargs: {
-                                    name: self.vue_data.name,
-                                    permiss: self.vue_data.permiss,
-                                    user_name: self.vue_data.person_data,
-                                    tree_id: implied_ids,
-                                },
-                            }).then(function (data) {
-                                self.vue_data.user_name = data
-                                self.do_action({"type": "ir.actions.act_window_close"})
+                        onSubmit: function (formName) {
+                            this.$refs[formName].validate((valid) => {
+                                if (valid) {
+                                    var implied_ids = [];
+                                    this.$refs.tree.getCheckedNodes(false, true).map(function (node) {
+                                        implied_ids.push(node.id)
+                                    });
+                                    self._rpc({
+                                        model: 'res.groups',
+                                        method: 'creste_new_record',
+                                        kwargs: {
+                                            name: self.vue_data.ruleForm.name,
+                                            permiss: self.vue_data.permiss,
+                                            user_name: self.vue_data.person_data,
+                                            tree_id: implied_ids,
+                                        },
+                                    }).then(function (data) {
+                                        self.vue_data.user_name = data
+                                        self.do_action({"type": "ir.actions.act_window_close"})
+                                    })
+                                }
+                                else {
+
+                                }
                             })
                         },
                         cancel: function () {

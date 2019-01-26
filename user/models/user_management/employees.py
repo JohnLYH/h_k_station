@@ -8,14 +8,35 @@ from email.header import Header
 import datetime
 
 
+class PostSelect(models.Model):
+    _name = 'user.post_select'
+
+    name = fields.Char(string='崗位')
+
+
 class EmployeesGet(models.Model):
     _inherit = 'res.users'
 
-    post = fields.Char(string='崗位')
-    role = fields.Char(string='角色')
-    state = fields.Selection([('正常', '正常'), ('禁用', '禁用')], default='正常')
-    branch = fields.Char(string='員工部門')
-    department_list = fields.Char(string='部門')
+    post = fields.Many2one('user.post_select', string='崗位', required=True)
+    role = fields.Many2one('res.groups', string='角色', equired=True)
+    state = fields.Selection([('正常', '正常'), ('禁用', '禁用')], default='正常', equired=True)
+    branch = fields.Char(string='員工部門', equired=True)
+    department_list = fields.Char(string='部門', equired=True)
+    depertment_many = fields.Many2many('user.department', 'user_department_rel', 'udepartment_id',
+                                       'user_id', readonly=True)
+
+    # 创建角色的时候在当前的组下面
+    @api.onchange('role')
+    def get_group_id(self):
+        config_dict = self.env['res.groups'].get_config_info()
+        category_id = self.env.ref('{}.{}'.format(config_dict['module_name'], config_dict['custom_group_id']))
+        category_id.ensure_one()
+
+        return {
+            'domain': {
+                'role': [('category_id', '=', category_id.id)]
+            }
+        }
 
     @api.model
     def get_users_info(self, **kw):
@@ -27,10 +48,20 @@ class EmployeesGet(models.Model):
             return {'users': [], 'count': 0}
         role_ids = self.env['user.department'].search([('id', '=', kw.get('department_id'))])
 
-        users = self.env['res.users'].search_read(
-            [('id', 'in', role_ids.users.ids)],
-            fields=['name', 'login', 'post', 'role', 'state', 'branch', 'email'
-                    ], limit=30)
+        users = self.env['res.users'].search([('id', 'in', role_ids.users.ids)], limit=30)
+        list_user = []
+        for i in users:
+            dic = {}
+            dic['id'] = i.id
+            dic['name'] = i.name
+            dic['login'] = i.login
+            dic['login'] = i.login
+            dic['post'] = i.post.name
+            dic['role'] = i.role.name
+            dic['state'] = i.state
+            dic['branch'] = i.branch
+            dic['email'] = i.email
+            list_user.append(dic)
         count = self.env['res.users'].search_count([('id', 'in', role_ids.users.ids)])
         lis = []  # 用来存放部门
         lis.append(kw.get('department_id'))
@@ -42,7 +73,7 @@ class EmployeesGet(models.Model):
                                                                  ['parent_id'])
                 if two_id[0].get('parent_id'):
                     lis.append(two_id[0].get('parent_id')[0])
-        return {'users': users, 'count': count, 'department': lis[::-1]}
+        return {'users': list_user, 'count': count, 'department': lis[::-1]}
 
     @api.model
     def page_size(self, **kw):
@@ -113,57 +144,87 @@ class EmployeesGet(models.Model):
     @api.model
     def get_chose_user_info(self, name, chose):
         if chose == 'all':
-            record = self.search_read([('name', '=', name)])
+            record = self.search([('name', '=', name)])
+            list_user = []
+            for i in record:
+                dic = {}
+                dic['id'] = i.id
+                dic['name'] = i.name
+                dic['login'] = i.login
+                dic['login'] = i.login
+                dic['post'] = i.post.name
+                dic['role'] = i.role.name
+                dic['state'] = i.state
+                dic['branch'] = i.branch
+                dic['email'] = i.email
+                list_user.append(dic)
+
         else:
             record = self.search_read([('name', '=', name), ('state', '=', chose)])
+            list_user = []
+            for i in record:
+                dic = {}
+                dic['id'] = i.id
+                dic['name'] = i.name
+                dic['login'] = i.login
+                dic['login'] = i.login
+                dic['post'] = i.post.name
+                dic['role'] = i.role.name
+                dic['state'] = i.state
+                dic['branch'] = i.branch
+                dic['email'] = i.email
+                list_user.append(dic)
 
-        return record
+        return list_user
 
     @api.model
     def disable_info(self, **kw):
         record = self.search([('login', '=', kw.get('disable_id'))])
         record.write({'state': '禁用'})
 
-    # 编辑人员信息
+    # 编辑人员信息 选择了部门的情况下
     @api.model
     def edit_per_information(self, **kw):
-        old_record = self.env['user.department'].search([('id', '=', kw.get('old_deparment'))])
-        old_data = old_record.users.ids
-        old_data.remove(kw.get('self_id'))
-        old_record.write({'users': [(6, 0, old_data)]})
-        record_depar = self.env['user.department'].search([('id', '=', kw.get('deparment')[-1])])
-        data_ids = record_depar.users.ids
-        data_ids.append(kw.get('self_id'))
-        record_depar.write({'users': [(6, 0, data_ids)]})
+        old_record = self.search([('id', '=', kw.get('self_id'))])
+        old_record.write({'depertment_many': [(6, 0, [kw.get('deparment')[-1]])]})
+
+        if type(kw.get('post')) is str:
+            post_rec = self.env['user.post_select'].search([('name', '=', str(kw.get('post')))])
+        else:
+            post_rec = self.env['user.post_select'].search([('id', '=', str(kw.get('post')))])
+
+        if type(kw.get('role')) is str:
+            role_rec = self.env['res.groups'].search([('name', '=', str(kw.get('role')))])
+        else:
+            role_rec = self.env['res.groups'].search([('id', '=', str(kw.get('role')))])
+        old_record.post = post_rec.id
+        old_record.role = role_rec.id
+        old_record.name = kw.get('name')
+        old_record.email = kw.get('role_email')
 
     # 獲取所有的部門 崗位 和員工角色
     @api.model
     def gt_all_department(self):
+        config_dict = self.env['res.groups'].get_config_info()
+        category_id = self.env.ref('{}.{}'.format(config_dict['module_name'], config_dict['custom_group_id']))
         lis = []
         post_lis = []  # 用來存放崗位
-        dep_lis = []  # 用來存放部門
         role_lis = []  # 用來存放角色組
-        record = self.search_read([], ['post', 'branch', 'role'])
-        for post in record:
-            dic = {}
-            if post.get('post'):
-                dic['value'] = post.get('post')
-                dic['label'] = post.get('post')
-                post_lis.append(dic)
-        for dep in record:
-            dep_dic = {}
-            if dep.get('branch'):
-                dep_dic['value'] = dep.get('branch')
-                dep_dic['label'] = dep.get('branch')
-                dep_lis.append(dep_dic)
-        for role in record:
-            role_dic = {}
-            if role.get('role'):
-                role_dic['value'] = role.get('role')
-                role_dic['label'] = role.get('role')
-                role_lis.append(role_dic)
+        post_rec = self.env['user.post_select'].search([])
+        role_rec = self.env['res.groups'].search([('category_id', '=', category_id.id)])
+        for post_i in post_rec:
+            dic_post = {}
+            dic_post['id'] = post_i.id
+            dic_post['name'] = post_i.name
+            post_lis.append(dic_post)
+
+        for role_i in role_rec:
+            dic_role = {}
+            dic_role['id'] = role_i.id
+            dic_role['name'] = role_i.name
+            role_lis.append(dic_role)
+
         lis.append(post_lis)
-        lis.append(dep_lis)
         lis.append(role_lis)
         return lis
 

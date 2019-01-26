@@ -29,6 +29,8 @@ odoo.define('edit_role', function (require) {
                 tree_input: false,
                 tree_date: '',
                 options_per: '',
+                ruleForm: {input: action.context.role_name},
+                rules: {input: [{required: true, message: '請輸入角色名', trigger: 'blur'}]},
 
 
             };
@@ -82,25 +84,31 @@ odoo.define('edit_role', function (require) {
                         click_node: function (data) {
                         },
 
-                        onSubmit: function (date) {
-                            var implied_ids = [];
-                            this.$refs.tree.getCheckedNodes(false, true).map(function (node) {
-                                implied_ids.push(node.id)
-                            });
-                            self._rpc({
-                                model: 'res.groups',
-                                method: 'edit_save',
-                                kwargs: {
-                                    role_name: self.vue_data.role,
-                                    permission_illust: self.vue_data.per,
-                                    modify_name: self.vue_data.input,
-                                    modify_per: self.vue_data.textarea,
-                                    per_id: implied_ids,
-                                    self_id: self.vue_data.group_id
+                        onSubmit: function (formName) {
+                            this.$refs[formName].validate((valid) => {
+                                if (valid) {
+                                var implied_ids = [];
+                                this.$refs.tree.getCheckedNodes(false, true).map(function (node) {
+                                    implied_ids.push(node.id)
+                                });
+                                self._rpc({
+                                    model: 'res.groups',
+                                    method: 'edit_save',
+                                    kwargs: {
+                                        role_name: self.vue_data.role,
+                                        permission_illust: self.vue_data.per,
+                                        modify_name: self.vue_data.ruleForm.input,
+                                        modify_per: self.vue_data.textarea,
+                                        per_id: implied_ids,
+                                        self_id: self.vue_data.group_id
+                                    }
+                                }).then(function () {
+                                    self.do_action({"type": "ir.actions.act_window_close"})
+                                })
+                            }else {
+
                                 }
-                            }).then(function () {
-                                self.do_action({"type": "ir.actions.act_window_close"})
-                            })
+                        })
                         },
                         cancel: function () {
                             self.do_action({"type": "ir.actions.act_window_close"})
@@ -113,7 +121,7 @@ odoo.define('edit_role', function (require) {
                             self.vue_data.tree_input = false
                         },
 
-                        per_data_return: function(){
+                        per_data_return: function () {
                             self._rpc({
                                 model: 'res.groups',
                                 method: 'get_user_name_data',

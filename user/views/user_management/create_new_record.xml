@@ -10,12 +10,12 @@
                 <form creata="0" edit="0" class="noOpen">
                     <sheet>
                         <group>
-                            <field name="name" string="姓名"></field>
+                            <field name="name" string="姓名" required="1"></field>
                             <field name="login" string="賬號"></field>
                             <field name="post" string="崗位"></field>
-                            <field name="role" string="角色"></field>
-                            <field name="department_list" string="員工部門" widget="cascader_widget"></field>
-                            <field name="email" string="郵箱"></field>
+                            <field name="role" string="角色" required="1"></field>
+                            <field name="department_list" string="員工部門" widget="cascader_widget" required="1"></field>
+                            <field name="email" string="郵箱" required="1"></field>
                         </group>
                         <footer>
                             <button name='create_new_send_email'

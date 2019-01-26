@@ -4,6 +4,7 @@ from odoo import models, fields, api
 import xlrd
 import base64
 
+lis_departmnet_id = [] # 全局变量用来存放编辑的时候的部门ID
 
 class Department(models.Model):
     _name = 'user.department'
@@ -125,3 +126,20 @@ class Department(models.Model):
                 vals['children'] = children
             rst.append(vals)
         return rst
+
+    # 默认部门权限
+    @api.model
+    def get_default_department_edit(self, **kwargs):
+        parent_id = self.env['res.users'].search([('id', '=', kwargs.get('self_id'))]).depertment_many.id
+        lis_record = self.get_parent(parent_id)
+
+        return lis_record[::-1]
+
+    def get_parent(self, parent_id):
+        lis_departmnet_id.append(parent_id)
+        local_rec = self.search([('id', '=', parent_id)])
+        if local_rec.parent_id.id:
+            return self.get_parent(local_rec.parent_id.id)
+
+        else:
+            return lis_departmnet_id

@@ -166,6 +166,7 @@ odoo.define('employees_management_action', function (require) {
                                 }
                             }, {
                                 on_close: function () {
+                                    this_vue.click_node_page(this_vue)
                                 }
                             });
                         },
@@ -192,6 +193,7 @@ odoo.define('employees_management_action', function (require) {
                         },
 
                         search: function (data) {
+                           var search_data = this;
                             self._rpc({
                                 model: 'res.users',
                                 method: 'get_chose_user_info',
