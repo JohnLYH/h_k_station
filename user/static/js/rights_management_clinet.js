@@ -162,7 +162,7 @@ odoo.define('rights_management', function (require) {
                                     per: row.permission_illust,
                                     groups_id: row.id
                                 },
-                            },{size: 'medium'} ,{
+                            },{
                                 on_close: function () {
                                     self_act.handleCurrentChange(self.vue_data.currentPage4)
                                 }
