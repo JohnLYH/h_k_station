@@ -212,6 +212,25 @@ class OtherEquipment(models.Model):
                                        + datetime.timedelta(hours=8)
                 if nowtime > maintenance_due_data:
                     record.status = '失效'
+                    title = '{}已失效'.format(record.equipment_num)
+                    try:
+                        int(record.freq_of_cal)
+                        freq_of_cal = str(record.freq_of_cal) + '個月'
+                    except:
+                        freq_of_cal = record.freq_of_cal
+                    content = '設備編號：{}，設備名稱：{}，型號：{}，設備位置：{}，所屬班組：{}，檢驗週期：{}，最後檢驗日期：{}，有效期：{}'.format(
+                        record.equipment_num, record.equipment_name, record.model, record.location_of_equipment,
+                        record.departments.name, freq_of_cal, record.last_maintenance_date,
+                        record.maintenance_due_data)
+                    # 需要確定收件人
+                    # TODO:等待驗證
+                    # 班組
+                    users = record.departments.users.filtered(lambda f: f.role in ['督導員', '工程師'])
+                    for user in users:
+                        email = user.email
+                        self.env['user.send_email'].reset_password({
+                            'content':content, 'title': title, 'email': email
+                        })
             else:
                 pass
 

@@ -11,7 +11,8 @@ class OrderForm(models.Model):
     order_id = fields.Many2one('maintenance_plan.maintenance.plan', string='工單')
     name = fields.Char('表單名稱')
     content = fields.Text('表單json內容')
-    # 表單狀態：PENDING 待審批, PROGRESS 審批中 ，APPROVED 已審批 WRITE:表單填寫，SUBMIT:獨立安全檢查員審核, CHECK:檢查員審核, COMPLETE:表單簽署結束
+    # 表單狀態：PENDING 待審批, PROGRESS 審批中 ，APPROVED 已審批 WRITE:表單填寫，SUBMIT:獨立安全檢查員審核, CHECK:檢查員審核,
+    # COMPLETE:表單簽署結束, NOTBEGIN: 未开始测试
     status = fields.Char('表單狀態')
     approval_ids = fields.One2many('maintenance_plan.order.form.approval', 'order_form_id', string='審批流水')
     next_execute_user_id = fields.Many2one('res.users', '下級審批人', compute='_com_next_execute')

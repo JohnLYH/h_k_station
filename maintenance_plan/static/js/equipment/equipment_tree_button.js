@@ -12,19 +12,27 @@ odoo.define('equipment_tree_button', function (require) {
             self._rpc({
                 model: 'maintenance_plan.config',
                 method: 'get_ref_id',
-                kwargs: {list_string_name: ['maintenance_plan.maintenance_plan_equipment_detail_form']}
+                kwargs: {
+                    list_string_name: ['maintenance_plan.maintenance_plan_equipment_detail_form']
+                }
             }).then(function (result) {
                 self.do_action({
                     type: "ir.actions.act_window",
                     res_model: "maintenance_plan.equipment",
                     res_id: self.id,
-                    views: [[result[0], "form"]],
-                    flags: {'initial_mode': 'readonly'}
+                    views: [
+                        [result[0], "form"]
+                    ],
+                    flags: {
+                        'initial_mode': 'readonly'
+                    },
                 })
             })
         }
     });
     widget_registry.add('equipment_tree_button', equipment_tree_button);
-    return {equipment_tree_button: equipment_tree_button}
+    return {
+        equipment_tree_button: equipment_tree_button
+    }
 
 });

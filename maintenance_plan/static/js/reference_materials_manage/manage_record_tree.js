@@ -15,7 +15,10 @@ odoo.define('manage_record_tree', function (require) {
 
         init: function (parent, state, params) {
             this._super(parent, state, params);
-            this.record = state
+            this.record = state;
+            console.log(parent);
+            console.log(state);
+            console.log(params);
         },
 
         _renderView: function () {

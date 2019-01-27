@@ -2,44 +2,36 @@
 <template>
     <!-- plan搜索 -->
     <t t-name="plan_search_template">
-        <div class="form-inline custom_search_box" search_pannel_js_class="plan_search_pannel">
+        <div class="form-inline custom_search_box">
             <div class="container-fluid">
-                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
-                    <span class="search_label" style="float:left;">工單編號:</span>
-                    <div class="col-md-8 col-sm-12 col-xs-12">
-                        <div for="num" class="form-widget-item"/>
-                    </div>
+                <div class="col-lg-3" style="height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;width:auto;">工單編號:</span>
+                    <span for="num" class="col-xs-8"/>
                 </div>
 
-                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
-                    <span class="search_label" style="float:left;">設備編號:</span>
-                    <div class="col-md-8 col-sm-12 col-xs-12">
-                        <div for="equipment_num" class="form-widget-item"/>
-                    </div>
+                <div class="col-lg-3" style="height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;width:auto;">設備編號:</span>
+                    <span for="equipment_num" class="col-xs-8"/>
                 </div>
 
-                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
-                    <span class="search_label" style="float:left;">計劃時間:</span>
-                    <div class="col-md-8 col-sm-12 col-xs-12">
-                        <div for="plan_start_time" class="form-widget-item"/>
-                    </div>
+                <div class="col-lg-3" style="height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;width:auto;">計劃時間:</span>
+                    <span for="plan_start_time" class="col-xs-8"/>
                 </div>
 
-                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
-                    <div class="form-widget-item col-md-12 col-sm-12 col-xs-12">
-                        <button type="button" class="btn btn-primary search_extend_apply">
-                            搜索
-                        </button>
-                        <button type="button" class="btn btn-default search_extend_reset">
-                            重置
-                        </button>
-                        <button type="button" class="btn layui-btn-sm btn-primary put_in_excel">
-                            導入
-                        </button>
-                        <form style="display:none" action="">
-                            <input type="file" name="file" value=""/>
-                        </form>
-                    </div>
+                <div class="col-lg-3" style="height:40px; line-height:40px;">
+                    <button type="button" class="btn btn-primary search_extend_apply">
+                        搜索
+                    </button>
+                    <button type="button" class="btn btn-default search_extend_reset">
+                        重置
+                    </button>
+                    <button type="button" class="btn layui-btn-sm btn-primary put_in_excel">
+                        導入
+                    </button>
+                    <form style="display:none" action="">
+                        <input type="file" name="file" value=""/>
+                    </form>
                 </div>
             </div>
         </div>
@@ -47,62 +39,48 @@
 
     <!-- 工單搜索 -->
     <t t-name="work_order_search_template">
-        <div class="form-inline custom_search_box" search_pannel_js_class="plan_search_pannel">
+        <div class="form-inline custom_search_box">
             <div class="container-fluid">
-                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
-                    <span class="search_label" style="float:left;">工單編號:</span>
-                    <div class="col-md-8 col-sm-12 col-xs-12">
-                        <div for="num" class="form-widget-item"/>
-                    </div>
+                <div class="col-lg-3" style="height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;width:auto;">工單編號:</span>
+                    <span for="num" class="col-xs-8"/>
                 </div>
 
-                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
-                    <span class="search_label" style="float:left;">設備編號:</span>
-                    <div class="col-md-8 col-sm-12 col-xs-12">
-                        <div for="equipment_num" class="form-widget-item"/>
-                    </div>
+                <div class="col-lg-3" style="height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;width:auto;">設備編號:</span>
+                    <span for="equipment_num" class="col-xs-8"/>
                 </div>
 
-                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
-                    <span class="search_label" style="float:left;">狀態:</span>
-                    <div class="col-md-8 col-sm-12 col-xs-12">
-                        <div for="status" class="form-widget-item"/>
-                    </div>
+                <div class="col-lg-3" style="height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;width:auto;">狀態:</span>
+                    <span for="status" class="col-xs-8"/>
                 </div>
 
-                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
-                    <span class="search_label" style="float:left;">計劃時間:</span>
-                    <div class="col-md-8 col-sm-12 col-xs-12">
-                        <div for="plan_start_time" class="form-widget-item"/>
-                    </div>
+                <div class="col-lg-3" style="height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;width:auto;">計劃時間:</span>
+                    <span for="plan_start_time" class="col-xs-8"/>
                 </div>
 
-                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
-                    <span class="search_label" style="float:left;">實際開始時間:</span>
-                    <div class="col-md-8 col-sm-12 col-xs-12">
-                        <div for="actual_start_time" class="form-widget-item"/>
-                    </div>
+                <div class="col-lg-3" style="height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;width:auto;">實際開始時間:</span>
+                    <span for="actual_start_time" class="col-xs-8"/>
                 </div>
 
-                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
-                    <span class="search_label" style="float:left;">實際結束時間:</span>
-                    <div class="col-md-8 col-sm-12 col-xs-12">
-                        <div for="actual_end_time" class="form-widget-item"/>
-                    </div>
+                <div class="col-lg-3" style="height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;width:auto;">實際結束時間:</span>
+                    <span for="actual_end_time" class="col-xs-8"/>
                 </div>
 
-                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
-                    <div class="form-widget-item col-md-12 col-sm-12 col-xs-12">
-                        <button type="button" class="btn btn-primary search_extend_apply">
-                            搜索
-                        </button>
-                        <button type="button" class="btn btn-default search_extend_reset">
-                            重置
-                        </button>
-                        <button type="button" class="btn layui-btn-sm btn-primary export_excel">
-                            導出
-                        </button>
-                    </div>
+                <div class="col-lg-3" style="height:40px; line-height:40px;">
+                    <button type="button" class="btn btn-primary search_extend_apply">
+                        搜索
+                    </button>
+                    <button type="button" class="btn btn-default search_extend_reset">
+                        重置
+                    </button>
+                    <button type="button" class="btn layui-btn-sm btn-primary export_excel">
+                        導出
+                    </button>
                 </div>
             </div>
         </div>
@@ -110,40 +88,44 @@
 
     <!--設備搜索-->
     <t t-name="equipment_search_template">
-        <div class="form-inline custom_search_box" search_pannel_js_class="plan_search_pannel">
+        <div class="form-inline custom_search_box">
             <div class="container-fluid">
-                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
-                    <span class="search_label" style="float:left;">設備編號:</span>
-                    <div class="col-md-8 col-sm-12 col-xs-12">
-                        <div for="num" class="form-widget-item"/>
-                    </div>
+                <div class="col-lg-3" style="height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;width:auto;">設備描述:</span>
+                    <span for="description" class="col-xs-8"/>
                 </div>
 
-                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
-                    <span class="search_label" style="float:left;">設備序列號:</span>
-                    <div class="col-md-8 col-sm-12 col-xs-12">
-                        <div for="serial_number" class="form-widget-item"/>
-                    </div>
+                <div class="col-lg-3" style="height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;width:auto;">設備編號:</span>
+                    <span for="num" class="col-xs-8"/>
                 </div>
 
-                <div class="col-md-6 col-sm-12 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
-                    <div class="form-widget-item col-md-12 col-sm-12 col-xs-12">
-                        <button type="button" class="btn btn-primary equipment_search_apply">
-                            搜索
-                        </button>
-                        <button type="button" class="btn btn-default equipment_reset_search">
-                            重置
-                        </button>
-                        <button type="button" class="btn btn-warning put_in_equipment">
-                            導入設備
-                        </button>
-                        <form style="display:none" action="">
-                            <input type="file" name="file" value=""/>
-                        </form>
-                        <button type="button" class="btn btn-warning export_qr_code">
-                            導出二維碼
-                        </button>
-                    </div>
+                <div class="col-lg-3" style="height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;width:auto;">設備序列號:</span>
+                    <span for="serial_number" class="col-xs-8"/>
+                </div>
+
+                <div class="col-lg-3" style="height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;width:auto;">註冊時間:</span>
+                    <span for="create_date" class="col-xs-8"/>
+                </div>
+
+                <div class="col-lg-12" style="height:40px; line-height:40px;">
+                    <button type="button" class="btn btn-primary equipment_search_apply">
+                        搜索
+                    </button>
+                    <button type="button" class="btn btn-default equipment_reset_search">
+                        重置
+                    </button>
+                    <button type="button" class="btn btn-warning put_in_equipment">
+                        導入設備
+                    </button>
+                    <form style="display:none" action="">
+                        <input type="file" name="file" value=""/>
+                    </form>
+                    <button type="button" class="btn btn-warning export_qr_code">
+                        導出二維碼
+                    </button>
                 </div>
             </div>
         </div>
@@ -151,52 +133,40 @@
 
     <!-- 工單審批搜索 -->
     <t t-name="order_approval_search_template">
-        <div class="form-inline custom_search_box" search_pannel_js_class="plan_search_pannel">
+        <div class="form-inline custom_search_box">
             <div class="container-fluid">
-                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
-                    <span class="search_label" style="float:left;">工單編號:</span>
-                    <div class="col-md-8 col-sm-12 col-xs-12">
-                        <div for="num" class="form-widget-item"/>
-                    </div>
+                <div class="col-lg-3" style="height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;width:auto;">工單編號:</span>
+                    <span for="num" class="col-xs-8"/>
                 </div>
 
-                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
-                    <span class="search_label" style="float:left;">執行班組:</span>
-                    <div class="col-md-8 col-sm-12 col-xs-12">
-                        <div for="action_dep_id" class="form-widget-item"/>
-                    </div>
+                <div class="col-lg-3" style="height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;width:auto;">執行班組:</span>
+                    <span for="action_dep_id" class="col-xs-8"/>
                 </div>
 
-                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
-                    <span class="search_label" style="float:left;">提交人:</span>
-                    <div class="col-md-8 col-sm-12 col-xs-12">
-                        <div for="submit_user_id" class="form-widget-item"/>
-                    </div>
+                <div class="col-lg-3" style="height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;width:auto;">提交人:</span>
+                    <span for="submit_user_id" class="col-xs-8"/>
                 </div>
 
-                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
-                    <span class="search_label" style="float:left;">審批人:</span>
-                    <div class="col-md-8 col-sm-12 col-xs-12">
-                        <div for="approver_user_id" class="form-widget-item"/>
-                    </div>
+                <div class="col-lg-3" style="height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;width:auto;">審批人:</span>
+                    <span for="approver_user_id" class="col-xs-8"/>
                 </div>
 
-                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
-                    <span class="search_label" style="float:left;">狀態:</span>
-                    <div class="col-md-8 col-sm-12 col-xs-12">
-                        <div for="approver_status" class="form-widget-item"/>
-                    </div>
+                <div class="col-lg-3" style="height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;width:auto;">狀態:</span>
+                    <span for="approver_status" class="col-xs-8"/>
                 </div>
 
-                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
-                    <div class="form-widget-item col-md-12 col-sm-12 col-xs-12">
-                        <button type="button" class="btn btn-primary search_extend_apply">
-                            搜索
-                        </button>
-                        <button type="button" class="btn btn-default search_extend_reset">
-                            重置
-                        </button>
-                    </div>
+                <div class="col-lg-3" style="height:40px; line-height:40px;">
+                    <button type="button" class="btn btn-primary search_extend_apply">
+                        搜索
+                    </button>
+                    <button type="button" class="btn btn-default search_extend_reset">
+                        重置
+                    </button>
                 </div>
             </div>
         </div>
@@ -204,31 +174,25 @@
 
     <!--參考資料管理-->
     <t t-name="materials_manage_search_template">
-        <div class="form-inline custom_search_box" search_pannel_js_class="plan_search_pannel">
+        <div class="form-inline custom_search_box">
             <div class="container-fluid">
-                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
-                    <span class="search_label" style="float:left;">設備名稱:</span>
-                    <div class="col-md-8 col-sm-12 col-xs-12">
-                        <div for="description" class="form-widget-item"/>
-                    </div>
+                <div class="col-lg-3" style="height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;width:auto;">設備名稱:</span>
+                    <span for="description" class="col-xs-8"/>
                 </div>
 
-                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
-                    <span class="search_label" style="float:left;">設備型號:</span>
-                    <div class="col-md-8 col-sm-12 col-xs-12">
-                        <div for="equipment_model" class="form-widget-item"/>
-                    </div>
+                <div class="col-lg-3" style="height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;width:auto;">設備型號:</span>
+                    <span for="equipment_model" class="col-xs-8"/>
                 </div>
 
-                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
-                    <div class="form-widget-item col-md-12 col-sm-12 col-xs-12">
-                        <button type="button" class="btn btn-primary search_extend_apply">
-                            搜索
-                        </button>
-                        <button type="button" class="btn btn-default search_extend_reset">
-                            重置
-                        </button>
-                    </div>
+                <div class="col-lg-3" style="height:40px; line-height:40px;">
+                    <button type="button" class="btn btn-primary search_extend_apply">
+                        搜索
+                    </button>
+                    <button type="button" class="btn btn-default search_extend_reset">
+                        重置
+                    </button>
                 </div>
             </div>
         </div>
@@ -238,67 +202,54 @@
     <t t-name="tool_maintenance_search_template">
         <div class="form-inline custom_search_box" search_pannel_js_class="tool_search">
             <div class="container-fluid">
-                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
-                    <span class="search_label" style="float:left;">設備名稱:</span>
-                    <div class="col-md-8 col-sm-12 col-xs-12">
-                        <div for="equipment_name" class="form-widget-item"/>
-                    </div>
+                <div class="col-lg-3" style="height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;width:auto;">設備名稱:</span>
+                    <span for="equipment_name" class="col-xs-8"/>
                 </div>
 
-                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
-                    <span class="search_label" style="float:left;">設備編號:</span>
-                    <div class="col-md-8 col-sm-12 col-xs-12">
-                        <div for="equipment_num" class="form-widget-item"/>
-                    </div>
+                <div class="col-lg-3" style="height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;width:auto;">設備編號:</span>
+                    <span for="equipment_num" class="col-xs-8"/>
                 </div>
 
-                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
-                    <span class="search_label" style="float:left;">所屬班組:</span>
-                    <div class="col-md-8 col-sm-12 col-xs-12">
-                        <div for="departments" class="form-widget-item"/>
-                    </div>
+                <div class="col-lg-3" style="height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;width:auto;">所屬班組:</span>
+                    <span for="departments" class="col-xs-8"/>
                 </div>
 
-                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
-                    <span class="search_label" style="float:left;">型號:</span>
-                    <div class="col-md-8 col-sm-12 col-xs-12">
-                        <div for="model" class="form-widget-item"/>
-                    </div>
+                <div class="col-lg-3" style="height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;width:auto;">型號:</span>
+                    <span for="model" class="col-xs-8"/>
                 </div>
 
-                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
-                    <span class="search_label" style="float:left;">狀態:</span>
-                    <div class="col-md-8 col-sm-12 col-xs-12">
-                        <div for="status" class="form-widget-item"/>
-                    </div>
+                <div class="col-lg-3" style="height:40px; line-height:40px;">
+                    <span class="search_label" style="float:left;width:auto;">狀態:</span>
+                    <span for="status" class="col-xs-8"/>
                 </div>
 
-                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
-                    <div class="form-widget-item col-md-12 col-sm-12 col-xs-12">
-                        <button type="button" class="btn btn-primary search_extend_apply">
-                            搜索
-                        </button>
-                        <button type="button" class="btn btn-default search_extend_reset">
-                            重置
-                        </button>
-                    </div>
+                <div class="col-lg-3" style="height:40px; line-height:40px;">
+                    <button type="button" class="btn btn-primary search_extend_apply">
+                        搜索
+                    </button>
+                    <button type="button" class="btn btn-default search_extend_reset">
+                        重置
+                    </button>
                 </div>
 
-                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom:5px; height:40px; line-height:40px;">
-                    <div class="form-widget-item col-md-12 col-sm-12 col-xs-12">
-                        <button type="button" class="btn search_import btn-primary">
-                            導入
-                        </button>
-                        <button type="button" class="btn search_export btn-primary">
-                            導出
-                        </button>
-                        <button type="button" class="btn search_new btn-primary">
-                            新增
-                        </button>
-                        <form style="display:none" action="/other_equipment/put_in_excel" method="post" enctype="multipart/form-data">
-                            <input type="file" name="file" value=""/>
-                        </form>
-                    </div>
+                <div class="col-lg-3" style="height:40px; line-height:40px;">
+                    <button type="button" class="btn search_import btn-primary">
+                        導入
+                    </button>
+                    <button type="button" class="btn search_export btn-primary">
+                        導出
+                    </button>
+                    <button type="button" class="btn search_new btn-primary">
+                        新增
+                    </button>
+                    <form style="display:none" action="/other_equipment/put_in_excel" method="post"
+                          enctype="multipart/form-data">
+                        <input type="file" name="file" value=""/>
+                    </form>
                 </div>
             </div>
         </div>

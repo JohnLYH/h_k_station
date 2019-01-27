@@ -32,6 +32,19 @@
         </div>
     </t>
 
+    <t t-name="tem_equipment_put_in_excel">
+        <div>
+            <div style="text-align: center">
+                <button class="btn-warning btn download">下載模板</button>
+                <button class="btn-primary btn put_in">上傳導入文件</button>
+            </div>
+        </div>
+
+        <div style="text-align: center">
+            <button class="btn-default btn dialog_close">關閉</button>
+        </div>
+    </t>
+
     <!-- 導入設備回調頁面 -->
     <t t-name="tem_equipment_callback">
         <div style="text-align: center;padding-bottom: 0px">

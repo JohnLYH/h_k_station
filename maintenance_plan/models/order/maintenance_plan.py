@@ -1,6 +1,9 @@
 # !user/bin/env python3
 # -*- coding: utf-8 -*-
 # Author: Artorias
+import datetime as dt
+from dateutil.relativedelta import relativedelta
+
 from odoo import models, fields, api
 
 from ..approval_management.order_approval import STATUS as APPROVER_STATUS
@@ -17,7 +20,7 @@ class MaintenancePlan(models.Model):
     _order = 'create_date DESC'
 
     def _default_order_forms(self):
-        return [(0, 0, {'name': '對向波口測試', 'status': 'WRITE'}), (0, 0, {'name': '檢測證書', 'status': 'WRITE'})]
+        return [(0, 0, {'name': '對向波口測試', 'status': 'NOTBEGIN'}), (0, 0, {'name': '檢測證書', 'status': 'NOTBEGIN'})]
 
     num = fields.Char('工單編號')
     work_order_type = fields.Char('工單類型', required=True)
@@ -26,6 +29,9 @@ class MaintenancePlan(models.Model):
     equipment_id = fields.Many2one('maintenance_plan.equipment', string='設備', required=True)
     equipment_num = fields.Char('設備編號', compute='_com_equipment', store=True)
     equipment_serial_number = fields.Char('設備序列號')  # 因設備序列號會變，故在此記錄生成工單時的瞬時設備序列號
+    equipment_type_id = fields.Char(string='設備類別', compute='_com_equipment')
+    medol = fields.Char(string='設備型號', compute='_com_equipment')
+    description = fields.Char(string='設備描述', compute='_com_equipment')
     plan_start_time = fields.Date('建議時間(開始)', required=True)
     plan_end_time = fields.Date('建議時間(結束)', required=True)
     display_plan_time = fields.Char('建議時間', compute='_com_plan_time', store=True)
@@ -35,6 +41,7 @@ class MaintenancePlan(models.Model):
     actual_start_time = fields.Datetime('實際開始時間')
     actual_end_time = fields.Datetime('實際結束時間')
     status = fields.Selection(STATUS, string='狀態')
+    is_overdue = fields.Selection([('yes', '是'), ('no', '否')], string='是否逾期', default='no')
     executor_id = fields.Many2one('res.users', string='執行人')  # 執行人一旦開始填表，則不可更改，執行人只能在執行班組中
     # 審批關聯
     order_approval_ids = fields.One2many('maintenance_plan.order.approval', 'work_order_id', string='審批')
@@ -50,6 +57,11 @@ class MaintenancePlan(models.Model):
 
     @api.model
     def create(self, vals):
+        # 給超過當前時間仍然未完成的工單標記逾期
+        now_day = dt.datetime.now() + relativedelta(hours=8)
+        if (dt.datetime.strptime(vals['plan_end_time'].replace('/', '-'), '%Y-%m-%d') - now_day < dt.timedelta(0) and
+                vals.get('status', None) != 'closed'):
+            vals['is_overdue'] = 'yes'
         serial_number = self.env['maintenance_plan.equipment'].browse(vals['equipment_id']).serial_number
         vals['equipment_serial_number'] = serial_number
         return super().create(vals)
@@ -64,8 +76,8 @@ class MaintenancePlan(models.Model):
             # 最後審批的記錄，可能為空記錄
             last_approver_approver = approver_approver_ids[-1] if len(approver_approver_ids) > 0 else None
             self.approver_status = last_approver_approver.to_status if last_approver_approver is not None else None
-            self.submit_user_id = last_submit_approver.executer_id
-            self.approver_user_id = last_approver_approver.executer_id if last_approver_approver is not None else None
+            self.submit_user_id = last_submit_approver.execute_user_id
+            self.approver_user_id = last_approver_approver.approver_user_id if last_approver_approver is not None else None
             self.last_submit_date = last_submit_approver.create_date
             self.last_approver_date = last_approver_approver.create_date if last_approver_approver is not None else None
 
@@ -74,6 +86,9 @@ class MaintenancePlan(models.Model):
     def _com_equipment(self):
         if len(self.equipment_id) != 0:
             self.equipment_num = self.equipment_id.num
+            self.equipment_type_id = self.equipment_id.equipment_type_id.name
+            self.medol = self.equipment_id.equipment_model.equipment_model
+            self.description = self.equipment_id.description
 
     @api.one
     @api.depends('plan_start_time', 'plan_end_time')
@@ -146,3 +161,13 @@ class MaintenancePlan(models.Model):
             'status': 'be_executed'
         })
         return
+
+    def cron_order_check_overdue(self):
+        '''
+        定时检查工單逾期
+        :return:
+        '''
+        now_day = dt.datetime.strftime(dt.datetime.now() + relativedelta(hours=8), '%Y-%m-%d')
+        # 給超過當前時間仍然未完成的工單標記逾期
+        self.search([('is_overdue', '!=', 'yes'), ('plan_end_time', '<', now_day), ('status', '=', 'closed')]) \
+            .write({'is_overdue': 'yes'})

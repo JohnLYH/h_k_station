@@ -290,26 +290,26 @@ class EmployeesGet(models.Model):
         # 新建賬號發送郵件的時候發送郵件
         receive_name = ''  # 收件人的人名
         sender = 'businessempire@163.com'  # 发送人的邮箱
-        # receiver = 'merchantfield@163.com'  # 接收人的邮箱 是list
+        receiver = 'merchantfield@163.com'  # 接收人的邮箱 是list
         subject = '賬號信息詳情'  # 标题
-        # email_name = '賬號信息詳情'  # 邮箱的标题
-        # smtpserver = 'smtp.163.com'  # 邮箱的server
-        # username = 'businessempire@163.com'  # 发送人的邮箱
-        # password = '57624530asd'  # 发送人的授权码,不是密码
+        email_name = '賬號信息詳情'  # 邮箱的标题
+        smtpserver = 'smtp.163.com'  # 邮箱的server
+        username = 'businessempire@163.com'  # 发送人的邮箱
+        password = '57624530asd'  # 发送人的授权码,不是密码
         info = '''
                         管理員已為您開通MTR移動管理應用，賬號：%s，初始密碼：123456，APP下載地址：https://pro.modao.cc/app/wtl9bDa7gySi56dReeSDeH9IhnXSHko，
                         管理後台地址：https://pro.modao.cc/app/XsU5ZiLTlpyAoAV59PHOPQpC1QdVKo6，
                         請盡快登錄修改密碼。
                         ''' % self.login
-        # msg = MIMEText(info, 'plain', 'utf-8')  # 中文需参数‘utf-8'，单字节字符不需要
-        # msg['Subject'] = Header(subject, 'utf-8')  # 标题
-        # msg['From'] = '%s<merchantfield@163.com>' % email_name
-        # msg['To'] = 'merchantfield@163.com'
-        # smtp = smtplib.SMTP()
-        # smtp.connect(smtpserver, 25)
-        # smtp.login(username, password)
-        # smtp.sendmail(sender, [receiver], msg.as_string())
-        # smtp.quit()  # 退出
+        msg = MIMEText(info, 'plain', 'utf-8')  # 中文需参数‘utf-8'，单字节字符不需要
+        msg['Subject'] = Header(subject, 'utf-8')  # 标题
+        msg['From'] = '%s<merchantfield@163.com>' % email_name
+        msg['To'] = 'merchantfield@163.com'
+        smtp = smtplib.SMTP()
+        smtp.connect(smtpserver, 25)
+        smtp.login(username, password)
+        smtp.sendmail(sender, [receiver], msg.as_string())
+        smtp.quit()  # 退出
         rec = self.env['user.department'].search([('id', '=', self.department_list)])  # 獲取部門的記錄
         lis_rec = rec.users.ids  # 獲取當前部門下面的人員id
         lis_rec.append(self.id)
@@ -338,6 +338,11 @@ class EmployeesGet(models.Model):
             record = self.env['user.department'].create(
                 {'name': kwargs.get('value'), 'parent_id': kwargs.get('parent_id')[-1]})
         return record.id
+        date_int = max(self.env['user.department'].search([]).ids)
+        self.env['user.department'].create({
+            'name': kwargs['value'], 'parent_id': kwargs['parent_id']
+        })
+        return date_int + 1
 
     # 删除tree数据
     @api.model

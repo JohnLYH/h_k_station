@@ -10,15 +10,15 @@ class Department(models.Model):
     _name = 'user.department'
     _rec_name = 'name'
     _description = '部門信息'
-    _order = 'parent_order desc, department_order'
+    # _order = 'parent_order desc, department_order'
     _parent_store = True
-    _parent_order = 'department_order'
+    # _parent_order = 'department_order'
 
     name = fields.Char('部门名称', readonly=True)
     department_order = fields.Integer('部门编号', readonly=True)
     parent_order = fields.Integer('父部门编号', readonly=True)
     department_hierarchy = fields.Integer(string='部门层级')  # 用于计算
-    parent_id = fields.Many2one('user.department', string='父部门', ondelete='cascade')
+    parent_id = fields.Many2one('user.department', string='父部门')
     child_ids = fields.One2many('user.department', 'parent_id', string='子部门')
     parent_left = fields.Integer(index=True)
     parent_right = fields.Integer(index=True)

@@ -34,10 +34,13 @@
         'views/maintenance_plan/work_order_view.xml',
         'views/equipment/equipment_view.xml',
         'views/equipment/equipment_type_view.xml',
+        'views/equipment/equipment_serial_number.xml',
         'views/other_equipment/tool_management.xml',
         'views/menu.xml',
         'views/inventory_management/inventory.xml',
         'views/inventory_management/inventory_export.xml',
+        # 定時任務
+        'data/cron/order_check_overdue.xml'
     ],
     # only loaded in demonstration mode
     'demo': [
