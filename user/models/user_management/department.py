@@ -131,6 +131,7 @@ class Department(models.Model):
     @api.model
     def get_default_department_edit(self, **kwargs):
         parent_id = self.env['res.users'].search([('id', '=', kwargs.get('self_id'))]).depertment_many.id
+        del lis_departmnet_id[:]
         lis_record = self.get_parent(parent_id)
 
         return lis_record[::-1]
